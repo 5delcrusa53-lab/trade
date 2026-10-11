@@ -224,8 +224,8 @@ main{padding:12px 16px calc(84px + env(safe-area-inset-bottom,0px));max-width:76
 .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:.86rem}
 
 /* barre d'onglets */
-.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
-.tabbar button{border:0;background:none;display:grid;justify-items:center;gap:2px;padding:4px 0;font-size:.66rem;color:var(--muted);letter-spacing:.02em;position:relative}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(7,1fr);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabbar button{border:0;background:none;display:grid;justify-items:center;gap:2px;padding:4px 0;font-size:.6rem;min-width:0;overflow:hidden;color:var(--muted);letter-spacing:.02em;position:relative}
 .tabbar svg{width:22px;height:22px}
 .tabbar button[aria-selected="true"]{color:var(--accent)}
 .tabbar .dot{position:absolute;top:2px;left:calc(50% + 8px);width:8px;height:8px;border-radius:50%;background:var(--short)}
@@ -346,12 +346,17 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
 .q-lab{font-size:.78rem;color:var(--muted);letter-spacing:.03em}
 #bQsl,#bQtp{text-transform:none}
 
+/* ---------- nouveaux coins ---------- */
+.n-soc{display:flex;flex-wrap:wrap;gap:6px}
+.n-soc .chip{white-space:normal}
+#newSrc b.pos{color:var(--long)} #newSrc b.neg{color:var(--short)}
+
 </style>
 </head>
 <body>
 <header class="top">
   <div class="top-row meme-only">
-    <span class="pair" style="cursor:default;white-space:nowrap">Radar mèmes</span>
+    <span class="pair" id="memeTitle" style="cursor:default;white-space:nowrap">Radar mèmes</span>
     <div class="px"><div class="px-now" style="font-size:1rem">Solana</div><div class="px-sub">temps réel</div></div>
   </div>
   <div class="top-row futures-only">
@@ -533,6 +538,33 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
     </div>
   </section>
 
+  <!-- ===== NOUVEAUX COINS ===== -->
+  <section class="tab" id="tab-new" hidden>
+    <div class="card" id="autoCard">
+      <h2>Mode auto <span class="sp" id="autoState"></span></h2>
+      <div id="autoBody"></div>
+    </div>
+    <p class="note" id="newSrc" style="margin:0"></p>
+    <div class="seg wide" id="newFilter" role="group" aria-label="Filtre">
+      <button data-f="all">Tous <span>0</span></button><button data-f="cand">Candidats <span>0</span></button><button data-f="reject">Rejetés <span>0</span></button>
+    </div>
+    <div class="m-list" id="newList"></div>
+    <div class="card">
+      <h2>Réglages du mode auto</h2>
+      <div class="form">
+        <div class="field"><label for="aScore">Score minimum pour entrer</label><input id="aScore" type="number" inputmode="numeric" step="5"></div>
+        <div class="field"><label for="aMinAge">Âge minimum du coin (s)</label><input id="aMinAge" type="number" inputmode="numeric" step="10"><span class="hint">Laisse passer la vague des snipers</span></div>
+        <div class="field"><label for="aAge">Âge maximum du coin (min)</label><input id="aAge" type="number" inputmode="numeric" step="1"></div>
+        <div class="field"><label for="aHour">Entrées maximum par heure</label><input id="aHour" type="number" inputmode="numeric" step="1"></div>
+        <div class="field"><label for="aCool">Pause après une perte (min)</label><input id="aCool" type="number" inputmode="numeric" step="1"></div>
+      </div>
+      <label class="toggle"><span>Exiger un lien X vérifié<small>Tweet ou compte existant, pas copié d'un autre coin</small></span><input type="checkbox" id="aReqX"></label>
+      <label class="toggle"><span>Entrer sur les nouveaux coins<small>Coins sortis il y a moins de 20 min</small></span><input type="checkbox" id="aNew"></label>
+      <label class="toggle"><span>Entrer aussi sur les « intéressants » du radar</span><input type="checkbox" id="aRadar"></label>
+      <p class="note">Comment le score se calcule : part du créateur au lancement, lien X vérifié (et s'il parle du coin), Telegram et site, nombre de traders, achats contre ventes, acheteurs organiques, historique du créateur, concentration des portefeuilles. Un seul signal rouge (copie de lien X, créateur en série, mint ou freeze actif, coin signalé suspect) rejette le coin. Avant chaque achat, le bot refait ses propres contrôles : test de revente, coût d'un aller-retour, plafonds.</p>
+    </div>
+  </section>
+
   <!-- ===== STATS ===== -->
   <section class="tab" id="tab-stats" hidden>
     <div class="card">
@@ -555,6 +587,7 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
     <div class="card" id="appCard">
       <h2>Application</h2>
       <div id="appBody"><p class="note" style="margin:0">Vérification…</p></div>
+      <div id="appDiag"></div>
     </div>
     <div class="card">
       <h2>Plateforme</h2>
@@ -593,6 +626,7 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
   <button role="tab" data-tab="pos" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18l5-6 4 3 7-9"/><path d="M15 6h5v5"/></svg>Position<span class="dot" id="posDot" hidden></span></button>
   <button role="tab" data-tab="scan" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Scanner</button>
   <button role="tab" data-tab="meme" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.2 1-3.6 2.2-4.8.3 1.6 1.1 2.6 2.3 3 .2-3 .5-5.2.5-8.2z"/></svg>Mèmes<span class="cnt" id="memeDot" hidden></span></button>
+  <button role="tab" data-tab="new" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg>Nouveaux<span class="cnt" id="newDot" hidden></span></button>
   <button role="tab" data-tab="stats" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Stats</button>
   <button role="tab" data-tab="set" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Réglages</button>
 </nav>
@@ -1515,7 +1549,8 @@ function MemeRadar(h) {
         if (m.txType === 'create') {
           let dev = m.initialBuy ? +m.initialBuy / 1e9 * 100 : null;
           if (dev != null && dev > 100) dev = dev / 1e6;
-          add(m.mint, { source: 'pump.fun', name: m.name, symbol: m.symbol, created: now(), devBuyPct: dev, creator: m.traderPublicKey, launchpad: m.pool === 'bonk' ? 'letsbonk' : 'pump.fun' });
+          const nt = add(m.mint, { source: 'pump.fun', name: m.name, symbol: m.symbol, created: now(), devBuyPct: dev, creator: m.traderPublicKey, launchpad: m.pool === 'bonk' ? 'letsbonk' : 'pump.fun', uri: m.uri, mcSol0: +m.marketCapSol || null });
+          if (nt && h.onNew) { try { h.onNew(nt); } catch {} }
         } else if (/migrat/i.test(m.txType || '') || m.pool === 'pump-amm') {
           add(m.mint, { source: 'migration', migrated: true });
         }
@@ -1673,6 +1708,11 @@ function MemeRadar(h) {
       analyze(t);
     }
     setTimeout(secWorker, R.secQ.length ? 1500 : 2500);
+  }
+  function secureNow(mint) {
+    const t = R.tokens.get(mint);
+    if (!t || t.sec || t.secQueued) return;
+    t.secQueued = true; R.secQ.unshift(t);
   }
   function queueSec(t) {
     if (t.secQueued) return;
@@ -1984,6 +2024,7 @@ function MemeRadar(h) {
       ${(t.fails || []).length ? `<h3>Ce qui l'écarte</h3><ul class="m-why bad">${t.fails.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
       ${(t.risks || []).length ? `<h3>Risques</h3><ul class="m-why warn">${t.risks.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
       <h3>Contrôles de sécurité ${s ? '<small class="muted">(' + esc(s.src) + ')</small>' : ''}</h3><ul class="m-checks">${checks}</ul>
+      ${h.socialHtml ? h.socialHtml(t) : ''}
       <h3>Historique du coin</h3>
       <p class="note" id="mdLife" style="margin:0 0 8px">${esc(lifeText(t))}</p>
       <canvas class="m-chart" id="mdChart" aria-label="Graphique du coin"></canvas>
@@ -2038,7 +2079,7 @@ function MemeRadar(h) {
     const t = add(mint, { source: 'wallet' });
     if (t) t.mktAt = 0;
   }
-  return { start, render, badge, bindUI, R, track, get: mint => R.tokens.get(mint), getCfg: () => cfg, openDetail, life, lifeText, chartData, supplyOf };
+  return { start, render, badge, bindUI, R, track, get: mint => R.tokens.get(mint), getCfg: () => cfg, openDetail, life, lifeText, chartData, supplyOf, secureNow, demo: () => R.demo, addToken: (mint, info) => add(mint, info) };
 }
 if (typeof module !== 'undefined') module.exports = MemeRadar;
 
@@ -3114,7 +3155,7 @@ function TradeBot(h, radar, jup, tr) {
       if (t.flaggedAt && now - t.flaggedAt > 4 * 60000) continue;
       B.props.unshift({ mint: t.mint, sym: t.symbol || short(t.mint), score: t.score, t: now });
       radar.life(t.mint).catch(() => {});
-      h.ask(`Le bot propose : rejoindre ${t.symbol || 'ce jeton'} ? (score ${t.score})`);
+      if (!(h.autoOn && h.autoOn())) h.ask(`Le bot propose : rejoindre ${t.symbol || 'ce jeton'} ? (score ${t.score})`);
     }
     B.props = B.props.slice(0, 5);
   }
@@ -3380,9 +3421,481 @@ function TradeBot(h, radar, jup, tr) {
     bindUI(); render();
     setTimeout(loop, 2000);
   }
-  return { start, render, detailHtml, unlocked: () => !!kp, openCount: () => openPos().length, S, _test: { decide, curV, pushHist, b58enc, b58dec } };
+  async function autoJoin(mint, sol, why) {
+    try { return await join(mint, sol, why); }
+    catch (e) { log(`Entrée auto refusée sur ${symOf(mint)} : ${e.message}`, 'warn'); throw e; }
+  }
+  return { start, render, detailHtml, unlocked: () => !!kp, openCount: () => openPos().length, S,
+    autoJoin, dayLossHit: () => day().pnl <= -S.cfg.dayLoss, lastClosed: () => S.hist[0] || null, cfg: () => S.cfg, hasWallet: () => !!S.pub,
+    traded: mint => !!(S.pos[mint] && S.pos[mint].state !== 'closed') || !!(S.ignored[mint] && Date.now() - S.ignored[mint] < 2 * 3600e3), logMsg: (m, l) => log(m, l), _test: { decide, curV, pushHist, b58enc, b58dec } };
 }
 if (typeof module !== 'undefined') module.exports = TradeBot;
+
+/* ================= NOUVEAUX COINS + MODE AUTO =================
+   Les coins qui sortent à la seconde (Pump.fun, plus la liste « récents » de Jupiter), analysés avant toute entrée :
+   créateur, liens déclarés, vérification du lien X (le tweet ou le compte existe-t-il, parle-t-il du coin,
+   le lien a-t-il déjà servi à un autre coin), activité réelle (traders, achats/ventes, acheteurs organiques).
+   Le mode auto fait entrer le bot seul sur les meilleurs candidats ; les sorties restent gérées par le bot. */
+
+/* Vérification d'un lien X via l'oEmbed public, dans une iframe isolée (aucun accès à la page ni à la clé du bot) */
+const XCheck = (() => {
+  let frame = null, ready = null, seq = 0, last = 0;
+  const waits = new Map(), cache = new Map();
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  function ensure() {
+    if (ready) return ready;
+    ready = new Promise(res => {
+      frame = document.createElement('iframe');
+      frame.setAttribute('sandbox', 'allow-scripts');
+      frame.setAttribute('aria-hidden', 'true');
+      frame.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden';
+      frame.srcdoc = '<!doctype html><scr' + 'ipt>addEventListener("message",function(e){var d=e.data||{};if(!d.id)return;var done=false,cb="cb"+d.id,hosts=["https://publish.x.com","https://publish.twitter.com"],i=0;'
+        + 'window[cb]=function(r){done=true;parent.postMessage({id:d.id,ok:true,r:r},"*")};'
+        + 'function go(){if(done)return;if(i>=hosts.length){parent.postMessage({id:d.id,ok:false},"*");return}var s=document.createElement("script");'
+        + 's.src=hosts[i++]+"/oembed?omit_script=true&dnt=true&url="+encodeURIComponent(d.url)+"&callback="+cb;s.onerror=go;document.head.appendChild(s)}'
+        + 'go();setTimeout(function(){if(!done)parent.postMessage({id:d.id,ok:false,timeout:true},"*")},9000)});</' + 'script>';
+      addEventListener('message', e => {
+        if (!frame || e.source !== frame.contentWindow) return;
+        const w = waits.get(e.data && e.data.id);
+        if (w) { waits.delete(e.data.id); w(e.data); }
+      });
+      frame.onload = () => res();
+      document.body.appendChild(frame);
+    });
+    return ready;
+  }
+  function parse(r) {
+    if (!r || !r.html) return { ok: !!r, author: r && r.author_name, handle: r && r.author_url ? r.author_url.split('/').pop() : null };
+    let text = '', date = null;
+    try {
+      const doc = new DOMParser().parseFromString(r.html, 'text/html');
+      const p = doc.querySelector('blockquote p');
+      text = p ? p.textContent.trim() : '';
+      const links = doc.querySelectorAll('blockquote a');
+      const lastA = links[links.length - 1];
+      const d = lastA ? Date.parse(lastA.textContent.trim()) : NaN;
+      date = Number.isFinite(d) ? d : null;
+    } catch {}
+    return { ok: true, author: r.author_name || null, handle: r.author_url ? r.author_url.split('/').pop() : null, text, date };
+  }
+  async function viaFetch(url) {
+    for (const host of ['https://publish.x.com', 'https://publish.twitter.com']) {
+      const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 7000);
+      try {
+        const r = await fetch(`${host}/oembed?omit_script=true&dnt=true&url=${encodeURIComponent(url)}`, { signal: ctl.signal });
+        if (r.status === 404 || r.status === 403) return { ok: false };
+        if (r.ok) return parse(await r.json());
+      } catch { /* CORS ou réseau : on passera par l'iframe */ } finally { clearTimeout(to); }
+    }
+    return null;
+  }
+  async function check(url) {
+    if (cache.has(url)) return cache.get(url);
+    const wait = Math.max(0, last + 2500 - Date.now());
+    if (wait) await sleep(wait);
+    last = Date.now();
+    let out = await viaFetch(url);
+    if (!out) {
+      await ensure();
+      const id = ++seq;
+      const r = await new Promise(res => { waits.set(id, res); frame.contentWindow.postMessage({ id, url }, '*'); });
+      out = r.ok ? parse(r.r) : { ok: r.timeout ? null : false };
+    }
+    cache.set(url, out);
+    return out;
+  }
+  return { check };
+})();
+
+function NewCoins(h, radar, bot) {
+  const fin = Number.isFinite, esc = h.esc, $ = h.$, $$ = h.$$;
+  const now = () => Date.now();
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  const n1 = x => x.toFixed(1).replace('.', ',');
+  const usd = x => !fin(x) ? '—' : MemeChart.fmtUsd(x) + ' $';
+  const pct = x => !fin(x) ? '—' : (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(0) + ' %';
+  const ageTxt = ms => { const s = Math.max(0, Math.round(ms / 1000)); return s < 60 ? s + ' s' : s < 3600 ? Math.floor(s / 60) + ' min ' + String(s % 60).padStart(2, '0') : Math.floor(s / 3600) + ' h ' + String(Math.floor(s / 60) % 60).padStart(2, '0'); };
+  const DEF = { on: false, useNew: true, useRadar: true, minScore: 65, requireX: true, maxAgeMin: 10, minAgeSec: 30, perHour: 4, cooldown: 3 };
+  let A = Object.assign({ cfg: {}, entries: [] }, h.store.get('auto', {}));
+  A.cfg = Object.assign({}, DEF, A.cfg);
+  const save = () => h.store.set('auto', { cfg: A.cfg, entries: A.entries.slice(-50) });
+  const N = { list: [], filter: 'all', metaQ: [], xQ: [], links: new Map(), busy: false, status: 'En veille', confirm: false };
+  const NEW_MAX_MIN = 20;
+
+  /* ---------- arrivée d'un coin ---------- */
+  function nc(t) {
+    if (!t.nc) t.nc = { t0: t.created || t.first || now(), status: 'scan', score: 0, why: [], risks: [], fails: [], social: {} };
+    return t.nc;
+  }
+  function onNew(t) {
+    if (radar.demo && radar.demo()) return;
+    if (N.list.includes(t)) return;
+    const c = nc(t);
+    N.list.unshift(t);
+    if (N.list.length > 160) N.list.length = 160;
+    const f = [];
+    if (!t.symbol || !t.name) f.push('Nom ou symbole vide');
+    else if (t.symbol.length > 14) f.push('Symbole anormal');
+    if (fin(t.devBuyPct) && t.devBuyPct > 10) f.push(`Le créateur s'est servi ${Math.round(t.devBuyPct)} % au lancement`);
+    c.pre = f;
+    if (f.length) { c.fails = f; c.status = 'reject'; return; }
+    if (t.uri && /^https?:\/\//i.test(t.uri)) N.metaQ.push(t);
+  }
+
+  /* ---------- liens déclarés ---------- */
+  function xLink(u) {
+    if (!u || typeof u !== 'string') return null;
+    let s = u.trim();
+    if (!/^https?:\/\//i.test(s)) { if (/^@?[A-Za-z0-9_]{1,15}$/.test(s)) s = 'https://x.com/' + s.replace('@', ''); else return null; }
+    let url; try { url = new URL(s); } catch { return null; }
+    if (!/(^|\.)(x|twitter)\.com$/i.test(url.hostname)) return null;
+    const p = url.pathname.replace(/\/+$/, '');
+    let m;
+    if ((m = p.match(/^\/([A-Za-z0-9_]{1,15})\/status(?:es)?\/(\d{5,25})/))) return { kind: 'tweet', handle: m[1], id: m[2], key: 'tw:' + m[2], url: `https://twitter.com/${m[1]}/status/${m[2]}` };
+    if ((m = p.match(/^\/i\/communities\/(\d+)/))) return { kind: 'community', id: m[1], key: 'co:' + m[1], url: `https://x.com/i/communities/${m[1]}` };
+    if ((m = p.match(/^\/([A-Za-z0-9_]{1,15})$/)) && !/^(home|search|explore|i|intent|share|hashtag|messages|notifications)$/i.test(m[1])) return { kind: 'profile', handle: m[1], key: 'pr:' + m[1].toLowerCase(), url: `https://twitter.com/${m[1]}` };
+    return { kind: 'other', key: null, url: s };
+  }
+  function setLinks(t, L) {
+    const s = nc(t).social;
+    const x = [L.twitter, L.website].map(xLink).find(v => v && v.kind !== 'other') || xLink(L.twitter);
+    if (x && !s.x) {
+      s.x = x;
+      if (x.key) {
+        const arr = N.links.get(x.key) || [];
+        if (!arr.some(e => e.mint === t.mint)) arr.push({ mint: t.mint, t0: nc(t).t0 });
+        arr.sort((a, b) => a.t0 - b.t0);
+        N.links.set(x.key, arr);
+      }
+      if (x.kind === 'tweet' || x.kind === 'profile') N.xQ.push(t);
+    }
+    if (L.telegram && /t\.me\//i.test(L.telegram)) s.tg = true;
+    if (L.website && !xLink(L.website) && /^https?:\/\//i.test(L.website)) s.web = true;
+    if (L.description) s.desc = String(L.description).slice(0, 200);
+  }
+  function copyInfo(t) {
+    const s = t.nc && t.nc.social;
+    if (!s || !s.x || !s.x.key) return { rank: 0, count: 0 };
+    const arr = N.links.get(s.x.key) || [];
+    const rank = arr.findIndex(e => e.mint === t.mint);
+    return { rank: Math.max(0, rank), count: arr.length - 1 };
+  }
+  function mentions(t, text) {
+    if (!text) return false;
+    const T = text.toLowerCase();
+    const sym = (t.symbol || '').toLowerCase().replace(/^\$/, '');
+    if (sym.length >= 2 && (T.includes('$' + sym) || new RegExp('(^|[^a-z0-9])' + sym.replace(/[^a-z0-9]/g, '') + '([^a-z0-9]|$)').test(T))) return true;
+    return (t.name || '').toLowerCase().split(/\s+/).filter(w => w.length >= 4).some(w => T.includes(w));
+  }
+  // Pour un jeton du radar (pas vu à sa sortie) : liens pris chez DexScreener
+  function ensureSocial(t) {
+    const c = nc(t);
+    if (c.socialFromPair || !t.pair || !t.pair.info) return;
+    c.socialFromPair = true;
+    const info = t.pair.info;
+    const tw = (info.socials || []).find(s => /twitter|x/i.test(s.type || s.platform || '') || /x\.com|twitter\.com/i.test(s.url || ''));
+    const web = (info.websites || []).map(w => w.url)[0];
+    const tg = (info.socials || []).find(s => /telegram/i.test(s.type || s.platform || '') || /t\.me/i.test(s.url || ''));
+    setLinks(t, { twitter: tw && (tw.url || tw.handle), website: web, telegram: tg && tg.url });
+  }
+
+  /* ---------- ouvriers : métadonnées, vérification X, données Jupiter ---------- */
+  async function metaWorker() {
+    const t = N.metaQ.shift();
+    if (t && !t.nc.metaDone && t.nc.status !== 'reject') {
+      const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 6000);
+      try {
+        const r = await fetch(t.uri, { signal: ctl.signal });
+        const j = await r.json();
+        setLinks(t, { twitter: j.twitter || (j.extensions && j.extensions.twitter), website: j.website || (j.extensions && j.extensions.website), telegram: j.telegram || (j.extensions && j.extensions.telegram), description: j.description });
+      } catch {} finally { clearTimeout(to); t.nc.metaDone = true; evaluate(t); }
+    }
+    setTimeout(metaWorker, N.metaQ.length ? 1200 : 2500);
+  }
+  async function xWorker() {
+    const t = N.xQ.shift();
+    if (t && t.nc.social.x && t.nc.social.xRes == null) {
+      try { t.nc.social.xRes = await XCheck.check(t.nc.social.x.url); } catch { t.nc.social.xRes = { ok: null }; }
+      const r = t.nc.social.xRes;
+      if (r && r.ok && t.nc.social.x.kind === 'tweet') { t.nc.social.mention = mentions(t, r.text); t.nc.social.tweetAgeH = r.date ? (now() - r.date) / 3600e3 : null; }
+      evaluate(t);
+      const el = $('#mdSocial'); if (el && el.dataset.mint === t.mint) el.outerHTML = socialHtml(t);
+    }
+    setTimeout(xWorker, N.xQ.length ? 800 : 2500);
+  }
+  function jupFields(x) {
+    const a = x.audit || {}, s5 = x.stats5m || {};
+    return { traders: s5.numTraders, buys: s5.numBuys, sells: s5.numSells, org: s5.numOrganicBuyers, ch5: s5.priceChange, holders: x.holderCount, mcap: x.mcap, liq: x.liquidity, px: x.usdPrice,
+      organic: x.organicScore, label: x.organicScoreLabel, sus: !!a.isSus, mintOff: a.mintAuthorityDisabled, freezeOff: a.freezeAuthorityDisabled, top: a.topHoldersPercentage, dev: a.devBalancePercentage, devMints: a.devMints, at: now() };
+  }
+  async function jupWorker() {
+    try {
+      const list = N.list.filter(t => t.nc.status !== 'reject' && t.nc.status !== 'old' && now() - t.nc.t0 > 12000 && now() - t.nc.t0 < NEW_MAX_MIN * 60000).slice(0, 100);
+      if (list.length && h.jup) {
+        const r = await h.jup('/tokens/v2/search?query=' + list.map(t => t.mint).join(','), 'low');
+        const by = new Map((Array.isArray(r) ? r : []).map(x => [x.id, x]));
+        for (const t of list) {
+          const x = by.get(t.mint);
+          if (!x) continue;
+          t.nc.j = jupFields(x);
+          if (!t.nc.metaDone || !t.nc.social.x) setLinks(t, { twitter: x.twitter, website: x.website, telegram: x.telegram });
+          evaluate(t);
+        }
+      }
+    } catch {}
+    setTimeout(jupWorker, 15000);
+  }
+  // Source de secours : coins récents listés par Jupiter (si le flux Pump.fun ne passe pas)
+  async function recentWorker() {
+    try {
+      if (h.jup && !(radar.R.src.pump === 'on' && N.list.length > 5)) {
+        const r = await h.jup('/tokens/v2/recent', 'low');
+        for (const x of (Array.isArray(r) ? r : []).slice(0, 30)) {
+          const born = Date.parse((x.firstPool && x.firstPool.createdAt) || x.createdAt || '');
+          if (!fin(born) || now() - born > 15 * 60000) continue;
+          const t = radar.addToken(x.id, { source: 'Jupiter', name: x.name, symbol: x.symbol, created: born, icon: x.icon });
+          if (!t || N.list.includes(t)) continue;
+          onNew(t);
+          t.nc.metaDone = true; t.nc.j = jupFields(x);
+          setLinks(t, { twitter: x.twitter, website: x.website, telegram: x.telegram });
+          evaluate(t);
+        }
+        N.list.sort((a, b) => b.nc.t0 - a.nc.t0);
+      }
+    } catch {}
+    setTimeout(recentWorker, 30000);
+  }
+
+  /* ---------- analyse et score ---------- */
+  function xVerified(t) {
+    const s = t.nc && t.nc.social;
+    if (!s || !s.x) return false;
+    if (copyInfo(t).rank > 0) return false;
+    if (s.x.kind === 'community') return true;
+    return !!(s.xRes && s.xRes.ok);
+  }
+  function evaluate(t) {
+    const c = nc(t), s = c.social, j = c.j, age = (now() - c.t0) / 1000;
+    if (c.status === 'bought') return;
+    let sc = 20;
+    const why = [], risks = [], fails = [...(c.pre || []), ...(c.fails || []).filter(f => f.startsWith('Entrée'))];
+    if (fin(t.devBuyPct)) {
+      if (t.devBuyPct > 10) fails.push(`Le créateur s'est servi ${Math.round(t.devBuyPct)} % au lancement`);
+      else if (t.devBuyPct <= 3) { sc += 8; why.push(`Le créateur n'a pris que ${n1(t.devBuyPct)} % au lancement`); }
+      else if (t.devBuyPct <= 6) sc += 3;
+      else risks.push(`Le créateur a pris ${n1(t.devBuyPct)} % au lancement`);
+    }
+    if (s.x) {
+      sc += 8;
+      const cp = copyInfo(t), r = s.xRes;
+      if (s.x.kind === 'tweet' && r) {
+        if (r.ok) {
+          sc += 14;
+          why.push(`Tweet vérifié de @${r.handle || s.x.handle}${r.date ? ' (' + new Date(r.date).toLocaleDateString('fr-FR') + ')' : ''}${r.text ? ' : « ' + r.text.slice(0, 90) + (r.text.length > 90 ? '…' : '') + ' »' : ''}`);
+          if (s.mention) { sc += 8; why.push('Le tweet parle bien de ce coin'); }
+          else risks.push('Le tweet ne cite ni le nom ni le ticker : coin opportuniste sur un sujet du moment');
+          if (fin(s.tweetAgeH) && s.tweetAgeH <= 48) sc += 4;
+          else if (fin(s.tweetAgeH) && s.tweetAgeH > 24 * 30) risks.push('Tweet ancien (plus d\'un mois)');
+        } else if (r.ok === false) { sc -= 12; risks.push('Le tweet lié est introuvable ou supprimé'); }
+      } else if (s.x.kind === 'profile' && r) {
+        if (r.ok) { sc += 8; why.push(`Compte X @${s.x.handle} trouvé`); }
+        else if (r.ok === false) { sc -= 10; risks.push(`Compte X @${s.x.handle} introuvable`); }
+      } else if (s.x.kind === 'community') { sc += 4; why.push('Communauté X liée'); }
+      if (cp.rank > 0) fails.push('Lien X déjà utilisé par un coin sorti avant lui : copie');
+      else if (cp.count > 0) risks.push(`${cp.count} coin${cp.count > 1 ? 's ont' : ' a'} copié son lien X après lui`);
+    } else if (c.metaDone) { sc -= 8; risks.push('Aucun lien X déclaré'); }
+    if (s.tg) sc += 3;
+    if (s.web) sc += 3;
+    if (s.desc) sc += 2;
+    if (j) {
+      if (j.sus) fails.push('Signalé suspect par Jupiter');
+      if (j.mintOff === false) fails.push('Le créateur peut encore imprimer des jetons');
+      if (j.freezeOff === false) fails.push('Le créateur peut geler les portefeuilles');
+      if (fin(j.dev) && j.dev > 8) fails.push(`Le créateur détient encore ${Math.round(j.dev)} %`);
+      if (fin(j.devMints) && j.devMints >= 40) fails.push(`Créateur en série : ${j.devMints} coins déjà lancés`);
+      else if (fin(j.devMints) && j.devMints >= 10) { sc -= 12; risks.push(`Le créateur a déjà lancé ${j.devMints} coins`); }
+      if (fin(j.top) && j.top > radar.getCfg().maxTop10 + 10) fails.push(`Les plus gros portefeuilles détiennent ${Math.round(j.top)} %`);
+      const tr = j.traders || 0, b = j.buys || 0, sl = j.sells || 0;
+      if (tr >= 50) { sc += 15; why.push(`${tr} traders différents sur 5 min`); }
+      else if (tr >= 20) { sc += 10; why.push(`${tr} traders différents sur 5 min`); }
+      else if (age > 120 && tr < 8) { sc -= 10; risks.push('Très peu de traders'); }
+      if (fin(j.org) && j.org >= 10) { sc += 8; why.push(`${j.org} acheteurs organiques (pas des bots)`); }
+      if (b + sl >= 10) {
+        const ratio = b / Math.max(1, sl);
+        if (ratio >= 1.5) { sc += 8; why.push(`${b} achats pour ${sl} ventes`); }
+        else if (ratio < 0.8) { sc -= 15; risks.push(`Plus de ventes (${sl}) que d'achats (${b})`); }
+      }
+      if (fin(j.ch5)) { if (j.ch5 > 0 && j.ch5 < 300) sc += 5; if (j.ch5 < -30) { sc -= 20; risks.push(`Prix ${pct(j.ch5)} sur 5 min`); } }
+      if (fin(j.holders) && j.holders >= 50) sc += 5;
+      if (j.label === 'low' && tr >= 30) { sc -= 8; risks.push('Activité surtout faite par des bots'); }
+    } else if (age > 90) risks.push('Pas encore de données de trading');
+    if (t.sec && t.fails && t.fails.length && t.verdict === 'reject') fails.push(...t.fails.slice(0, 2));
+    c.score = Math.round(clamp(sc, 0, 100));
+    c.why = why; c.risks = risks; c.fails = [...new Set(fails)];
+    if (c.fails.length) c.status = 'reject';
+    else if (age > NEW_MAX_MIN * 60) c.status = 'old';
+    else if (j && c.score >= A.cfg.minScore && (!A.cfg.requireX || xVerified(t))) { c.status = 'cand'; if (radar.secureNow) radar.secureNow(t.mint); }
+    else c.status = 'scan';
+  }
+
+  /* ---------- mode auto ---------- */
+  function autoOn() { return !!A.cfg.on; }
+  async function autoTick() {
+    const c = A.cfg;
+    try {
+      if (!c.on) { N.status = 'Mode auto coupé'; return; }
+      if (N.busy) return;
+      if (!bot.unlocked()) { N.status = 'Bot verrouillé : déverrouille-le dans l\'onglet Mèmes'; return; }
+      if (bot.dayLossHit()) { c.on = false; save(); bot.logMsg('Mode auto coupé : perte du jour atteinte', 'bad'); h.notify('Mode auto coupé : perte du jour atteinte', 'short'); return; }
+      const inHour = A.entries.filter(x => now() - x < 3600e3).length;
+      if (inHour >= c.perHour) { N.status = `Limite de ${c.perHour} entrées par heure atteinte`; return; }
+      const lc = bot.lastClosed();
+      if (lc && lc.net < 0 && now() - lc.t1 < c.cooldown * 60000) { N.status = `Pause de ${c.cooldown} min après une perte`; return; }
+      if (bot.openCount() >= bot.cfg().maxPos) { N.status = 'Nombre maximum de positions atteint'; return; }
+      const cands = [];
+      if (c.useNew) for (const t of N.list) {
+        const a = (now() - t.nc.t0) / 1000;
+        if (t.nc.status === 'cand' && a >= c.minAgeSec && a <= c.maxAgeMin * 60 && !t.nc.autoTried && !bot.traded(t.mint)) cands.push({ t, score: t.nc.score, src: 'nouveau coin' });
+      }
+      if (c.useRadar) for (const t of radar.R.tokens.values()) {
+        if (t.verdict !== 'buy' || t.autoTried || bot.traded(t.mint) || (t.sources && t.sources.has('démo'))) continue;
+        if (c.requireX) { ensureSocial(t); if (!xVerified(t)) continue; }
+        cands.push({ t, score: t.score, src: 'radar' });
+      }
+      if (!cands.length) { N.status = 'En veille : aucun candidat assez solide'; return; }
+      cands.sort((a, b) => b.score - a.score);
+      const pick = cands[0], t = pick.t;
+      t.autoTried = true; if (t.nc) t.nc.autoTried = true;
+      N.busy = true; N.status = `Entrée en cours sur ${t.symbol || '?'}…`;
+      try {
+        await bot.autoJoin(t.mint, null, `Mode auto (${pick.src}, score ${pick.score})`);
+        A.entries.push(now()); save();
+        if (t.nc) t.nc.status = 'bought';
+        h.notify(`Mode auto : achat ${t.symbol || ''}`, 'long');
+      } catch (e) {
+        if (t.nc) { t.nc.fails = ['Entrée refusée : ' + e.message]; t.nc.status = 'reject'; }
+      } finally { N.busy = false; }
+    } finally { if (curVisible()) renderAuto(); }
+  }
+
+  /* ---------- rendu ---------- */
+  const curVisible = () => h.visible('new');
+  function socialHtml(t) {
+    if (!t) return '';
+    ensureSocial(t);
+    const c = nc(t), s = c.social, cp = copyInfo(t), r = s.xRes;
+    if (s.x && s.xRes == null && !N.xQ.includes(t) && (s.x.kind === 'tweet' || s.x.kind === 'profile')) N.xQ.unshift(t);
+    const li = (ok, txt) => `<li class="${ok === true ? 'ok' : ok === false ? 'ko' : 'na'}">${esc(txt)}</li>`;
+    let items = '';
+    if (!s.x) items += li(false, c.metaDone || c.socialFromPair ? 'Aucun lien X déclaré par le coin' : 'Liens du coin en cours de lecture…');
+    else if (s.x.kind === 'tweet') {
+      items += r == null ? li(null, `Tweet de @${s.x.handle} : vérification…`) : r.ok ? li(true, `Tweet de @${r.handle || s.x.handle}${r.date ? ' du ' + new Date(r.date).toLocaleDateString('fr-FR') : ''}${r.text ? ' : « ' + r.text.slice(0, 160) + ' »' : ''}`) : li(r.ok === false ? false : null, r.ok === false ? 'Le tweet lié est introuvable ou supprimé' : 'Tweet non vérifiable depuis ce navigateur');
+      if (r && r.ok) items += li(!!s.mention, s.mention ? 'Le tweet parle bien de ce coin (nom ou ticker cité)' : 'Le tweet ne cite ni le nom ni le ticker');
+    } else if (s.x.kind === 'profile') items += r == null ? li(null, `Compte @${s.x.handle} : vérification…`) : li(r.ok, r.ok ? `Compte X @${s.x.handle} trouvé` : r.ok === false ? `Compte X @${s.x.handle} introuvable` : 'Compte non vérifiable depuis ce navigateur');
+    else if (s.x.kind === 'community') items += li(null, 'Communauté X liée (contenu non lisible sans compte)');
+    if (s.x && s.x.key) items += li(cp.rank === 0, cp.rank > 0 ? 'Lien X déjà utilisé par un coin sorti avant : copie' : cp.count ? `Lien X original (${cp.count} copie${cp.count > 1 ? 's' : ''} après lui)` : 'Lien X utilisé par aucun autre coin vu');
+    items += li(s.tg ? true : null, s.tg ? 'Groupe Telegram déclaré' : 'Pas de Telegram');
+    items += li(s.web ? true : null, s.web ? 'Site web déclaré' : 'Pas de site web');
+    return `<div id="mdSocial" data-mint="${esc(t.mint)}"><h3>Réseaux et mentions</h3><ul class="m-checks">${items}</ul>
+      ${s.desc ? `<p class="note">Description : « ${esc(s.desc)} »</p>` : ''}
+      <p class="note">La recherche dans tout X demande l'API payante de X. Je vérifie les liens déclarés par le coin : le tweet ou le compte existe-t-il, parle-t-il du coin, et le lien a-t-il déjà servi à un autre coin.</p></div>`;
+  }
+  function xChip(t) {
+    const s = t.nc.social, r = s.xRes, cp = copyInfo(t);
+    if (!s.x) return t.nc.metaDone ? '<span class="chip">pas de X</span>' : '<span class="chip">X ?</span>';
+    if (cp.rank > 0) return '<span class="chip short">X copié</span>';
+    const h2 = esc(s.x.handle ? '@' + s.x.handle : 'communauté');
+    if (s.x.kind === 'community') return `<span class="chip">X ${h2}</span>`;
+    if (r == null) return `<span class="chip">X ${h2} …</span>`;
+    if (r.ok) return `<span class="chip long">X ✓ ${h2}${s.mention ? ' · cite le coin' : ''}</span>`;
+    return r.ok === false ? `<span class="chip short">X ✕ ${h2}</span>` : `<span class="chip">X ${h2} ?</span>`;
+  }
+  function card(t) {
+    const c = t.nc, j = c.j, age = now() - c.t0;
+    const st = { cand: '<span class="chip long">CANDIDAT</span>', reject: '<span class="chip short">REJETÉ</span>', bought: '<span class="chip warn">ACHETÉ</span>', old: '<span class="chip">trop vieux</span>', scan: '<span class="chip">analyse…</span>' }[c.status] || '';
+    const su = h.solUsd && h.solUsd();
+    const mc = j && fin(j.mcap) ? j.mcap : t.pair ? (t.pair.marketCap || t.pair.fdv) : (t.mcSol0 && su ? t.mcSol0 * su : NaN);
+    const list = c.status === 'reject' ? c.fails.slice(0, 2) : c.why.slice(0, 2);
+    const img = (t.pair && t.pair.info && t.pair.info.imageUrl) || t.icon;
+    return `<button class="m-card" data-nmint="${esc(t.mint)}" data-v="${c.status === 'cand' ? 'buy' : c.status === 'reject' ? 'reject' : c.status === 'bought' ? 'watch' : 'cold'}">
+      <div class="m-head"><span class="m-ava">${esc((t.symbol || '?').slice(0, 2).toUpperCase())}${img ? `<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</span>
+        <span class="m-name"><b>${esc(t.symbol || '?')}</b><small>sorti il y a ${ageTxt(age)} · ${esc((t.name || '').slice(0, 24))}</small></span>${st}</div>
+      <div class="m-kpis"><span>Cap <b>${usd(mc)}</b></span><span>Traders <b>${j && fin(j.traders) ? j.traders : '—'}</b></span><span>Achats/ventes <b>${j && fin(j.buys) ? j.buys + '/' + (j.sells || 0) : '—'}</b></span><span>Créateur <b>${fin(t.devBuyPct) ? n1(t.devBuyPct) + ' %' : '—'}</b></span></div>
+      <div class="n-soc">${xChip(t)}${c.social.tg ? '<span class="chip">Telegram</span>' : ''}${c.social.web ? '<span class="chip">site</span>' : ''}</div>
+      <div class="m-score"><span class="bar"><i style="width:${c.score}%"></i></span><span>score ${c.score}</span></div>
+      ${list.length ? `<ul class="m-why ${c.status === 'reject' ? 'bad' : ''}">${list.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+    </button>`;
+  }
+  function renderAuto() {
+    const box = $('#autoBody');
+    if (!box) return;
+    const c = A.cfg, bc = bot.cfg();
+    $('#autoState').innerHTML = c.on ? '<span class="chip long">actif</span>' : '<span class="chip">coupé</span>';
+    if (!bot.hasWallet()) { box.innerHTML = '<p class="note" style="margin:0">Crée d\'abord le wallet du bot dans l\'onglet Mèmes (carte « Bot autonome ») et alimente-le.</p>'; return; }
+    const inHour = A.entries.filter(x => now() - x < 3600e3).length;
+    const logs = (bot.S.log || []).slice(0, 6).map(x => `<div class="b-log" data-l="${x.lvl}"><span class="mono">${new Date(x.t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span><span>${esc(x.msg)}</span></div>`).join('');
+    box.innerHTML = `${c.on ? `<div class="advice" data-l="ok" style="margin:0 0 10px"><h3>Le bot entre et sort seul</h3><p>${esc(N.status)}</p></div>` : ''}
+      <div class="w-top">
+        <div class="kv"><div class="k">Mise par trade</div><div class="v">${String(bc.size).replace('.', ',')} SOL</div></div>
+        <div class="kv"><div class="k">Perte / gain</div><div class="v">−${bc.sl} % / +${bc.tp1} %</div></div>
+        <div class="kv"><div class="k">Entrées cette heure</div><div class="v">${inHour} / ${c.perHour}</div></div>
+      </div>
+      <p class="note">Positions ${bot.openCount()} / ${bc.maxPos} · arrêt automatique après ${String(bc.dayLoss).replace('.', ',')} SOL de perte dans la journée. Mise, perte et gain se règlent dans la carte du bot (onglet Mèmes).${bot.unlocked() ? '' : ' <strong>Bot verrouillé : rien ne peut se passer.</strong>'}</p>
+      <div class="row-btns">${c.on ? '<button class="btn danger" data-a="off">Couper le mode auto</button>' : '<button class="btn pri" data-a="arm">Activer le mode auto</button>'}<button class="btn" data-a="bot">Voir le bot</button></div>
+      ${N.confirm && !c.on ? `<div class="advice" data-l="warn" style="margin-top:10px"><h3>Le bot va décider seul</h3><p>Il achètera sans te demander les coins qui passent tous les contrôles (score ≥ ${c.minScore}${c.requireX ? ', lien X vérifié' : ''}), jusqu'à ${c.perHour} fois par heure, avec ${String(bc.size).replace('.', ',')} SOL par trade, et revendra seul. Les nouveaux coins sont les plus risqués : la plupart perdent tout en quelques minutes.</p>
+        <div class="row-btns"><button class="btn pri" data-a="arm-yes">Oui, mode auto</button><button class="btn" data-a="arm-no">Annuler</button></div></div>` : ''}
+      ${logs ? `<h3 class="w-h">Dernières actions du bot</h3><div class="b-logs">${logs}</div>` : ''}`;
+  }
+  function render() {
+    if (!$('#newList')) return;
+    renderAuto();
+    const cnt = { all: N.list.length, cand: 0, reject: 0 };
+    for (const t of N.list) { if (now() - t.nc.t0 > NEW_MAX_MIN * 60000 && t.nc.status !== 'bought' && t.nc.status !== 'reject') t.nc.status = 'old'; if (t.nc.status === 'cand') cnt.cand++; else if (t.nc.status === 'reject') cnt.reject++; }
+    $$('#newFilter button').forEach(b => { b.setAttribute('aria-pressed', b.dataset.f === N.filter); b.querySelector('span').textContent = cnt[b.dataset.f]; });
+    const src = radar.R.src.pump;
+    $('#newSrc').innerHTML = radar.demo && radar.demo() ? 'Mode démo : pas de vrais coins ici.' : `Flux Pump.fun : ${src === 'on' ? '<b class="pos">connecté</b>' : src === 'off' ? '<b class="neg">coupé</b> (liste de secours Jupiter toutes les 30 s)' : 'connexion…'} · ${N.list.length} coins vus`;
+    const L = N.list.filter(t => N.filter === 'all' ? t.nc.status !== 'old' : t.nc.status === N.filter).slice(0, 40);
+    $('#newList').innerHTML = L.length ? L.map(card).join('') : `<p class="note">${N.filter === 'cand' ? 'Aucun candidat pour l\'instant : la plupart des coins neufs ne passent pas les contrôles, c\'est normal.' : 'En attente des nouveaux coins…'}</p>`;
+  }
+
+  /* ---------- événements ---------- */
+  function bindUI() {
+    $('#newFilter').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { N.filter = b.dataset.f; render(); } });
+    $('#newList').addEventListener('click', e => { const b = e.target.closest('[data-nmint]'); if (b) radar.openDetail(b.dataset.nmint); });
+    $('#autoBody').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      const a = b.dataset.a;
+      if (a === 'arm') { N.confirm = true; renderAuto(); }
+      else if (a === 'arm-no') { N.confirm = false; renderAuto(); }
+      else if (a === 'arm-yes') { N.confirm = false; A.cfg.on = true; save(); bot.logMsg(`Mode auto activé (score ≥ ${A.cfg.minScore}, ${A.cfg.perHour} entrées/h max)`, 'warn'); renderAuto(); autoTick(); }
+      else if (a === 'off') { A.cfg.on = false; save(); bot.logMsg('Mode auto coupé : les positions ouvertes restent gérées par le bot', 'warn'); renderAuto(); }
+      else if (a === 'bot') h.showBot();
+    });
+    const F = [['#aScore', 'minScore', 30, 100], ['#aAge', 'maxAgeMin', 1, 120], ['#aMinAge', 'minAgeSec', 0, 600], ['#aHour', 'perHour', 1, 30], ['#aCool', 'cooldown', 0, 120]];
+    for (const [id, k, mn, mx] of F) {
+      const el = $(id); if (!el) continue;
+      el.value = A.cfg[k];
+      el.addEventListener('change', () => { const v = parseFloat(String(el.value).replace(',', '.')); if (fin(v) && v >= mn && v <= mx) { A.cfg[k] = v; save(); N.list.forEach(evaluate); render(); } else { el.value = A.cfg[k]; h.toast(`Valeur hors limites (${mn} à ${mx}).`); } });
+    }
+    for (const [id, k] of [['#aReqX', 'requireX'], ['#aNew', 'useNew'], ['#aRadar', 'useRadar']]) {
+      const el = $(id); if (!el) continue;
+      el.checked = !!A.cfg[k];
+      el.addEventListener('change', () => { A.cfg[k] = el.checked; save(); N.list.forEach(evaluate); render(); });
+    }
+  }
+  function start() {
+    bindUI();
+    metaWorker(); xWorker();
+    setTimeout(jupWorker, 8000);
+    setTimeout(recentWorker, 20000);
+    setInterval(() => { for (const t of N.list.slice(0, 60)) if (t.nc.status === 'scan' || t.nc.status === 'cand') evaluate(t); }, 5000);
+    setInterval(autoTick, 4000);
+    setInterval(() => { if (curVisible()) render(); }, 1500);
+  }
+  return { start, render, onNew, socialHtml, autoOn, _test: { xLink, mentions, evaluate, copyInfo, xVerified, N, A } };
+}
+if (typeof module !== 'undefined') module.exports = { NewCoins, XCheck };
 
 /* ================= APPLICATION ================= */
 (() => {
@@ -4322,7 +4835,9 @@ if (typeof module !== 'undefined') module.exports = TradeBot;
   /* ---------- navigation ---------- */
   function showTab(t) {
     curTab = t;
-    document.body.classList.toggle('meme', t === 'meme');
+    document.body.classList.toggle('meme', t === 'meme' || t === 'new');
+    { const mt = $('#memeTitle'); if (mt) mt.textContent = t === 'new' ? 'Nouveaux coins' : 'Radar mèmes'; }
+    if (t === 'new') setTimeout(() => newCoins && newCoins.render(), 0);
     $$('.tab').forEach(s => { s.hidden = s.id !== 'tab-' + t; });
     if (t === 'meme') setTimeout(() => { radar.render(); trader.render(); bot.render(); }, 0);
     $$('.tabbar button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
@@ -4330,13 +4845,13 @@ if (typeof module !== 'undefined') module.exports = TradeBot;
     if (t === 'scan') { renderScan(!!st.scanAt); if (!st.scanAt || Date.now() - st.scanAt > 30000) scan(); }
     if (t === 'stats') { renderCalib(); renderJournal(); }
     if (t === 'pos') { if (!pos) fillForm(null); renderPos(); }
-    if (t === 'set') { renderSettings(); renderDiag(); renderApp(); }
+    if (t === 'set') { renderSettings(); renderDiag(); renderApp(); appDiag(); }
     window.scrollTo(0, 0);
   }
   $$('.tabbar button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
 
   // radar mèmes + trading via wallet + bot autonome
-  let trader = null, bot = null;
+  let trader = null, bot = null, newCoins = null;
   const inFrame = (() => { try { return window.top !== window.self; } catch { return true; } })();
   const buzz = p => { if (set.vibrate && navigator.vibrate) try { navigator.vibrate(p); } catch {} };
   const jup = JupClient(() => (trader ? trader.jupKey() : ''));
@@ -4346,6 +4861,8 @@ if (typeof module !== 'undefined') module.exports = TradeBot;
     jup: (p, prio) => jup.get(p, prio),
     rpc: (m, p) => rpcPool.call(m, p),
     tradeHtml: t => (trader ? trader.detailHtml(t) : '') + (bot ? bot.detailHtml(t) : ''),
+    onNew: t => { if (newCoins) newCoins.onNew(t); },
+    socialHtml: t => (newCoins ? newCoins.socialHtml(t) : ''),
     alert: msg => { toast('Mème · ' + msg, 'long'); beep(1); if (set.vibrate && navigator.vibrate) try { navigator.vibrate([80, 40, 80, 40, 160]); } catch {} }
   });
   radar.bindUI();
@@ -4359,9 +4876,19 @@ if (typeof module !== 'undefined') module.exports = TradeBot;
     $, $$, esc, store, log, toast, inFrame,
     visible: () => curTab === 'meme' && document.visibilityState === 'visible',
     notify: (msg, cls) => { toast(msg, cls); beep(cls === 'short' ? -1 : 1); buzz(cls === 'short' ? [300, 80, 300] : [120, 60, 120]); },
-    ask: msg => { toast(msg, 'long'); beep(1); buzz([80, 40, 80, 40, 160]); }
+    ask: msg => { toast(msg, 'long'); beep(1); buzz([80, 40, 80, 40, 160]); },
+    autoOn: () => !!(newCoins && newCoins.autoOn())
   }, radar, jup, trader);
   bot.start();
+  newCoins = NewCoins({
+    $, $$, esc, store, toast,
+    jup: (p, prio) => jup.get(p, prio),
+    solUsd: () => trader.solUsd(),
+    visible: tab => curTab === tab && document.visibilityState === 'visible',
+    notify: (msg, cls) => { toast(msg, cls); beep(cls === 'short' ? -1 : 1); buzz(cls === 'short' ? [300, 80, 300] : [120, 60, 120]); },
+    showBot: () => { showTab('meme'); setTimeout(() => { const el = $('#botCard'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
+  }, radar, bot);
+  newCoins.start();
   let wTick = 0;
   setInterval(() => {
     if (curTab === 'meme' && $('#memeSheet').hidden && $('#tradeSheet').hidden) radar.render();
@@ -4476,6 +5003,23 @@ if (typeof module !== 'undefined') module.exports = TradeBot;
     if (installEvt) { box.innerHTML = '<div class="row-btns" style="margin:0"><button class="btn pri" id="appInstall">Installer Vigie Scalp</button></div>' + keyNote; $('#appInstall').onclick = async () => { const ev = installEvt; installEvt = null; try { ev.prompt(); const r = await ev.userChoice; if (r && r.outcome !== 'accepted') toast('Installation annulée'); } catch { toast('Installation impossible ici'); } renderApp(); }; return; }
     box.innerHTML = '<p class="note" style="margin:0">Dans Chrome : menu ⋮ puis « Installer l\'application ». Si Chrome répond que c\'est déjà installé alors que non, c\'est que l\'appli est dans le dossier d\'une autre appli installée sur le même site : mets-la dans son propre dépôt.</p>' + keyNote;
   }
+  // Diagnostic : ce que Chrome voit (autres applis installées sur la même adresse)
+  async function appDiag() {
+    const box = $('#appDiag');
+    if (!box || !hasManifest || inFrame) return;
+    const ours = new URL('sw.js', location.href).href, here = location.href.split('#')[0];
+    let regs = [], man = null;
+    try { regs = (await navigator.serviceWorker.getRegistrations()).map(r => ({ scope: r.scope, script: ((r.active || r.waiting || r.installing) || {}).scriptURL || '' })); } catch {}
+    try { const l = document.querySelector('link[rel="manifest"]'); const j = await (await fetch(l.href, { cache: 'no-store' })).json(); man = { id: new URL(j.id || j.start_url || './', location.origin).href, scope: new URL(j.scope || './', l.href).href, name: j.name }; } catch {}
+    const others = regs.filter(r => r.script !== ours);
+    const covering = others.filter(r => here.startsWith(r.scope));
+    const li = (a, b) => `<div class="j-row" style="grid-template-columns:minmax(0,1fr)"><div class="j-mid"><div>${esc(a)}</div><div class="mono" style="overflow-wrap:anywhere">${esc(b)}</div></div></div>`;
+    box.innerHTML = `<h3 class="w-h">Ce que Chrome voit</h3>
+      ${covering.length ? `<div class="advice" data-l="danger" style="margin:0 0 8px"><h3>Une autre appli couvre cette adresse</h3><p>Une autre appli de ce site est enregistrée à ${covering.map(r => esc(r.scope)).join(', ')} et englobe l'adresse de Vigie : Chrome croit que Vigie en fait partie. Donne à Vigie sa propre adresse (voir ci-dessous).</p></div>` : ''}
+      <div class="journal">${li('Adresse de la page', here)}${man ? li('Identité de l\'appli', man.id) + li('Zone de l\'appli', man.scope) : li('Fichier d\'installation', 'introuvable')}${others.length ? li('Autres applis enregistrées sur ce site', others.map(r => r.scope).join(' · ')) : li('Autres applis enregistrées sur ce site', 'aucune visible')}</div>
+      <p class="note">Si Chrome dit encore « déjà installée » : ouvre le menu ⋮ sur cette page. S'il propose « Ouvrir dans … » avec le nom d'une autre de tes applis, c'est elle qui réclame tout le site (une appli faite avec PWABuilder le fait souvent). Solution sûre : mettre Vigie à une autre adresse, par exemple une organisation GitHub gratuite (nom-org.github.io), ou corriger la zone (scope) de l'autre appli.</p>`;
+  }
+
   if (hasManifest && 'serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !inFrame) {
     navigator.serviceWorker.register('sw.js').catch(e => log('Installation : service worker refusé (' + e.message + ')'));
   }
@@ -4485,7 +5029,7 @@ if (typeof module !== 'undefined') module.exports = TradeBot;
   applyWake();
   start();
   radar.start();
-  showTab(['signal', 'pos', 'scan', 'meme', 'stats', 'set'].includes(hash) ? hash : 'signal');
+  showTab(['signal', 'pos', 'scan', 'meme', 'new', 'stats', 'set'].includes(hash) ? hash : 'signal');
 })();
 
 </script>
