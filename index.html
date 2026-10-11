@@ -351,6 +351,31 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
 .n-soc .chip{white-space:normal}
 #newSrc b.pos{color:var(--long)} #newSrc b.neg{color:var(--short)}
 
+/* ---------- détenteurs, achats et ventes ---------- */
+.p-flow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.f-cell.f-hold{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:10px;row-gap:2px}
+.f-hold .f-k{font-size:.74rem}
+.f-k em{font-style:normal;white-space:nowrap;color:var(--fg);font-weight:600}.f-hold b{font-size:1.05rem}
+.f-cell{display:grid;gap:3px;align-content:start;min-width:0;padding:8px;border:1px solid var(--line);border-radius:calc(var(--r) - 2px);background:var(--bg)}
+.f-k{font-size:.68rem;color:var(--muted);letter-spacing:.03em;line-height:1.2}
+.f-cell b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.95rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f-cell small{font-size:.7rem;line-height:1.25}
+.p-flow .pos{color:var(--long)} .p-flow .neg{color:var(--short)} .p-flow .muted{color:var(--muted)}
+.f-split{display:block;height:5px;border-radius:3px;background:var(--short);overflow:hidden}
+.f-split i{display:block;height:100%;background:var(--long)}
+.m-card .p-flow{margin-top:2px;text-align:left}
+#memeDetail .p-flow{margin-bottom:4px}
+
+/* ---------- vérification de l'installation ---------- */
+.i-chk{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.i-chk li{display:grid;gap:2px;padding:8px 10px;border:1px solid var(--line);border-radius:calc(var(--r) - 2px);font-size:.86rem;min-width:0}
+.i-chk li b{font-weight:600;overflow-wrap:anywhere}
+.i-chk li.ok b{color:var(--long)}
+.i-chk li.bad{border-color:var(--short);background:var(--short-soft)}
+.i-chk li.bad b{color:var(--short)}
+.i-chk li span{color:var(--fg);font-size:.82rem}
+.i-steps{margin:6px 0;padding-left:20px;display:grid;gap:6px;font-size:.84rem}
+
 </style>
 </head>
 <body>
@@ -1515,6 +1540,57 @@ function MemeRadar(h) {
     return `Sorti il y a ${age} · plus bas ${mc(L.loMc) || MemeChart.fmtPx(L.lo) + ' $'} · plus haut ${mc(L.hiMc) || MemeChart.fmtPx(L.hi) + ' $'} (il y a ${ago(Date.now() - L.hiT)}) ${span}${fin(L.fromHi) && L.fromHi < -0.02 ? ` · actuel ${pct(L.fromHi * 100)} sous le plus haut` : ''}`;
   }
 
+  /* ---------- détenteurs, achats et ventes (coins détenus) ---------- */
+  // Relevés successifs du nombre de détenteurs, pour en voir l'évolution
+  function noteHolders(t, n, src) {
+    if (!t || !fin(n) || n <= 0) return;
+    const H = t.holdHist || (t.holdHist = []);
+    const last = H[H.length - 1];
+    if (last && last.src === src && now() - last.t < 4000) { last.n = n; return; }
+    // Jupiter compte mieux que RugCheck en temps réel : on ne mélange pas les deux pour la tendance
+    if (src === 'rug' && H.some(x => x.src === 'jup')) return;
+    H.push({ t: now(), n: Math.round(n), src });
+    if (H.length > 200) H.splice(0, H.length - 200);
+  }
+  function flow(mint) {
+    const t = R.tokens.get(mint);
+    if (!t) return null;
+    const j = t.jup || {}, nj = (t.nc && t.nc.j) || {}, tx = (t.pair && t.pair.txns) || {};
+    const H = t.holdHist || [], last = H[H.length - 1];
+    const holders = last ? last.n : fin(+j.holders) && j.holders > 0 ? +j.holders : fin(+nj.holders) && nj.holders > 0 ? +nj.holders : (t.sec && t.sec.holders) || null;
+    let dH = null, win = 0, dHp = null;
+    if (last) {
+      // Écart avec le relevé le plus ancien des 6 dernières minutes (même source)
+      const ref = H.find(x => x.src === last.src && x.t >= last.t - 6 * 60000);
+      if (ref && ref !== last && last.t - ref.t >= 45000) { dH = last.n - ref.n; win = last.t - ref.t; }
+    }
+    if (dH == null && fin(+j.hch5)) dHp = +j.hch5;
+    const num = v => fin(+v) && v !== null && v !== '' ? +v : null;
+    const pickPair = (w, k) => tx[w] && num(tx[w][k]) != null ? num(tx[w][k]) : null;
+    let b5 = pickPair('m5', 'buys'), s5 = pickPair('m5', 'sells'), b1 = pickPair('h1', 'buys'), s1 = pickPair('h1', 'sells'), src = 'DexScreener';
+    if (b5 == null && s5 == null) { b5 = num(j.buys5) ?? num(nj.buys); s5 = num(j.sells5) ?? num(nj.sells); src = 'Jupiter'; }
+    if (b1 == null && s1 == null) { b1 = num(j.buys1); s1 = num(j.sells1); }
+    return { holders, dH, win, dHp, b5, s5, b1, s1, src, at: Math.max(t.mktAt || 0, (last && last.t) || 0) };
+  }
+  function flowHtml(mint) {
+    const f = flow(mint);
+    if (!f) return '';
+    const nf = v => fin(v) ? Math.round(v).toLocaleString('fr-FR') : '—';
+    const d = f.dH != null ? f.dH : f.dHp;
+    const trend = f.dH != null ? `${f.dH > 0 ? '+' : f.dH < 0 ? '−' : '±'}${nf(Math.abs(f.dH))} en ${Math.max(1, Math.round(f.win / 60000))} min`
+      : f.dHp != null ? `${pct(f.dHp, 1)} en 5 min` : f.holders ? 'évolution : relevé en cours' : 'en attente des données';
+    const cell = (k, b, s) => {
+      if (b == null && s == null) return `<div class="f-cell"><span class="f-k">${k}</span><b>—</b><small class="muted">pas encore de données</small></div>`;
+      const tot = (b || 0) + (s || 0), sh = tot ? (b || 0) / tot : 0.5;
+      const tone = tot >= 10 && sh < 0.45 ? 'neg' : tot >= 10 && sh > 0.55 ? 'pos' : 'muted';
+      return `<div class="f-cell"><span class="f-k">${k}</span><b><span class="pos">${nf(b)}</span> <span class="muted">/</span> <span class="neg">${nf(s)}</span></b>`
+        + `<span class="f-split" role="img" aria-label="${Math.round(sh * 100)} % d'achats"><i style="width:${Math.round(sh * 100)}%"></i></span>`
+        + `<small class="${tone}">${tot ? Math.round(sh * 100) + ' % d\'achats' : 'aucun échange'}</small></div>`;
+    };
+    return `<div class="p-flow"><div class="f-cell f-hold"><span class="f-k">Détenteurs</span><b>${nf(f.holders)}</b><small class="${d > 0 ? 'pos' : d < 0 ? 'neg' : 'muted'}">${trend}</small></div>`
+      + `${cell('Achats / ventes <em>5 min</em>', f.b5, f.s5)}${cell('Achats / ventes <em>1 h</em>', f.b1, f.s1)}</div>`;
+  }
+
   /* ---------- registre des jetons ---------- */
   function add(mint, info) {
     if (typeof mint !== 'string' || mint.length < 32 || mint.length > 44 || SKIP.has(mint)) return null;
@@ -1599,7 +1675,9 @@ function MemeRadar(h) {
   /* ---------- source 4 : Jupiter (audit, score organique, détenteurs) ---------- */
   async function pollJup() {
     if (!h.jup || R.demo) return;
-    const list = [...R.tokens.values()].filter(t => t.pair && (R.pinned.has(t.mint) || t.verdict === 'buy' || t.verdict === 'watch' || (t.verdict === 'cold' && t.m && t.m.tx5 >= 10)) && now() - (t.jupAt || 0) > 60000);
+    const pin = t => R.pinned.has(t.mint);
+    const list = [...R.tokens.values()].filter(t => pin(t) ? now() - (t.jupAt || 0) > 25000
+      : t.pair && (t.verdict === 'buy' || t.verdict === 'watch' || (t.verdict === 'cold' && t.m && t.m.tx5 >= 10)) && now() - (t.jupAt || 0) > 60000);
     list.sort((a, b) => (R.pinned.has(b.mint) - R.pinned.has(a.mint)) || prio(a) - prio(b));
     const batch = list.slice(0, 100);
     if (!batch.length) return;
@@ -1610,11 +1688,13 @@ function MemeRadar(h) {
         t.jupAt = now();
         const x = byId.get(t.mint);
         if (!x) continue;
-        const a = x.audit || {}, s5 = x.stats5m || {};
+        const a = x.audit || {}, s5 = x.stats5m || {}, s1 = x.stats1h || {};
         t.jup = { organic: +x.organicScore, label: x.organicScoreLabel || null, sus: !!a.isSus, mintOff: a.mintAuthorityDisabled, freezeOff: a.freezeAuthorityDisabled,
           top: a.topHoldersPercentage, dev: a.devBalancePercentage, devMints: a.devMints, holders: x.holderCount, decimals: x.decimals, verified: !!x.isVerified,
-          orgBuyers5: s5.numOrganicBuyers, traders5: s5.numTraders, launchpad: x.launchpad || null };
-        analyze(t);
+          orgBuyers5: s5.numOrganicBuyers, traders5: s5.numTraders, launchpad: x.launchpad || null,
+          buys5: s5.numBuys, sells5: s5.numSells, buys1: s1.numBuys, sells1: s1.numSells, hch5: s5.holderChange, hch1: s1.holderChange, at: now() };
+        noteHolders(t, +x.holderCount, 'jup');
+        if (t.pair) analyze(t);
       }
       setSrc('jup', 'on', 'audit et score organique actifs');
     } catch (e) { if (!/file Jupiter pleine/.test(e.message)) setSrc('jup', 'off', 'indisponible (' + e.message + ')'); }
@@ -1698,6 +1778,7 @@ function MemeRadar(h) {
         if (R.rugFails >= 3 && R.rugFails % 10 !== 0) throw new Error('mis en pause après plusieurs échecs');
         const r = await getJSON(`https://api.rugcheck.xyz/v1/tokens/${t.mint}/report`, {}, 12000);
         t.sec = parseRug(r); R.rugFails = 0; setSrc('rug', 'on', 'analyses de sécurité actives');
+        noteHolders(t, t.sec.holders, 'rug');
       } catch (e) {
         R.rugFails++;
         setSrc('rug', 'off', 'indisponible (' + e.message + '), repli sur Solana RPC');
@@ -1874,10 +1955,13 @@ function MemeRadar(h) {
       priceChange: { m5: (Math.random() - (good ? 0.2 : 0.6)) * 40, h1: (Math.random() - 0.3) * 150 }, info: { socials: good ? [{}, {}] : [] }, baseToken: { name: sym, symbol: sym } };
     t.sec = { src: 'démo', mintAuth: false, freezeAuth: !good && Math.random() < 0.3, top10: good ? 12 + Math.random() * 15 : 20 + Math.random() * 40, top1: 3 + Math.random() * 5, insiders: 0, insiderGraph: Math.floor(Math.random() * 4), holders: Math.round(50 + Math.random() * 800), rugged: false, lpLocked: 100, risks: [] };
     t.mktAt = now(); t.secAt = now();
+    noteHolders(t, t.sec.holders, 'rug');
     analyze(t);
     for (const x of R.tokens.values()) if (x.sources.has('démo') && x !== t && Math.random() < 0.3 && x.pair) {
       x.pair.priceChange.m5 = (Math.random() - 0.45) * 30; x.pair.txns.m5.buys = Math.round(x.pair.txns.m5.buys * (0.7 + Math.random() * 0.6));
-      x.pair.priceUsd = String(+x.pair.priceUsd * (1 + x.pair.priceChange.m5 / 300)); analyze(x);
+      x.pair.priceUsd = String(+x.pair.priceUsd * (1 + x.pair.priceChange.m5 / 300));
+      if (x.sec && x.sec.holders) { x.sec.holders = Math.max(10, Math.round(x.sec.holders * (0.97 + Math.random() * 0.07))); noteHolders(x, x.sec.holders, 'rug'); }
+      analyze(x);
     }
   }
 
@@ -1906,7 +1990,7 @@ function MemeRadar(h) {
     pollDex(); pollGecko();
     setInterval(pollDex, 45000);
     setInterval(pollGecko, 60000);
-    setTimeout(pollJup, 20000); setInterval(pollJup, 45000);
+    setTimeout(pollJup, 20000); setInterval(pollJup, 30000);
     const loop = async () => { try { await refreshMarket(); } catch {} setTimeout(loop, 8000); };
     setTimeout(loop, 4000);
     secWorker();
@@ -2028,6 +2112,7 @@ function MemeRadar(h) {
       <h3>Historique du coin</h3>
       <p class="note" id="mdLife" style="margin:0 0 8px">${esc(lifeText(t))}</p>
       <canvas class="m-chart" id="mdChart" aria-label="Graphique du coin"></canvas>
+      <h3>Détenteurs et échanges</h3>${flowHtml(mint)}
       <h3>Chiffres</h3><div class="sizing" style="border:0;margin:0;padding:0">
         <div class="kv"><div class="k">Capitalisation</div><div class="v">${usd(m.mc)}</div></div>
         <div class="kv"><div class="k">${m.onCurve ? 'Courbe pump.fun' : 'Liquidité'}</div><div class="v">${m.onCurve ? (m.progress != null ? '≈ ' + Math.round(m.progress * 100) + ' %' : '—') : usd(m.liq)}</div></div>
@@ -2079,7 +2164,7 @@ function MemeRadar(h) {
     const t = add(mint, { source: 'wallet' });
     if (t) t.mktAt = 0;
   }
-  return { start, render, badge, bindUI, R, track, get: mint => R.tokens.get(mint), getCfg: () => cfg, openDetail, life, lifeText, chartData, supplyOf, secureNow, demo: () => R.demo, addToken: (mint, info) => add(mint, info) };
+  return { start, render, badge, bindUI, R, track, get: mint => R.tokens.get(mint), getCfg: () => cfg, openDetail, life, lifeText, chartData, supplyOf, secureNow, flow, flowHtml, noteHolders, demo: () => R.demo, addToken: (mint, info) => add(mint, info), _test: { pollJup } };
 }
 if (typeof module !== 'undefined') module.exports = MemeRadar;
 
@@ -2610,6 +2695,7 @@ function WalletTrader(h, radar, jup) {
         <div class="p-head"><button class="p-sym" data-open="${esc(p.mint)}">${esc(p.sym)}</button><span class="muted small">acheté il y a ${ago(Date.now() - p.opened)}</span><span class="p-pnl ${g > 0 ? 'pos' : g < 0 ? 'neg' : ''}">${fPct(g)}</span></div>
         <div class="m-kpis"><span>Mise <b>${fSol(p.cost)}</b></span><span>Valeur <b>${fUsd(val)}</b></span><span>Gain <b class="${pnl > 0 ? 'pos' : pnl < 0 ? 'neg' : ''}">${fUsd(pnl)}</b></span><span>Entrée <b>${fPx(entry)}</b></span></div>
         <div class="p-adv"><b>${esc(a.title)}</b><span>${esc(a.text)}</span></div>
+        ${radar.flowHtml ? radar.flowHtml(p.mint) : ''}
         <div class="row-btns" style="margin:0">${[25, 50, 100].map(x => `<button class="btn sm ${x === rec ? 'pri' : ''}" data-sell="${esc(p.mint)}" data-pct="${x}">Vendre ${x} %</button>`).join('')}</div>
       </div>`;
     }).join('');
@@ -3247,6 +3333,7 @@ function TradeBot(h, radar, jup, tr) {
         <div class="p-head"><button class="p-sym" data-open="${esc(p.mint)}">${esc(p.sym)}</button><span class="muted small">il y a ${ago(Date.now() - p.t0)} · ${st}</span><span class="p-pnl ${pnl > 0 ? 'pos' : pnl < 0 ? 'neg' : ''}">${fPct(pnl)}</span></div>
         <div class="m-kpis two"><span>Mise <b>${fSol(p.cost)}</b></span><span>Valeur nette <b>${fSol(tot)}</b></span><span>Résultat <b class="${tot > p.cost ? 'pos' : 'neg'}">${fin(tot) ? fSol(tot - p.cost) : '—'}</b></span><span>Aller-retour à l'achat <b>${fPct(-p.rt)}</b></span></div>
         <p class="p-life">${esc(radar.lifeText(radar.get(p.mint)))}</p>
+        ${radar.flowHtml ? radar.flowHtml(p.mint) : ''}
         <canvas class="b-chart" data-mint="${esc(p.mint)}" aria-label="Graphique de ${esc(p.sym)}"></canvas>
         <div class="row-btns" style="margin:0"><button class="btn sm danger" data-bclose="${esc(p.mint)}" ${p.state === 'selling' ? 'disabled' : ''}>Fermer maintenant</button></div></div>`;
     }).join('');
@@ -3638,7 +3725,7 @@ function NewCoins(h, radar, bot) {
         for (const t of list) {
           const x = by.get(t.mint);
           if (!x) continue;
-          t.nc.j = jupFields(x);
+          t.nc.j = jupFields(x); if (radar.noteHolders) radar.noteHolders(t, +x.holderCount, 'jup');
           if (!t.nc.metaDone || !t.nc.social.x) setLinks(t, { twitter: x.twitter, website: x.website, telegram: x.telegram });
           evaluate(t);
         }
@@ -3657,7 +3744,7 @@ function NewCoins(h, radar, bot) {
           const t = radar.addToken(x.id, { source: 'Jupiter', name: x.name, symbol: x.symbol, created: born, icon: x.icon });
           if (!t || N.list.includes(t)) continue;
           onNew(t);
-          t.nc.metaDone = true; t.nc.j = jupFields(x);
+          t.nc.metaDone = true; t.nc.j = jupFields(x); if (radar.noteHolders) radar.noteHolders(t, +x.holderCount, 'jup');
           setLinks(t, { twitter: x.twitter, website: x.website, telegram: x.telegram });
           evaluate(t);
         }
@@ -3826,6 +3913,7 @@ function NewCoins(h, radar, bot) {
   }
   function card(t) {
     const c = t.nc, j = c.j, age = now() - c.t0;
+    const fl = radar.flow ? radar.flow(t.mint) : null, bp = bot.S && bot.S.pos && bot.S.pos[t.mint], mine = c.status === 'bought' || !!(bp && bp.state !== 'closed');
     const st = { cand: '<span class="chip long">CANDIDAT</span>', reject: '<span class="chip short">REJETÉ</span>', bought: '<span class="chip warn">ACHETÉ</span>', old: '<span class="chip">trop vieux</span>', scan: '<span class="chip">analyse…</span>' }[c.status] || '';
     const su = h.solUsd && h.solUsd();
     const mc = j && fin(j.mcap) ? j.mcap : t.pair ? (t.pair.marketCap || t.pair.fdv) : (t.mcSol0 && su ? t.mcSol0 * su : NaN);
@@ -3834,8 +3922,11 @@ function NewCoins(h, radar, bot) {
     return `<button class="m-card" data-nmint="${esc(t.mint)}" data-v="${c.status === 'cand' ? 'buy' : c.status === 'reject' ? 'reject' : c.status === 'bought' ? 'watch' : 'cold'}">
       <div class="m-head"><span class="m-ava">${esc((t.symbol || '?').slice(0, 2).toUpperCase())}${img ? `<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</span>
         <span class="m-name"><b>${esc(t.symbol || '?')}</b><small>sorti il y a ${ageTxt(age)} · ${esc((t.name || '').slice(0, 24))}</small></span>${st}</div>
-      <div class="m-kpis"><span>Cap <b>${usd(mc)}</b></span><span>Traders <b>${j && fin(j.traders) ? j.traders : '—'}</b></span><span>Achats/ventes <b>${j && fin(j.buys) ? j.buys + '/' + (j.sells || 0) : '—'}</b></span><span>Créateur <b>${fin(t.devBuyPct) ? n1(t.devBuyPct) + ' %' : '—'}</b></span></div>
-      <div class="n-soc">${xChip(t)}${c.social.tg ? '<span class="chip">Telegram</span>' : ''}${c.social.web ? '<span class="chip">site</span>' : ''}</div>
+      <div class="m-kpis"><span>Cap <b>${usd(mc)}</b></span>${mine
+        ? `<span>Traders <b>${j && fin(j.traders) ? j.traders : '—'}</b></span><span>Prix 5 min <b class="${j && j.ch5 > 0 ? 'pos' : j && j.ch5 < 0 ? 'neg' : ''}">${j && fin(j.ch5) ? (j.ch5 > 0 ? '+' : '') + n1(j.ch5) + ' %' : '—'}</b></span><span>Créateur <b>${fin(t.devBuyPct) ? n1(t.devBuyPct) + ' %' : '—'}</b></span>`
+        : `<span>Détenteurs <b>${fl && fin(fl.holders) ? fl.holders.toLocaleString('fr-FR') : '—'}</b></span><span>Traders <b>${j && fin(j.traders) ? j.traders : '—'}</b></span><span>Achats/ventes <b>${fl && fin(fl.b5) ? fl.b5 + '/' + (fl.s5 || 0) : j && fin(j.buys) ? j.buys + '/' + (j.sells || 0) : '—'}</b></span>`}</div>
+      <div class="n-soc">${xChip(t)}${c.social.tg ? '<span class="chip">Telegram</span>' : ''}${c.social.web ? '<span class="chip">site</span>' : ''}${!mine && fin(t.devBuyPct) ? `<span class="chip">créateur ${n1(t.devBuyPct)} %</span>` : ''}</div>
+      ${mine && radar.flowHtml ? radar.flowHtml(t.mint) : ''}
       <div class="m-score"><span class="bar"><i style="width:${c.score}%"></i></span><span>score ${c.score}</span></div>
       ${list.length ? `<ul class="m-why ${c.status === 'reject' ? 'bad' : ''}">${list.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
     </button>`;
@@ -5004,34 +5095,85 @@ if (typeof module !== 'undefined') module.exports = { NewCoins, XCheck };
   let installEvt = null;
   const standalone = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch { return false; } };
   const hasManifest = !!document.querySelector('link[rel="manifest"]');
-  addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; renderApp(); });
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; renderApp(); if (curTab === 'set') appDiag(); });
   addEventListener('appinstalled', () => { installEvt = null; toast('Vigie Scalp installée', 'long'); renderApp(); });
   function renderApp() {
     const box = $('#appBody');
     if (!box) return;
     const bot = (() => { try { return !!JSON.parse(localStorage.getItem('vigie.bot') || '{}').pub; } catch { return false; } })();
-    const keyNote = '<p class="note">La clé du bot est enregistrée dans le navigateur où tu l\'as créée. L\'appli installée a son propre stockage : exporte d\'abord la clé là où le bot tourne, puis utilise « Restaurer » dans l\'appli installée. Ne fais jamais tourner le bot à deux endroits en même temps.</p>';
+    const keyNote = '<p class="note">La clé du bot est enregistrée pour l\'adresse où tu l\'as créée. Si tu changes d\'adresse (nouveau dépôt ou nouvelle organisation GitHub), exporte la clé depuis l\'ancienne adresse, puis utilise « Restaurer » à la nouvelle. Ne fais jamais tourner le bot à deux endroits en même temps.</p>';
     if (standalone()) { box.innerHTML = '<p class="note" style="margin:0"><strong>Tu utilises l\'appli installée.</strong></p>' + (bot ? '' : keyNote); return; }
     if (inFrame) { box.innerHTML = '<p class="note" style="margin:0">L\'installation n\'est pas possible dans l\'aperçu Claude.</p>'; return; }
     if (!hasManifest) { box.innerHTML = '<p class="note" style="margin:0">Ce fichier ne contient pas les informations d\'installation. Utilise la version « dossier » (index.html, manifest.webmanifest, sw.js et les icônes) mise dans son propre dépôt.</p>'; return; }
     if (installEvt) { box.innerHTML = '<div class="row-btns" style="margin:0"><button class="btn pri" id="appInstall">Installer Vigie Scalp</button></div>' + keyNote; $('#appInstall').onclick = async () => { const ev = installEvt; installEvt = null; try { ev.prompt(); const r = await ev.userChoice; if (r && r.outcome !== 'accepted') toast('Installation annulée'); } catch { toast('Installation impossible ici'); } renderApp(); }; return; }
-    box.innerHTML = '<p class="note" style="margin:0">Dans Chrome : menu ⋮ puis « Installer l\'application ». Si Chrome répond que c\'est déjà installé alors que non, c\'est que l\'appli est dans le dossier d\'une autre appli installée sur le même site : mets-la dans son propre dépôt.</p>' + keyNote;
+    box.innerHTML = '<p class="note" style="margin:0">Dans Chrome : menu ⋮ puis « Installer l\'application ». La vérification ci-dessous dit ce qui bloque, s\'il y a un souci.</p>' + keyNote;
   }
-  // Diagnostic : ce que Chrome voit (autres applis installées sur la même adresse)
+  // Vérification de l'installation : chaque condition que Chrome exige, avec la correction à faire
+  let diagBusy = false;
   async function appDiag() {
     const box = $('#appDiag');
-    if (!box || !hasManifest || inFrame) return;
-    const ours = new URL('sw.js', location.href).href, here = location.href.split('#')[0];
-    let regs = [], man = null;
+    if (!box || inFrame || standalone() || diagBusy) return;
+    diagBusy = true;
+    const res = [];
+    const add = (ok, label, fix) => res.push({ ok, label, fix });
+    const ua = navigator.userAgent || '', android = /Android/i.test(ua);
+    const inApp = android && (!!window.phantom || !!window.solana || /; wv\)|Phantom/i.test(ua));
+    const other = /SamsungBrowser|Firefox|EdgA|OPR\/|Brave/i.test(ua);
+    add(!inApp && !other, inApp ? 'Navigateur intégré (Phantom ou autre appli)' : other ? 'Navigateur autre que Chrome' : 'Ouvert dans Chrome',
+      inApp ? 'Le navigateur de Phantom ne sait pas installer d\'appli. Copie l\'adresse, ouvre-la dans Chrome, puis installe depuis Chrome.' : 'Ouvre l\'adresse dans Google Chrome pour installer.');
+    add(location.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname), 'Adresse sécurisée (https)', 'Ouvre l\'appli depuis son adresse https://…github.io/…, pas depuis un fichier téléchargé sur le téléphone.');
+    const here = location.href.split('#')[0].split('?')[0];
+    let man = null, manUrl = null;
+    if (!hasManifest) add(false, 'Fichier d\'installation dans la page', 'Ce fichier est la version « page seule ». Mets en ligne le index.html du dossier d\'installation.');
+    else {
+      manUrl = new URL(document.querySelector('link[rel="manifest"]').getAttribute('href'), location.href).href;
+      try {
+        const r = await fetch(manUrl, { cache: 'no-store' });
+        if (!r.ok) throw new Error(r.status === 404 ? 'fichier absent' : 'HTTP ' + r.status);
+        man = await r.json();
+        const okF = man.name && man.start_url && /standalone|fullscreen|minimal-ui/.test(man.display || '') && (man.icons || []).length;
+        add(!!okF, 'manifest.webmanifest', okF ? '' : 'Le fichier est incomplet : remets celui du dossier d\'installation.');
+      } catch (e) { add(false, 'manifest.webmanifest', `Introuvable (${e.message}). Il doit être dans le même dossier que index.html, avec ce nom exact.`); }
+    }
+    if (man) {
+      const scope = new URL(man.scope || './', manUrl).href;
+      add(here.startsWith(scope), 'Page dans la zone de l\'appli', `La page doit être dans ${scope}. Ouvre l'adresse du dossier, pas un autre fichier.`);
+      for (const ic of man.icons || []) {
+        const u = new URL(ic.src, manUrl).href;
+        const got = await new Promise(ok => { const im = new Image(); const to = setTimeout(() => ok(null), 8000); im.onload = () => { clearTimeout(to); ok(im.naturalWidth + 'x' + im.naturalHeight); }; im.onerror = () => { clearTimeout(to); ok(null); }; im.src = u + (u.includes('?') ? '&' : '?') + 'chk=' + Date.now(); });
+        add(got === ic.sizes, `Icône ${ic.src}`, got ? `Taille ${got} au lieu de ${ic.sizes} : remets l'icône d'origine.` : `Introuvable : envoie ${ic.src} à côté de index.html.`);
+      }
+    }
+    let swOk = false;
+    try { const r = await fetch('sw.js', { cache: 'no-store' }); swOk = r.ok && /javascript/.test(r.headers.get('content-type') || 'javascript'); } catch {}
+    let reg = null; try { reg = await navigator.serviceWorker.getRegistration(); } catch {}
+    add(swOk, 'sw.js', 'Introuvable : envoie sw.js à côté de index.html.');
+    if (swOk) add(!!(reg && reg.active), 'Mode hors ligne actif', 'Pas encore actif : recharge la page une fois, puis réessaie.');
+    let regs = [];
     try { regs = (await navigator.serviceWorker.getRegistrations()).map(r => ({ scope: r.scope, script: ((r.active || r.waiting || r.installing) || {}).scriptURL || '' })); } catch {}
-    try { const l = document.querySelector('link[rel="manifest"]'); const j = await (await fetch(l.href, { cache: 'no-store' })).json(); man = { id: new URL(j.id || j.start_url || './', location.origin).href, scope: new URL(j.scope || './', l.href).href, name: j.name }; } catch {}
-    const others = regs.filter(r => r.script !== ours);
-    const covering = others.filter(r => here.startsWith(r.scope));
-    const li = (a, b) => `<div class="j-row" style="grid-template-columns:minmax(0,1fr)"><div class="j-mid"><div>${esc(a)}</div><div class="mono" style="overflow-wrap:anywhere">${esc(b)}</div></div></div>`;
-    box.innerHTML = `<h3 class="w-h">Ce que Chrome voit</h3>
-      ${covering.length ? `<div class="advice" data-l="danger" style="margin:0 0 8px"><h3>Une autre appli couvre cette adresse</h3><p>Une autre appli de ce site est enregistrée à ${covering.map(r => esc(r.scope)).join(', ')} et englobe l'adresse de Vigie : Chrome croit que Vigie en fait partie. Donne à Vigie sa propre adresse (voir ci-dessous).</p></div>` : ''}
-      <div class="journal">${li('Adresse de la page', here)}${man ? li('Identité de l\'appli', man.id) + li('Zone de l\'appli', man.scope) : li('Fichier d\'installation', 'introuvable')}${others.length ? li('Autres applis enregistrées sur ce site', others.map(r => r.scope).join(' · ')) : li('Autres applis enregistrées sur ce site', 'aucune visible')}</div>
-      <p class="note">Si Chrome dit encore « déjà installée » : ouvre le menu ⋮ sur cette page. S'il propose « Ouvrir dans … » avec le nom d'une autre de tes applis, c'est elle qui réclame tout le site (une appli faite avec PWABuilder le fait souvent). Solution sûre : mettre Vigie à une autre adresse, par exemple une organisation GitHub gratuite (nom-org.github.io), ou corriger la zone (scope) de l'autre appli.</p>`;
+    const ours = new URL('sw.js', location.href).href;
+    const covering = regs.filter(r => r.script !== ours && here.startsWith(r.scope));
+    add(!covering.length, 'Aucune autre appli sur cette adresse', `Une autre appli du site couvre ${covering.map(r => r.scope).join(', ')} : Chrome croit que Vigie en fait partie. Mets Vigie dans une organisation GitHub à part (nom-org.github.io).`);
+    const bad = res.filter(x => !x.ok);
+    const li = x => `<li class="${x.ok ? 'ok' : 'bad'}"><b>${x.ok ? '✓' : '✗'} ${esc(x.label)}</b>${x.ok ? '' : `<span>${esc(x.fix)}</span>`}</li>`;
+    box.innerHTML = `<h3 class="w-h">Vérification de l'installation</h3>
+      <ul class="i-chk">${res.map(li).join('')}</ul>
+      ${bad.length ? `<div class="advice" data-l="danger" style="margin:8px 0"><h3>${bad.length} point${bad.length > 1 ? 's' : ''} à corriger</h3><p>Corrige ce qui est marqué ✗, puis touche « Vérifier à nouveau ».</p></div>`
+        : `<div class="advice" data-l="ok" style="margin:8px 0"><h3>Les fichiers sont bons</h3><p>${installEvt ? 'Chrome propose l\'installation : touche « Installer Vigie Scalp » plus haut.' : 'Installe depuis le menu ⋮ de Chrome, « Installer l\'application » (ou « Ajouter à l\'écran d\'accueil » puis « Installer »).'}</p></div>
+        <details class="w-oth"><summary>Chrome répond « Impossible d'installer l'application »</summary>
+          <p class="note">Avec des fichiers corrects, l'appli Android est fabriquée par un serveur de Google puis installée par le Play Store. Le blocage vient alors du téléphone :</p>
+          <ol class="i-steps">
+            <li>Mets à jour Chrome et le Play Store (Play Store, ta photo, « Gérer les applis et l'appareil », « Tout mettre à jour »), puis Paramètres, Sécurité et confidentialité, Mise à jour du système Google Play.</li>
+            <li>Paramètres, Applis : si une ancienne « Vigie » apparaît, désinstalle-la.</li>
+            <li>Coupe un VPN, un bloqueur de pubs ou un DNS privé filtrant (Paramètres, Réseau et Internet, DNS privé) le temps de l'installation.</li>
+            <li>Ferme complètement Chrome (vue des applis récentes), rouvre cette adresse et réessaie.</li>
+            <li>En dernier recours, efface les données de ce site dans Chrome (⋮, Paramètres, Paramètres des sites, Toutes les données). <strong>Exporte d'abord la clé du bot</strong> : elle est effacée avec.</li>
+          </ol>
+          <p class="note">Plan B qui marche toujours : un APK fait avec PWABuilder (pwabuilder.com) à partir de cette adresse.</p></details>`}
+      <div class="row-btns"><button class="btn sm" id="appRecheck">Vérifier à nouveau</button></div>
+      <div class="journal">${[['Adresse de la page', here], ...(man ? [['Identité de l\'appli', new URL(man.id || man.start_url || './', location.origin).href]] : [])].map(([a, b]) => `<div class="j-row" style="grid-template-columns:minmax(0,1fr)"><div class="j-mid"><div>${esc(a)}</div><div class="mono" style="overflow-wrap:anywhere">${esc(b)}</div></div></div>`).join('')}</div>`;
+    const rb = $('#appRecheck'); if (rb) rb.onclick = () => { box.innerHTML = '<p class="note">Vérification…</p>'; appDiag(); };
+    diagBusy = false;
   }
 
   if (hasManifest && 'serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !inFrame) {
