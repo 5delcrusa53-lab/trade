@@ -501,7 +501,7 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
       <div class="form">
         <div class="field"><label for="tPer">Plafond par achat (SOL)</label><input id="tPer" type="number" inputmode="decimal" step="0.01"><span class="hint">Un achat plus gros est refusé</span></div>
         <div class="field"><label for="tDay">Plafond par jour (SOL)</label><input id="tDay" type="number" inputmode="decimal" step="0.1"><span class="hint">Total des achats sur la journée</span></div>
-        <div class="field"><label for="tRpc">RPC Solana (facultatif)</label><input id="tRpc" type="url" autocomplete="off" placeholder="https://… (Helius, QuickNode)"><span class="hint">Pour lire tes soldes si le RPC public sature</span></div>
+        <div class="field"><label for="tRpc">RPC Solana (facultatif)</label><input id="tRpc" type="url" autocomplete="off" placeholder="https://… (Helius, QuickNode)"><span class="hint">Conseillé : clé gratuite sur helius.dev, puis colle https://mainnet.helius-rpc.com/?api-key=…</span></div>
         <div class="field"><label for="tJup">Clé API Jupiter (facultatif)</label><input id="tJup" type="password" autocomplete="off" placeholder="sans clé : 30 requêtes/min"><span class="hint">Gratuite sur developers.jup.ag</span></div>
       </div>
       <p class="note">Les ordres passent par Jupiter, qui trouve le meilleur prix sur pump.fun, PumpSwap, Raydium et les autres. Avant chaque achat, l'appli vérifie tes plafonds, les contrôles du radar, l'écart avec le prix du marché, et teste qu'une revente immédiate est possible. Ensuite ton wallet affiche la transaction et tu la valides.</p>
@@ -1475,7 +1475,8 @@ function MemeRadar(h) {
     };
   }
   async function rpc(method, params) {
-    const r = await getJSON('https://api.mainnet-beta.solana.com', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }) });
+    if (h.rpc) return h.rpc(method, params);
+    const r = await getJSON('https://solana-rpc.publicnode.com', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }) });
     if (r.error) throw new Error(r.error.message || 'erreur RPC');
     return r.result;
   }
@@ -1882,7 +1883,7 @@ function JupClient(getKey) {
       let body = null;
       try { body = await r.json(); } catch {}
       if (!r.ok) {
-        const e = new Error((body && (body.error || body.errorMessage || body.message)) || ('HTTP ' + r.status));
+        const e = new Error('Jupiter : ' + ((body && (body.error || body.errorMessage || body.message)) || ('HTTP ' + r.status)));
         e.status = r.status; e.body = body; throw e;
       }
       return body;
@@ -1922,6 +1923,61 @@ function JupClient(getKey) {
     },
     post(path, body) { return raw(BASE + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }, 70000); }
   };
+}
+
+/* RPC Solana : le serveur public officiel refuse souvent les navigateurs (« Access forbidden »).
+   On essaie dans l'ordre : ton RPC perso, puis plusieurs RPC publics gratuits, et on garde celui qui répond. */
+function RpcPool(getCustom, log) {
+  const PUBLIC = ['https://solana-rpc.publicnode.com', 'https://solana.drpc.org', 'https://api.mainnet-beta.solana.com'];
+  let good = null, lastFull = 0, lastMsg = '?';
+  const bad = new Map();
+  const host = u => { try { return new URL(u).host; } catch { return 'RPC'; } };
+  function list() {
+    const c = getCustom();
+    const L = c ? [c, ...PUBLIC.filter(u => u !== c)] : PUBLIC.slice();
+    const ordered = good && L.includes(good) ? [good, ...L.filter(u => u !== good)] : L;
+    const now = Date.now(), ok = ordered.filter(u => (bad.get(u) || 0) <= now);
+    if (ok.length) return ok;
+    if (now - lastFull < 60000) return []; // tous en panne : on ne réessaie qu'une fois par minute
+    lastFull = now;
+    return ordered;
+  }
+  async function one(url, method, params) {
+    const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 10000);
+    try {
+      const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }), signal: ctl.signal });
+      let j = null; try { j = await r.json(); } catch {}
+      if (j && j.error) {
+        const m = j.error.message || 'erreur RPC', c = j.error.code;
+        throw Object.assign(new Error(m), { retry: /forbidden|rate|limit|too many|unauthori|not allowed|not supported|method not found|api key/i.test(m) || [403, 429, 401, -32601, -32005, -32052].includes(c) || !r.ok });
+      }
+      if (!r.ok || !j) throw Object.assign(new Error('HTTP ' + r.status), { retry: true });
+      return j.result;
+    } catch (e) {
+      if (e && e.name === 'AbortError') throw Object.assign(new Error('ne répond pas'), { retry: true });
+      if (e instanceof TypeError) throw Object.assign(new Error('injoignable depuis ce navigateur'), { retry: true });
+      throw e;
+    } finally { clearTimeout(to); }
+  }
+  async function call(method, params) {
+    let last = null;
+    for (const url of list()) {
+      try {
+        const r = await one(url, method, params);
+        if (good !== url) { good = url; log && log('RPC Solana actif : ' + host(url)); }
+        return r;
+      } catch (e) {
+        last = e;
+        if (!e.retry) throw new Error('RPC ' + host(url) + ' : ' + e.message);
+        bad.set(url, Date.now() + 90000);
+        if (good === url) good = null;
+        log && log('RPC ' + host(url) + ' refusé (' + e.message + '), essai du suivant');
+      }
+    }
+    if (last) { lastMsg = last.message; lastFull = Date.now(); }
+    throw new Error('aucun RPC Solana ne répond (' + lastMsg + '). Ajoute un RPC gratuit (Helius) dans Réglages du trading.');
+  }
+  return { call, current: () => (good ? host(good) : null) };
 }
 
 function WalletTrader(h, radar, jup) {
@@ -2018,17 +2074,8 @@ function WalletTrader(h, radar, jup) {
   }
 
   /* ---------- soldes : RPC Solana, repli Jupiter ---------- */
-  async function rpc(method, params) {
-    const url = cfg.rpc || 'https://api.mainnet-beta.solana.com';
-    const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 10000);
-    try {
-      const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }), signal: ctl.signal });
-      const j = await r.json();
-      if (j.error) throw new Error(j.error.message || 'erreur RPC');
-      return j.result;
-    } catch (e) { throw new Error(e && e.name === 'AbortError' ? 'le RPC ne répond pas' : (e && e.message) || 'RPC injoignable'); }
-    finally { clearTimeout(to); }
-  }
+  const pool = h.rpcPool || RpcPool(() => cfg.rpc, h.log);
+  const rpc = (method, params) => pool.call(method, params);
   let holdBusy = false;
   async function refreshHoldings() {
     if (!W.addr || holdBusy) return;
@@ -2466,8 +2513,8 @@ function WalletTrader(h, radar, jup) {
     setInterval(checkAlerts, 3000);
   }
 
-  return { start, render, detailHtml, jupKey: () => cfg.jupKey, connected: () => !!W.addr, W,
-    rpc, solUsd, loadW3, decimalsOf, orderErr, execErr, b64ToBytes, bytesToB64, provider: () => W.cur, addr: () => W.addr,
+  return { start, render, detailHtml, jupKey: () => cfg.jupKey, rpcUrl: () => cfg.rpc, connected: () => !!W.addr, W,
+    rpc, rpcName: () => pool.current(), solUsd, loadW3, decimalsOf, orderErr, execErr, b64ToBytes, bytesToB64, provider: () => W.cur, addr: () => W.addr,
     fmt: { fSol, fUsd, fQty, fPx, fPct, short, ago, n } };
 }
 if (typeof module !== 'undefined') module.exports = { JupClient, WalletTrader };
@@ -2572,6 +2619,22 @@ function TradeBot(h, radar, jup, tr) {
   /* ---------- blockchain ---------- */
   async function refresh() {
     if (!S.pub) return;
+    try { await refreshRpc(); }
+    catch (e) {
+      // repli : soldes lus chez Jupiter (pas besoin de RPC)
+      let j;
+      try { j = await jup.get('/ultra/v1/holdings/' + S.pub, 'high'); }
+      catch (e2) { throw new Error('soldes illisibles (' + e.message + ' ; ' + e2.message + ')'); }
+      const m = new Map();
+      for (const [mint, arr] of Object.entries((j && j.tokens) || {})) {
+        const e = { raw: 0n, dec: 0, accts: [] };
+        for (const x of arr || []) { e.raw += BigInt(x.amount || '0'); e.dec = x.decimals; e.accts.push({ pubkey: x.account, program: x.programId, lamports: Math.round(RENT * 1e9), raw: String(x.amount || '0'), frozen: !!x.isFrozen }); }
+        m.set(mint, e);
+      }
+      B.sol = +j.uiAmount; B.hold = m; B.holdAt = Date.now(); B.via = 'Jupiter';
+    }
+  }
+  async function refreshRpc() {
     const opt = { encoding: 'jsonParsed', commitment: 'confirmed' };
     const [bal, a, b] = await Promise.all([
       tr.rpc('getBalance', [S.pub, { commitment: 'confirmed' }]),
@@ -2587,7 +2650,7 @@ function TradeBot(h, radar, jup, tr) {
       e.raw += BigInt(info.tokenAmount.amount);
       e.accts.push({ pubkey: acc.pubkey, program: acc.account.owner, lamports: acc.account.lamports || 0, raw: info.tokenAmount.amount, frozen: info.state === 'frozen' });
     }
-    B.sol = bal.value / 1e9; B.hold = m; B.holdAt = Date.now();
+    B.sol = bal.value / 1e9; B.hold = m; B.holdAt = Date.now(); B.via = 'RPC';
   }
   async function confirmSig(sig, ms = 45000) {
     const t0 = Date.now();
@@ -2663,10 +2726,11 @@ function TradeBot(h, radar, jup, tr) {
     if (day().pnl <= -c.dayLoss) throw stop(`Perte du jour atteinte (${fSol(day().pnl)}) : pas de nouveau trade avant demain`);
     if (t && t.sources && t.sources.has('démo')) throw stop('Jeton fictif (démo)');
     if (t && t.verdict === 'reject') throw stop('Jeton écarté : ' + ((t.fails && t.fails[0]) || ''));
-    await refresh();
-    const had = B.hold.has(mint);
+    let known = true;
+    try { await refresh(); } catch (e) { known = false; log(`Solde du bot illisible (${e.message}) : Jupiter vérifiera les fonds`, 'warn'); }
+    const had = known && B.hold.has(mint);
     const need = sol + (had ? 0 : RENT + 0.0005) + RESERVE;
-    if (!(B.sol >= need)) throw stop(`Solde du bot insuffisant : ${fSol(B.sol)}. Il faut ≈ ${fSol(need)} (mise, dépôt du compte jeton et réserve pour vendre).`);
+    if (known && !(B.sol >= need)) throw stop(`Solde du bot insuffisant : ${fSol(B.sol)}. Il faut ≈ ${fSol(need)} (mise, dépôt du compte jeton et réserve pour vendre).`);
     const lam = Math.round(sol * 1e9);
     let o = await order(SOL, mint, lam, { taker: true });
     if (!o || !o.transaction) throw stop(tr.orderErr(o, 'buy'));
@@ -2765,11 +2829,12 @@ function TradeBot(h, radar, jup, tr) {
     p.busy = true; p.state = 'selling'; render();
     const c = S.cfg;
     try {
-      await refresh().catch(() => {});
-      const held = B.hold.get(p.mint);
-      const raw = held ? held.raw : 0n;
+      let known = true;
+      try { await refresh(); } catch { known = false; }
+      const held = known ? B.hold.get(p.mint) : null;
+      const raw = known ? (held ? held.raw : 0n) : BigInt(p.qtyRaw || '0');
       if (raw <= 0n) { await reclaim(p); close(p, 'Plus aucun jeton dans le wallet du bot'); return; }
-      if (held.accts.some(a => a.frozen && BigInt(a.raw) > 0n)) { p.frozen = true; log(`${p.sym} : compte gelé par le créateur, vente impossible`, 'bad'); return; }
+      if (held && held.accts.some(a => a.frozen && BigInt(a.raw) > 0n)) { p.frozen = true; log(`${p.sym} : compte gelé par le créateur, vente impossible`, 'bad'); return; }
       const amt = d.pct >= 100 ? raw : raw * BigInt(Math.round(d.pct)) / 100n;
       const max = Math.round(c.slip * 100);
       const tries = d.urgent ? [Math.round(max / 2), max, Math.min(5000, Math.round(max * 1.5))] : [0, Math.round(max / 3), max];
@@ -2968,6 +3033,7 @@ function TradeBot(h, radar, jup, tr) {
         <div class="kv"><div class="k">Positions</div><div class="v">${P.length} / ${c.maxPos}</div></div>
       </div>
       <div class="md-addr" style="margin-top:10px"><code id="bAddr">${esc(S.pub)}</code><button class="btn sm" data-b="copy">Copier</button></div>
+      <p class="note">Soldes lus via ${B.via === 'Jupiter' ? 'Jupiter (aucun RPC Solana ne répond : ajoute un RPC Helius gratuit dans Réglages du trading pour la récupération des dépôts et les retraits)' : (tr.rpcName && tr.rpcName()) || 'RPC Solana'}${B.holdAt ? ' · il y a ' + Math.max(0, Math.round((Date.now() - B.holdAt) / 1000)) + ' s' : ''}</p>
       ${P.length ? '<p class="note">Garde l\'appli ouverte et l\'écran allumé : téléphone en veille, le bot ne peut plus vendre.</p>' : ''}
       <div class="row-btns"><button class="btn sm ${c.active ? '' : 'pri'}" data-b="toggle">${c.active ? 'Mettre en pause' : 'Reprendre les propositions'}</button>${P.length ? '<button class="btn sm danger" data-b="closeall">Tout fermer</button>' : ''}</div>
       ${cf === 'closeall' ? '<div class="confirm"><span>Vendre toutes les positions maintenant ?</span><button class="btn sm danger" data-b="closeall-yes">Tout vendre</button><button class="btn sm" data-b="cancel">Annuler</button></div>' : ''}
@@ -4031,15 +4097,17 @@ if (typeof module !== 'undefined') module.exports = TradeBot;
   const inFrame = (() => { try { return window.top !== window.self; } catch { return true; } })();
   const buzz = p => { if (set.vibrate && navigator.vibrate) try { navigator.vibrate(p); } catch {} };
   const jup = JupClient(() => (trader ? trader.jupKey() : ''));
+  const rpcPool = RpcPool(() => (trader ? trader.rpcUrl() : ''), log);
   const radar = MemeRadar({
     $, $$, esc, store, log, toast, capital: () => set.capital,
     jup: (p, prio) => jup.get(p, prio),
+    rpc: (m, p) => rpcPool.call(m, p),
     tradeHtml: t => (trader ? trader.detailHtml(t) : '') + (bot ? bot.detailHtml(t) : ''),
     alert: msg => { toast('Mème · ' + msg, 'long'); beep(1); if (set.vibrate && navigator.vibrate) try { navigator.vibrate([80, 40, 80, 40, 160]); } catch {} }
   });
   radar.bindUI();
   trader = WalletTrader({
-    $, $$, esc, store, log, toast, capital: () => set.capital,
+    $, $$, esc, store, log, toast, capital: () => set.capital, rpcPool,
     solUsd: () => { if (!st.feed || st.feed === Demo || !st.tickers) return null; const x = st.tickers.get('SOLUSDT'); return x ? x.last : null; },
     alertSell: msg => { toast(msg, 'short'); beep(-1); if (set.vibrate && navigator.vibrate) try { navigator.vibrate([300, 80, 300]); } catch {} }
   }, radar, jup);
