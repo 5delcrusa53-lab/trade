@@ -332,6 +332,16 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
 .m-kpis.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 #bFund,#bPin{text-transform:none}
 
+/* ---------- graphiques et réglage perte/gain ---------- */
+.b-chart,.m-chart{display:block;width:100%;height:160px;max-width:100%}
+.p-life{margin:0;font-size:.8rem;color:var(--muted)}
+.q-set{display:grid;gap:10px;grid-template-columns:minmax(0,1fr)}
+.q-row{display:grid;gap:6px;grid-template-columns:minmax(0,1fr)}
+.q-set > *,.q-row > *{min-width:0}
+.q-set .add input{min-width:0;flex:1 1 0}
+.q-lab{font-size:.78rem;color:var(--muted);letter-spacing:.03em}
+#bQsl,#bQtp{text-transform:none}
+
 </style>
 </head>
 <body>
@@ -485,9 +495,9 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
       <div class="form">
         <div class="field"><label for="bSize">Mise par trade (SOL)</label><input id="bSize" type="number" inputmode="decimal" step="0.01"></div>
         <div class="field"><label for="bMax">Positions en même temps</label><input id="bMax" type="number" inputmode="numeric" step="1"></div>
-        <div class="field"><label for="bSl">Stop-loss (% net)</label><input id="bSl" type="number" inputmode="decimal" step="1"></div>
-        <div class="field"><label for="bTp1">Objectif 1 (% net, vend la moitié)</label><input id="bTp1" type="number" inputmode="decimal" step="5"></div>
-        <div class="field"><label for="bTrail">Stop suiveur après objectif 1 (%)</label><input id="bTrail" type="number" inputmode="decimal" step="1"></div>
+        <div class="field"><label for="bSl">Perte acceptée (% net)</label><input id="bSl" type="number" inputmode="decimal" step="1"></div>
+        <div class="field"><label for="bTp1">Gain visé (% net)</label><input id="bTp1" type="number" inputmode="decimal" step="5"></div>
+        <div class="field"><label for="bTrail">Stop suiveur après le gain visé (%)</label><input id="bTrail" type="number" inputmode="decimal" step="1"></div>
         <div class="field"><label for="bTp2">Objectif final (% net)</label><input id="bTp2" type="number" inputmode="decimal" step="10"></div>
         <div class="field"><label for="bDrop">Vente d'urgence si chute en 1 min (%)</label><input id="bDrop" type="number" inputmode="decimal" step="1"></div>
         <div class="field"><label for="bSlip">Glissement max en urgence (%)</label><input id="bSlip" type="number" inputmode="decimal" step="1"></div>
@@ -1282,6 +1292,76 @@ if (typeof module !== 'undefined') module.exports = { Binance, Bybit, Demo, TF_M
    Découverte : Pump.fun (PumpPortal, nouveaux jetons + migrations), DexScreener (profils, boosts,
    reprises communautaires), GeckoTerminal (nouveaux pools).
    Analyse : marché (DexScreener), sécurité (RugCheck, repli Solana RPC), puis verdict motivé. */
+/* Petit graphique en bougies (canvas) : prix ou capitalisation, lignes de niveaux, marques d'achat/vente */
+const MemeChart = {
+  fmtUsd(x) { return !Number.isFinite(x) ? '—' : x >= 1e9 ? (x / 1e9).toFixed(2).replace('.', ',') + ' Md' : x >= 1e6 ? (x / 1e6).toFixed(2).replace('.', ',') + ' M' : x >= 1e3 ? (x / 1e3).toFixed(1).replace('.', ',') + ' k' : x.toFixed(0); },
+  fmtPx(x) { return !(x > 0) ? '—' : x >= 1 ? x.toFixed(3).replace('.', ',') : x.toFixed(Math.min(12, 2 - Math.floor(Math.log10(x)))).replace('.', ','); },
+  withLive(list, live, step) {
+    if (!list || !list.length || !(live > 0)) return list || [];
+    const out = list.slice(), last = out[out.length - 1], now = Date.now();
+    if (now < last.t + step) out[out.length - 1] = Object.assign({}, last, { c: live, h: Math.max(last.h, live), l: Math.min(last.l, live) });
+    else out.push({ t: Math.floor(now / step) * step, o: last.c, h: Math.max(last.c, live), l: Math.min(last.c, live), c: live, v: 0 });
+    return out;
+  },
+  draw(cv, list, o = {}) {
+    if (!cv) return;
+    const W = cv.clientWidth, H = cv.clientHeight;
+    if (!W || !H) return;
+    const dpr = window.devicePixelRatio || 1;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const g = cv.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    const cs = getComputedStyle(document.documentElement), col = k => cs.getPropertyValue('--' + k).trim();
+    const C = { up: col('long'), dn: col('short'), mu: col('muted'), ln: col('line'), ac: col('accent'), wa: col('warn'), bg: col('bg') };
+    const font = cs.getPropertyValue('--f-mono').trim() || 'monospace';
+    if (!list || list.length < 2) { g.fillStyle = C.mu; g.font = '12px ' + font; g.textBaseline = 'middle'; g.fillText(o.empty || 'Graphique en chargement…', 8, H / 2); return; }
+    const padR = 64, padT = 10, padB = 16, pw = W - padR, ph = H - padT - padB, n = list.length, sp = pw / n;
+    let hi = -Infinity, lo = Infinity;
+    for (const k of list) { if (k.h > hi) hi = k.h; if (k.l > 0 && k.l < lo) lo = k.l; }
+    const lines = (o.lines || []).filter(L => L.v > 0);
+    for (const L of lines) if (L.v < hi * 2.5 && L.v > lo / 2.5) { hi = Math.max(hi, L.v); lo = Math.min(lo, L.v); } else L.off = true;
+    const pad = (hi - lo) * 0.08 || hi * 0.05; hi += pad; lo = Math.max(0, lo - pad);
+    const y = v => padT + (hi - v) / (hi - lo) * ph, x = i => i * sp + sp / 2;
+    const lab = v => o.sup ? MemeChart.fmtUsd(v * o.sup) + ' $' : MemeChart.fmtPx(v);
+    g.font = '10px ' + font; g.textBaseline = 'middle'; g.lineWidth = 1;
+    for (let i = 0; i <= 3; i++) {
+      const v = lo + (hi - lo) * i / 3, yy = Math.round(y(v)) + 0.5;
+      g.strokeStyle = C.ln; g.beginPath(); g.moveTo(0, yy); g.lineTo(pw, yy); g.stroke();
+      g.fillStyle = C.mu; g.fillText(lab(v), pw + 4, yy);
+    }
+    const bw = Math.max(1, sp * 0.62);
+    list.forEach((k, i) => {
+      const up = k.c >= k.o, xx = Math.round(x(i)) + 0.5;
+      g.strokeStyle = g.fillStyle = up ? C.up : C.dn;
+      g.beginPath(); g.moveTo(xx, y(k.h)); g.lineTo(xx, y(Math.max(k.l, lo))); g.stroke();
+      const a = y(k.o), b = y(k.c);
+      g.fillRect(xx - bw / 2, Math.min(a, b), bw, Math.max(1, Math.abs(a - b)));
+    });
+    for (const L of lines) {
+      if (L.off) continue;
+      const yy = Math.round(y(L.v)) + 0.5;
+      g.strokeStyle = L.color; g.setLineDash(L.dash || [4, 3]); g.beginPath(); g.moveTo(0, yy); g.lineTo(pw, yy); g.stroke(); g.setLineDash([]);
+      g.fillStyle = L.color; g.font = '600 10px ' + font; g.fillText(L.label, 4, yy - 7); g.font = '10px ' + font;
+    }
+    const step = o.step || 60000;
+    for (const m of o.marks || []) {
+      let i = list.findIndex(k => k.t + step > m.t); if (i < 0) i = n - 1;
+      const k = list[i], xx = x(i);
+      g.fillStyle = m.side === 'buy' ? C.ac : C.wa; g.beginPath();
+      if (m.side === 'buy') { const yy = Math.min(y(Math.max(k.l, lo)) + 9, padT + ph - 2); g.moveTo(xx, yy - 5); g.lineTo(xx - 5, yy + 4); g.lineTo(xx + 5, yy + 4); }
+      else { const yy = Math.max(y(k.h) - 9, padT + 4); g.moveTo(xx, yy + 5); g.lineTo(xx - 5, yy - 4); g.lineTo(xx + 5, yy - 4); }
+      g.fill();
+    }
+    const last = list[n - 1], ly = y(last.c);
+    g.fillStyle = last.c >= last.o ? C.up : C.dn; g.fillRect(pw + 1, ly - 8, padR - 1, 16);
+    g.fillStyle = C.bg; g.font = '600 10px ' + font; g.fillText(lab(last.c), pw + 4, ly);
+    g.fillStyle = C.mu; g.font = '10px ' + font; g.textBaseline = 'alphabetic'; g.textAlign = 'center';
+    const hm = t => new Date(t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    for (const i of [Math.floor(n * 0.12), Math.floor(n * 0.5), Math.floor(n * 0.88)]) if (list[i]) g.fillText(hm(list[i].t), x(i), H - 3);
+    g.textAlign = 'left';
+  }
+};
+
 function MemeRadar(h) {
   const WSOL = 'So11111111111111111111111111111111111111112';
   const SKIP = new Set([WSOL, 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB']);
@@ -1312,6 +1392,85 @@ function MemeRadar(h) {
     } catch (e) {
       throw new Error(e && e.name === 'AbortError' ? 'délai dépassé' : (e && e.message) || 'erreur réseau');
     } finally { clearTimeout(to); }
+  }
+
+  const G = { q: Promise.resolve(), last: 0, cache: new Map(), pend: new Map() };
+  function gecko(url) {
+    const run = async () => {
+      const wait = Math.max(0, G.last + 2300 - Date.now());
+      if (wait) await new Promise(r => setTimeout(r, wait));
+      G.last = Date.now();
+      return getJSON(url, {}, 10000);
+    };
+    const p = G.q.then(run, run);
+    G.q = p.catch(() => {});
+    return p;
+  }
+  const TFMS = { minute: 60000, hour: 3600e3, day: 86400e3 };
+  // Bougies : mode 'chart' = 90 dernières minutes, mode 'life' = depuis le lancement (minute, heure ou jour selon l'âge)
+  function candles(mint, mode) {
+    const t = R.tokens.get(mint);
+    const key = mint + '|' + mode, c = G.cache.get(key), maxAge = mode === 'chart' ? 30000 : 5 * 60000;
+    if (c && Date.now() - c.at < maxAge) return Promise.resolve(c);
+    if (G.pend.has(key)) return G.pend.get(key);
+    if (!t || !t.pair || !t.pair.pairAddress) return Promise.reject(new Error('pas encore de pool'));
+    const ageH = (Date.now() - (t.created || t.first)) / 3600e3;
+    let tf = 'minute', limit = mode === 'chart' ? 90 : 1000;
+    if (mode === 'life') { if (ageH > 16) tf = 'hour'; if (ageH > 24 * 40) tf = 'day'; }
+    const url = `https://api.geckoterminal.com/api/v2/networks/solana/pools/${t.pair.pairAddress}/ohlcv/${tf}?aggregate=1&limit=${limit}&currency=usd`;
+    const p = gecko(url).then(r => {
+      const L = (r && r.data && r.data.attributes && r.data.attributes.ohlcv_list) || [];
+      const out = { at: Date.now(), tf, step: TFMS[tf], list: L.map(x => ({ t: x[0] * 1000, o: +x[1], h: +x[2], l: +x[3], c: +x[4], v: +x[5] })).filter(k => k.h > 0).sort((a, b) => a.t - b.t), src: 'GeckoTerminal' };
+      G.cache.set(key, out);
+      return out;
+    }).finally(() => G.pend.delete(key));
+    G.pend.set(key, p);
+    return p;
+  }
+  // Repli : bougies d'une minute reconstruites avec nos relevés DexScreener
+  function histCandles(t) {
+    const out = [];
+    for (const s of (t && t.hist) || []) {
+      if (!(s.px > 0)) continue;
+      const m = Math.floor(s.ts / 60000) * 60000;
+      let k = out[out.length - 1];
+      if (!k || k.t !== m) { k = { t: m, o: s.px, h: s.px, l: s.px, c: s.px, v: 0 }; out.push(k); }
+      k.h = Math.max(k.h, s.px); k.l = Math.min(k.l, s.px); k.c = s.px;
+    }
+    return out;
+  }
+  async function chartData(mint) {
+    const t = R.tokens.get(mint);
+    try { const d = await candles(mint, 'chart'); if (d.list.length >= 2) return d; } catch {}
+    return { at: Date.now(), tf: 'minute', step: 60000, list: histCandles(t), src: 'relevés DexScreener' };
+  }
+  const supplyOf = t => (t && t.pair && +t.pair.priceUsd > 0 && (t.pair.marketCap || t.pair.fdv)) ? (t.pair.marketCap || t.pair.fdv) / +t.pair.priceUsd : null;
+  // Âge, plus bas et plus haut depuis la sortie du jeton
+  async function life(mint) {
+    const t = R.tokens.get(mint);
+    if (!t) return null;
+    let d = null;
+    try { d = await candles(mint, 'life'); } catch {}
+    let list = d && d.list.length ? d.list : histCandles(t), src = d && d.list.length ? 'GeckoTerminal' : 'relevés';
+    const px = t.pair ? +t.pair.priceUsd : NaN;
+    let lo = Infinity, hi = -Infinity, loT = 0, hiT = 0;
+    for (const k of list) { if (k.l > 0 && k.l < lo) { lo = k.l; loT = k.t; } if (k.h > hi) { hi = k.h; hiT = k.t; } }
+    if (px > 0) { if (px > hi) { hi = px; hiT = Date.now(); } if (px < lo) { lo = px; loT = Date.now(); } }
+    if (!(hi > 0)) return null;
+    const created = t.created || t.first, step = d ? d.step : 60000;
+    const complete = list.length && list[0].t <= created + 2 * step;
+    const sup = supplyOf(t);
+    const out = { at: Date.now(), created, lo, hi, loT, hiT, px, sup, loMc: sup ? lo * sup : null, hiMc: sup ? hi * sup : null, mc: t.pair ? (t.pair.marketCap || t.pair.fdv) : null, fromHi: px > 0 ? px / hi - 1 : null, complete, since: list.length ? list[0].t : Date.now(), src };
+    t.life = out;
+    return out;
+  }
+  function lifeText(t, L) {
+    L = L || (t && t.life);
+    const age = t ? ago(Date.now() - (t.created || t.first)) : '—';
+    if (!L) return `Sorti il y a ${age}`;
+    const span = L.complete ? 'depuis sa sortie' : `depuis ${ago(Date.now() - L.since)}`;
+    const mc = v => v ? usd(v) : null;
+    return `Sorti il y a ${age} · plus bas ${mc(L.loMc) || MemeChart.fmtPx(L.lo) + ' $'} · plus haut ${mc(L.hiMc) || MemeChart.fmtPx(L.hi) + ' $'} (il y a ${ago(Date.now() - L.hiT)}) ${span}${fin(L.fromHi) && L.fromHi < -0.02 ? ` · actuel ${pct(L.fromHi * 100)} sous le plus haut` : ''}`;
   }
 
   /* ---------- registre des jetons ---------- */
@@ -1381,7 +1540,7 @@ function MemeRadar(h) {
   /* ---------- source 3 : GeckoTerminal (nouveaux pools) ---------- */
   async function pollGecko() {
     try {
-      const r = await getJSON('https://api.geckoterminal.com/api/v2/networks/solana/new_pools?page=1');
+      const r = await gecko('https://api.geckoterminal.com/api/v2/networks/solana/new_pools?page=1');
       for (const p of r.data || []) {
         const a = p.attributes || {}, rel = p.relationships || {};
         let mint = ((rel.base_token && rel.base_token.data && rel.base_token.data.id) || '').replace(/^solana_/, '');
@@ -1729,7 +1888,7 @@ function MemeRadar(h) {
     return `<button class="m-card" data-mint="${esc(t.mint)}" data-v="${t.verdict}">
       <div class="m-head">
         <span class="m-ava">${esc((t.symbol || '?').slice(0, 2).toUpperCase())}${img ? `<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</span>
-        <span class="m-name"><b>${esc(t.symbol || '?')}</b><small>${esc((t.name || '').slice(0, 28))} · ${ago((m.age || 0) * 60000)} · ${esc(src)}</small></span>
+        <span class="m-name"><b>${esc(t.symbol || '?')}</b><small>sorti il y a ${ago((m.age || 0) * 60000)} · ${esc((t.name || '').slice(0, 24))} · ${esc(src)}</small></span>
         ${vchip}
       </div>
       <div class="m-kpis">
@@ -1817,6 +1976,9 @@ function MemeRadar(h) {
       ${(t.fails || []).length ? `<h3>Ce qui l'écarte</h3><ul class="m-why bad">${t.fails.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
       ${(t.risks || []).length ? `<h3>Risques</h3><ul class="m-why warn">${t.risks.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
       <h3>Contrôles de sécurité ${s ? '<small class="muted">(' + esc(s.src) + ')</small>' : ''}</h3><ul class="m-checks">${checks}</ul>
+      <h3>Historique du coin</h3>
+      <p class="note" id="mdLife" style="margin:0 0 8px">${esc(lifeText(t))}</p>
+      <canvas class="m-chart" id="mdChart" aria-label="Graphique du coin"></canvas>
       <h3>Chiffres</h3><div class="sizing" style="border:0;margin:0;padding:0">
         <div class="kv"><div class="k">Capitalisation</div><div class="v">${usd(m.mc)}</div></div>
         <div class="kv"><div class="k">${m.onCurve ? 'Courbe pump.fun' : 'Liquidité'}</div><div class="v">${m.onCurve ? (m.progress != null ? '≈ ' + Math.round(m.progress * 100) + ' %' : '—') : usd(m.liq)}</div></div>
@@ -1831,6 +1993,13 @@ function MemeRadar(h) {
       <div class="row-btns">${links.map(([l, u]) => `<a class="btn sm" href="${u}" target="_blank" rel="noopener noreferrer">${l}</a>`).join('')}</div>
       <p class="note">Ceci n'est pas un conseil financier. La grande majorité des mèmes finissent à zéro, même ceux qui passent les contrôles.</p>`;
     h.$('#memeSheet').hidden = false;
+    const sup = supplyOf(t);
+    MemeChart.draw(h.$('#mdChart'), [], { empty: 'Graphique en chargement…' });
+    life(mint).then(L => { const el = h.$('#mdLife'); if (el && L) el.textContent = lifeText(t, L); }).catch(() => {});
+    chartData(mint).then(d => {
+      const cv = h.$('#mdChart');
+      if (cv && !h.$('#memeSheet').hidden) MemeChart.draw(cv, MemeChart.withLive(d.list, t.pair ? +t.pair.priceUsd : NaN, d.step), { sup, step: d.step, empty: 'Pas encore de données de prix' });
+    }).catch(() => {});
     h.$('#mdClose').onclick = () => { h.$('#memeSheet').hidden = true; };
     h.$('#mdCopy').onclick = async () => {
       try { await navigator.clipboard.writeText(mint); h.toast('Adresse copiée'); }
@@ -1861,7 +2030,7 @@ function MemeRadar(h) {
     const t = add(mint, { source: 'wallet' });
     if (t) t.mktAt = 0;
   }
-  return { start, render, badge, bindUI, R, track, get: mint => R.tokens.get(mint), getCfg: () => cfg, openDetail };
+  return { start, render, badge, bindUI, R, track, get: mint => R.tokens.get(mint), getCfg: () => cfg, openDetail, life, lifeText, chartData, supplyOf };
 }
 if (typeof module !== 'undefined') module.exports = MemeRadar;
 
@@ -2540,7 +2709,7 @@ function TradeBot(h, radar, jup, tr) {
   S.cfg = Object.assign({}, DEF, S.cfg);
   const save = () => h.store.set('bot', S);
   let kp = null;
-  const B = { sol: null, hold: new Map(), holdAt: 0, props: [], ui: {}, wl: null, started: false };
+  const B = { sol: null, hold: new Map(), holdAt: 0, props: [], ui: {}, wl: null, started: false, charts: {}, chartBusy: {}, lifeAt: {} };
 
   function log(msg, lvl = 'info') {
     S.log.unshift({ t: Date.now(), msg, lvl });
@@ -2745,14 +2914,15 @@ function TradeBot(h, radar, jup, tr) {
     if (!back || !(+back.outAmount > 0)) throw stop('Revente impossible : aucune route de vente, piège probable');
     const rt = 1 - (+back.outAmount - NET_FEE * 1e9) / (lam + NET_FEE * 1e9);
     if (rt > 0.2) throw stop(`Un aller-retour coûterait ${Math.round(rt * 100)} % : taxe cachée ou liquidité piégée`);
-    if (rt * 100 > c.tp1 * 0.5) throw stop(`Un aller-retour coûte déjà ${Math.round(rt * 100)} % : trop cher pour viser +${c.tp1} %`);
+    if (rt * 100 > c.tp1 * 0.5) throw stop(`Un aller-retour coûte déjà ${Math.round(rt * 100)} % : trop cher pour un gain visé de +${c.tp1} %`);
     if (Date.now() - t0 > 15000) { o = await order(SOL, mint, lam, { taker: true }); if (!o || !o.transaction) throw stop(tr.orderErr(o, 'buy')); }
     const res = await execOrder(o);
     const qty = +res.totalOutputAmount;
     const p = S.pos[mint] = {
       mint, sym, dec, t0: Date.now(), state: 'open', why: why || 'Choisi par toi',
       cost: +res.totalInputAmount / 1e9 + NET_FEE, rent: had ? 0 : RENT, costReal: false,
-      qtyRaw: String(res.totalOutputAmount), realized: 0, tp1Done: false, peakTot: null, hist: [], sigs: [res.signature], rt
+      qtyRaw: String(res.totalOutputAmount), realized: 0, tp1Done: false, peakTot: null, hist: [], sigs: [res.signature], rt,
+      px0: px > 0 ? px : null, pxPeak: px > 0 ? px : null, events: [{ t: Date.now(), side: 'buy', px: px > 0 ? px : null }]
     };
     day().n++;
     save();
@@ -2782,6 +2952,7 @@ function TradeBot(h, radar, jup, tr) {
     if (!fin(p.v)) return NaN;
     const t = radar.get(p.mint);
     const px = t && t.pair ? +t.pair.priceUsd : NaN;
+    if (px > 0) p.pxPeak = Math.max(p.pxPeak || px, px);
     if (p.pxQ > 0 && px > 0 && t.mktAt > (p.estAt || 0)) {
       p.estAt = t.mktAt;
       const est = Math.max(0, p.v * px / p.pxQ);
@@ -2810,12 +2981,13 @@ function TradeBot(h, radar, jup, tr) {
     const win = p.hist.filter(x => now - x.t <= 60000);
     const hi = Math.max(tot, ...win.map(x => x.v));
     if (win.length >= 2 && tot <= hi * (1 - c.drop / 100)) return { pct: 100, urgent: true, why: `Chute rapide : −${Math.round((1 - tot / hi) * 100)} % en moins d'une minute (${fPct(pnl)} net)` };
-    if (pnl <= -c.sl / 100) return { pct: 100, urgent: true, why: `Stop-loss : ${fPct(pnl)} net de frais` };
+    if (pnl <= -c.sl / 100) return { pct: 100, urgent: true, why: `Perte acceptée atteinte (−${c.sl} %) : ${fPct(pnl)} net de frais` };
     if (pnl >= c.tp2 / 100) return { pct: 100, why: `Objectif final atteint : ${fPct(pnl)} net` };
     if (!p.tp1Done && pnl >= c.tp1 / 100) {
       const part = V * c.tp1Part / 100, rest = V - part;
-      const all = part < 0.01 || rest < 0.01; // trop petit : une 2e vente coûterait trop de frais
-      return { pct: all ? 100 : c.tp1Part, tp1: true, why: `Objectif 1 atteint : ${fPct(pnl)} net${all ? ' (position trop petite pour vendre en deux fois)' : ''}` };
+      const small = c.tp1Part < 100 && (part < 0.01 || rest < 0.01); // trop petit : une 2e vente coûterait trop de frais
+      const all = c.tp1Part >= 100 || small;
+      return { pct: all ? 100 : c.tp1Part, tp1: true, why: `Gain visé atteint : ${fPct(pnl)} net${small ? ' (position trop petite pour vendre en deux fois)' : ''}` };
     }
     if (p.tp1Done && tot <= p.peakTot * (1 - c.trail / 100)) return { pct: 100, why: `Stop suiveur : −${Math.round((1 - tot / p.peakTot) * 100)} % depuis le plus haut, ${fPct(pnl)} net` };
     if (!p.tp1Done && peakPnl >= c.beAt / 100 && pnl <= c.beFloor / 100) return { pct: 100, why: `Protection : le gain est retombé à ${fPct(pnl)} net, sortie avant de passer en perte` };
@@ -2852,6 +3024,7 @@ function TradeBot(h, radar, jup, tr) {
       p.realized += got;
       p.qtyRaw = (raw - BigInt(res.totalInputAmount)).toString();
       p.sigs.push(res.signature);
+      { const tt = radar.get(p.mint); (p.events = p.events || []).push({ t: Date.now(), side: 'sell', px: tt && tt.pair ? +tt.pair.priceUsd : null }); }
       if (d.tp1) p.tp1Done = true;
       p.v = null; p.vEst = null; p.vAt = 0;
       log(`Vente ${d.pct >= 100 ? 'totale' : d.pct + ' %'} ${p.sym} : ${fSol(got)} reçus. ${d.why}`, d.urgent ? 'bad' : 'sell');
@@ -2932,6 +3105,7 @@ function TradeBot(h, radar, jup, tr) {
       if (t.verdict !== 'buy' || S.pos[t.mint] || (S.ignored[t.mint] && now - S.ignored[t.mint] < 2 * 3600e3) || B.props.some(x => x.mint === t.mint) || (t.sources && t.sources.has('démo'))) continue;
       if (t.flaggedAt && now - t.flaggedAt > 4 * 60000) continue;
       B.props.unshift({ mint: t.mint, sym: t.symbol || short(t.mint), score: t.score, t: now });
+      radar.life(t.mint).catch(() => {});
       h.ask(`Le bot propose : rejoindre ${t.symbol || 'ce jeton'} ? (score ${t.score})`);
     }
     B.props = B.props.slice(0, 5);
@@ -3013,16 +3187,32 @@ function TradeBot(h, radar, jup, tr) {
       restore(); return;
     }
     const P = openPos().sort((a, b) => b.t0 - a.t0), d = day();
-    const props = B.props.map(x => `<div class="p-card" data-l="ok"><div class="p-head"><button class="p-sym" data-open="${esc(x.mint)}">${esc(x.sym)}</button><span class="muted small">score ${x.score} · il y a ${ago(Date.now() - x.t)}</span><span></span></div>
-      <div class="row-btns" style="margin:0"><button class="btn sm pri" data-bjoin="${esc(x.mint)}">Rejoindre avec ${fSol(c.size)}</button><button class="btn sm" data-bign="${esc(x.mint)}">Ignorer</button></div></div>`).join('');
+    for (const m of [...B.props.map(x => x.mint), ...P.map(p => p.mint)]) if (Date.now() - (B.lifeAt[m] || 0) > 60000) { B.lifeAt[m] = Date.now(); radar.life(m).catch(() => {}); }
+    const props = B.props.map(x => { const t = radar.get(x.mint); const mc = t && t.pair ? (t.pair.marketCap || t.pair.fdv) : null; return `<div class="p-card" data-l="ok"><div class="p-head"><button class="p-sym" data-open="${esc(x.mint)}">${esc(x.sym)}</button><span class="muted small">score ${x.score}${mc ? ' · cap ' + MemeChart.fmtUsd(mc) + ' $' : ''}</span><span></span></div>
+      <p class="p-life">${esc(radar.lifeText(t))}</p>
+      <div class="row-btns" style="margin:0"><button class="btn sm pri" data-bjoin="${esc(x.mint)}">Rejoindre avec ${fSol(c.size)}</button><button class="btn sm" data-bign="${esc(x.mint)}">Ignorer</button></div></div>`; }).join('');
     const pos = P.map(p => {
       const V = fin(p.vEst) && p.estAt > p.vAt ? p.vEst : p.v, tot = fin(V) ? V + p.realized : NaN, pnl = fin(tot) ? tot / p.cost - 1 : NaN;
-      const st = p.state === 'selling' ? 'vente en cours…' : p.frozen ? 'compte gelé' : p.tp1Done ? `objectif 1 pris · suiveur −${c.trail} %` : `stop −${c.sl} % · objectif +${c.tp1} %`;
+      const st = p.state === 'selling' ? 'vente en cours…' : p.frozen ? 'compte gelé' : p.tp1Done ? `gain visé pris · suiveur −${c.trail} %` : `perte max −${c.sl} % · gain visé +${c.tp1} %`;
       return `<div class="p-card" data-l="${p.state === 'selling' ? 'warn' : pnl < -c.sl / 200 ? 'danger' : pnl > 0 ? 'ok' : 'info'}">
         <div class="p-head"><button class="p-sym" data-open="${esc(p.mint)}">${esc(p.sym)}</button><span class="muted small">il y a ${ago(Date.now() - p.t0)} · ${st}</span><span class="p-pnl ${pnl > 0 ? 'pos' : pnl < 0 ? 'neg' : ''}">${fPct(pnl)}</span></div>
         <div class="m-kpis two"><span>Mise <b>${fSol(p.cost)}</b></span><span>Valeur nette <b>${fSol(tot)}</b></span><span>Résultat <b class="${tot > p.cost ? 'pos' : 'neg'}">${fin(tot) ? fSol(tot - p.cost) : '—'}</b></span><span>Aller-retour à l'achat <b>${fPct(-p.rt)}</b></span></div>
+        <p class="p-life">${esc(radar.lifeText(radar.get(p.mint)))}</p>
+        <canvas class="b-chart" data-mint="${esc(p.mint)}" aria-label="Graphique de ${esc(p.sym)}"></canvas>
         <div class="row-btns" style="margin:0"><button class="btn sm danger" data-bclose="${esc(p.mint)}" ${p.state === 'selling' ? 'disabled' : ''}>Fermer maintenant</button></div></div>`;
     }).join('');
+    const chip = (k, v, label, cur) => `<button class="btn sm ${cur ? 'pri' : ''}" data-bq="${k}" data-v="${v}" aria-pressed="${cur}">${label}</button>`;
+    const slList = [10, 15, 20, 25, 30, 50], tpList = [20, 30, 40, 60, 100, 200];
+    if (!slList.includes(c.sl)) slList.push(c.sl);
+    if (!tpList.includes(c.tp1)) tpList.push(c.tp1);
+    const quick = `<h3 class="w-h">Perte et gain (tous les trades du bot)</h3>
+      <div class="q-set">
+        <div class="q-row"><span class="q-lab">Perte acceptée</span><div class="row-btns" style="margin:0">${slList.sort((a, b) => a - b).map(v => chip('sl', v, '−' + n(v, 1) + ' %', v === c.sl)).join('')}</div></div>
+        <div class="q-row"><span class="q-lab">Gain visé</span><div class="row-btns" style="margin:0">${tpList.sort((a, b) => a - b).map(v => chip('tp1', v, '+' + n(v, 1) + ' %', v === c.tp1)).join('')}</div></div>
+        <div class="q-row"><span class="q-lab">Au gain visé</span><div class="row-btns" style="margin:0">${chip('part', 50, 'Vendre la moitié, laisser courir le reste', c.tp1Part < 100)}${chip('part', 100, 'Tout vendre', c.tp1Part >= 100)}</div></div>
+        <div class="add"><input id="bQsl" type="number" inputmode="decimal" step="1" placeholder="Perte %"><input id="bQtp" type="number" inputmode="decimal" step="1" placeholder="Gain %"><button class="btn" data-b="qapply">Appliquer</button></div>
+        <p class="note">Avec ta mise de ${fSol(c.size)} : perte max ≈ ${fSol(c.size * c.sl / 100)}, gain visé ≈ +${fSol(c.size * c.tp1 / 100)}${c.tp1Part < 100 ? ` sur la moitié vendue, le reste suit avec un stop à −${c.trail} % du plus haut` : ''}. Pourcentages nets de frais, appliqués tout de suite aux trades en cours. En cas de chute brutale, la vente d'urgence peut sortir un peu au-delà de la perte acceptée.</p>
+      </div>`;
     const hist = S.hist.slice(0, 8).map(x => `<div class="j-row"><span class="chip ${x.net >= 0 ? 'long' : 'short'}">${fPct(x.pnl)}</span><div class="j-mid"><div>${esc(x.sym)} · ${esc(x.why)}</div><div class="mono">${ago(Date.now() - x.t1)} · ${fSol(x.cost)} → ${fSol(x.back)}</div></div><span class="j-r ${x.net >= 0 ? 'pos' : 'neg'}">${fSol(x.net)}</span></div>`).join('');
     const logs = S.log.slice(0, 14).map(x => `<div class="b-log" data-l="${x.lvl}"><span class="mono">${new Date(x.t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span><span>${esc(x.msg)}</span></div>`).join('');
     const cf = B.ui.confirm;
@@ -3037,6 +3227,7 @@ function TradeBot(h, radar, jup, tr) {
       ${P.length ? '<p class="note">Garde l\'appli ouverte et l\'écran allumé : téléphone en veille, le bot ne peut plus vendre.</p>' : ''}
       <div class="row-btns"><button class="btn sm ${c.active ? '' : 'pri'}" data-b="toggle">${c.active ? 'Mettre en pause' : 'Reprendre les propositions'}</button>${P.length ? '<button class="btn sm danger" data-b="closeall">Tout fermer</button>' : ''}</div>
       ${cf === 'closeall' ? '<div class="confirm"><span>Vendre toutes les positions maintenant ?</span><button class="btn sm danger" data-b="closeall-yes">Tout vendre</button><button class="btn sm" data-b="cancel">Annuler</button></div>' : ''}
+      ${quick}
       ${props ? `<h3 class="w-h">Le bot te demande</h3>${props}` : (c.active ? '<p class="note">Le bot te proposera ici chaque jeton jugé intéressant par le radar. Tu peux aussi ouvrir n\'importe quel jeton et toucher « Confier au bot ».</p>' : '')}
       ${pos ? `<h3 class="w-h">Trades gérés par le bot</h3>${pos}` : ''}
       ${hist ? `<h3 class="w-h">Trades terminés</h3><div class="journal">${hist}</div>` : ''}
@@ -3048,15 +3239,39 @@ function TradeBot(h, radar, jup, tr) {
       ${cf === 'export' ? '<div class="confirm" style="display:grid;gap:8px"><input id="bPinX" type="password" autocomplete="current-password" placeholder="Code du bot" style="background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px"><span class="row-btns" style="margin:0"><button class="btn sm" data-b="export-yes">Afficher la clé</button><button class="btn sm" data-b="cancel">Annuler</button></span></div>' : ''}
       ${B.ui.secret ? `<div class="advice" data-l="danger"><h3>Clé privée du bot</h3><p>Garde-la secrète. Elle s'importe dans Phantom (« Importer une clé privée »).</p><div class="md-addr" style="margin-top:8px"><code id="bSecret">${esc(B.ui.secret)}</code><button class="btn sm" data-b="copysecret">Copier</button></div><div class="row-btns"><button class="btn sm" data-b="hidesecret">Masquer</button></div></div>` : ''}`;
     restore();
+    drawCharts();
+  }
+  function drawCharts() {
+    const cs = getComputedStyle(document.documentElement), col = k => cs.getPropertyValue('--' + k).trim();
+    for (const cv of document.querySelectorAll('#botBody canvas.b-chart')) {
+      const p = S.pos[cv.dataset.mint];
+      if (!p) continue;
+      const ch = B.charts[p.mint];
+      if ((!ch || Date.now() - ch.at > 30000) && !B.chartBusy[p.mint]) {
+        B.chartBusy[p.mint] = true;
+        radar.chartData(p.mint).then(d => { B.charts[p.mint] = { at: Date.now(), d }; }).catch(() => {}).finally(() => { B.chartBusy[p.mint] = false; });
+      }
+      if (!ch) { MemeChart.draw(cv, [], { empty: 'Graphique en chargement…' }); continue; }
+      const t = radar.get(p.mint), c = S.cfg, live = t && t.pair ? +t.pair.priceUsd : NaN;
+      const k = 1 - (p.rt || 0), lines = [];
+      if (p.px0 > 0) {
+        lines.push({ v: p.px0, color: col('accent'), label: 'Entrée' });
+        if (!p.tp1Done) {
+          lines.push({ v: p.px0 * (1 - c.sl / 100) / k, color: col('short'), label: `Perte −${n(c.sl, 1)} %` });
+          lines.push({ v: p.px0 * (1 + c.tp1 / 100) / k, color: col('long'), label: `Gain +${n(c.tp1, 1)} %` });
+        } else if (p.pxPeak > 0) lines.push({ v: p.pxPeak * (1 - c.trail / 100), color: col('warn'), label: `Suiveur −${n(c.trail, 1)} %` });
+      }
+      MemeChart.draw(cv, MemeChart.withLive(ch.d.list, live, ch.d.step).slice(-90), { sup: radar.supplyOf(t), step: ch.d.step, lines, marks: p.events || [], empty: 'Pas encore de données de prix' });
+    }
   }
 
   function detailHtml(t) {
     if (h.inFrame || !S.pub || (t.sources && t.sources.has('démo'))) return '';
     if (!kp) return '<div class="t-box bot"><b>Bot</b><p class="note" style="margin:4px 0 0">Déverrouille le bot en haut de l\'onglet pour lui confier ce trade.</p></div>';
     const p = S.pos[t.mint], c = S.cfg;
-    if (p && p.state !== 'closed') return `<div class="t-box bot"><b>Le bot gère ce trade</b><p class="note" style="margin:4px 0 8px">${fin(p.pnl) ? fPct(p.pnl) + ' net de frais. ' : ''}Stop −${c.sl} %, objectif +${c.tp1} %, vente d'urgence si −${c.drop} % en 1 min.</p><button class="btn sm danger" data-bclose="${esc(t.mint)}">Fermer maintenant</button></div>`;
+    if (p && p.state !== 'closed') return `<div class="t-box bot"><b>Le bot gère ce trade</b><p class="note" style="margin:4px 0 8px">${fin(p.pnl) ? fPct(p.pnl) + ' net de frais. ' : ''}Perte acceptée −${c.sl} %, gain visé +${c.tp1} %, vente d'urgence si −${c.drop} % en 1 min.</p><button class="btn sm danger" data-bclose="${esc(t.mint)}">Fermer maintenant</button></div>`;
     if (t.verdict === 'reject') return '';
-    return `<div class="t-box bot"><b>Confier au bot</b><p class="note" style="margin:4px 0 8px">Il achète ${fSol(c.size)} tout de suite, sans validation, puis revend seul : moitié à +${c.tp1} % net, stop −${c.sl} %, stop suiveur −${c.trail} %, vente d'urgence si chute rapide.</p><button class="btn sm pri" data-bjoin="${esc(t.mint)}">Rejoindre avec ${fSol(c.size)}</button></div>`;
+    return `<div class="t-box bot"><b>Confier au bot</b><p class="note" style="margin:4px 0 8px">Il achète ${fSol(c.size)} tout de suite, sans validation, puis revend seul : ${c.tp1Part < 100 ? 'moitié' : 'tout'} à +${c.tp1} % net, perte acceptée −${c.sl} %, vente d'urgence si chute rapide. Réglages dans la carte du bot.</p><button class="btn sm pri" data-bjoin="${esc(t.mint)}">Rejoindre avec ${fSol(c.size)}</button></div>`;
   }
 
   /* ---------- événements ---------- */
@@ -3082,7 +3297,16 @@ function TradeBot(h, radar, jup, tr) {
       if (p) { p.closeReq = true; log(`Fermeture immédiate demandée sur ${p.sym}`, 'warn'); save(); if (!p.busy) sell(p, { pct: 100, urgent: true, why: 'Fermeture demandée par toi' }); }
       render(); return;
     }
+    if (b.dataset.bq) { setQuick(b.dataset.bq, +b.dataset.v); return; }
     const a = b.dataset.b;
+    if (a === 'qapply') {
+      const sl = parseFloat(val('bQsl').replace(',', '.')), tp = parseFloat(val('bQtp').replace(',', '.'));
+      if (!fin(sl) && !fin(tp)) { h.toast('Indique une perte ou un gain en %'); return; }
+      ['bQsl', 'bQtp'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      if (fin(sl)) setQuick('sl', sl);
+      if (fin(tp)) setQuick('tp1', tp);
+      return;
+    }
     if (!a) return;
     if (a === 'create') {
       const p1 = val('bPin1'), p2 = val('bPin2');
@@ -3114,6 +3338,17 @@ function TradeBot(h, radar, jup, tr) {
   async function copy(text, id) {
     try { await navigator.clipboard.writeText(text); h.toast('Copié'); }
     catch { const r = document.createRange(); const el = document.getElementById(id); if (el) { r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } h.toast('Texte sélectionné : copie-le'); }
+  }
+  function setQuick(k, v) {
+    const lim = { sl: [3, 90], tp1: [5, 1000], part: [50, 100] }[k];
+    if (!lim || !(v >= lim[0] && v <= lim[1])) { h.toast(`Valeur hors limites (${lim ? lim[0] + ' à ' + lim[1] : '?'} %)`); return; }
+    if (k === 'tp1' && v <= 2 * 3) h.toast('Gain visé très faible : les frais risquent de tout manger');
+    S.cfg[k === 'part' ? 'tp1Part' : k] = v;
+    save();
+    const el = document.getElementById(k === 'sl' ? 'bSl' : k === 'tp1' ? 'bTp1' : '');
+    if (el) el.value = v;
+    log(k === 'sl' ? `Perte acceptée réglée à −${v} % pour tous les trades` : k === 'tp1' ? `Gain visé réglé à +${v} % pour tous les trades` : (v >= 100 ? 'Au gain visé : tout vendre' : 'Au gain visé : vendre la moitié et laisser courir'));
+    render();
   }
   function symOf(mint) { const t = radar.get(mint); return (t && t.symbol) || short(mint); }
 
