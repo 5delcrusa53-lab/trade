@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0a0f15">
 <title>Vigie Scalp</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
@@ -548,6 +552,10 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
 
   <!-- ===== RÉGLAGES ===== -->
   <section class="tab" id="tab-set" hidden>
+    <div class="card" id="appCard">
+      <h2>Application</h2>
+      <div id="appBody"><p class="note" style="margin:0">Vérification…</p></div>
+    </div>
     <div class="card">
       <h2>Plateforme</h2>
       <div class="seg" id="exSeg"><button data-ex="binance">Binance</button><button data-ex="bybit">Bybit</button><button data-ex="demo">Démo</button></div>
@@ -4322,7 +4330,7 @@ if (typeof module !== 'undefined') module.exports = TradeBot;
     if (t === 'scan') { renderScan(!!st.scanAt); if (!st.scanAt || Date.now() - st.scanAt > 30000) scan(); }
     if (t === 'stats') { renderCalib(); renderJournal(); }
     if (t === 'pos') { if (!pos) fillForm(null); renderPos(); }
-    if (t === 'set') { renderSettings(); renderDiag(); }
+    if (t === 'set') { renderSettings(); renderDiag(); renderApp(); }
     window.scrollTo(0, 0);
   }
   $$('.tabbar button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
@@ -4450,6 +4458,27 @@ if (typeof module !== 'undefined') module.exports = TradeBot;
     if (curTab === 'scan' && st.scanAt && Date.now() - st.scanAt > 60000) scan();
   }, 5000);
   setInterval(() => tick(false), 250);
+
+  // installation comme application
+  let installEvt = null;
+  const standalone = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch { return false; } };
+  const hasManifest = !!document.querySelector('link[rel="manifest"]');
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; renderApp(); });
+  addEventListener('appinstalled', () => { installEvt = null; toast('Vigie Scalp installée', 'long'); renderApp(); });
+  function renderApp() {
+    const box = $('#appBody');
+    if (!box) return;
+    const bot = (() => { try { return !!JSON.parse(localStorage.getItem('vigie.bot') || '{}').pub; } catch { return false; } })();
+    const keyNote = '<p class="note">La clé du bot est enregistrée dans le navigateur où tu l\'as créée. L\'appli installée a son propre stockage : exporte d\'abord la clé là où le bot tourne, puis utilise « Restaurer » dans l\'appli installée. Ne fais jamais tourner le bot à deux endroits en même temps.</p>';
+    if (standalone()) { box.innerHTML = '<p class="note" style="margin:0"><strong>Tu utilises l\'appli installée.</strong></p>' + (bot ? '' : keyNote); return; }
+    if (inFrame) { box.innerHTML = '<p class="note" style="margin:0">L\'installation n\'est pas possible dans l\'aperçu Claude.</p>'; return; }
+    if (!hasManifest) { box.innerHTML = '<p class="note" style="margin:0">Ce fichier ne contient pas les informations d\'installation. Utilise la version « dossier » (index.html, manifest.webmanifest, sw.js et les icônes) mise dans son propre dépôt.</p>'; return; }
+    if (installEvt) { box.innerHTML = '<div class="row-btns" style="margin:0"><button class="btn pri" id="appInstall">Installer Vigie Scalp</button></div>' + keyNote; $('#appInstall').onclick = async () => { const ev = installEvt; installEvt = null; try { ev.prompt(); const r = await ev.userChoice; if (r && r.outcome !== 'accepted') toast('Installation annulée'); } catch { toast('Installation impossible ici'); } renderApp(); }; return; }
+    box.innerHTML = '<p class="note" style="margin:0">Dans Chrome : menu ⋮ puis « Installer l\'application ». Si Chrome répond que c\'est déjà installé alors que non, c\'est que l\'appli est dans le dossier d\'une autre appli installée sur le même site : mets-la dans son propre dépôt.</p>' + keyNote;
+  }
+  if (hasManifest && 'serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !inFrame) {
+    navigator.serviceWorker.register('sw.js').catch(e => log('Installation : service worker refusé (' + e.message + ')'));
+  }
 
   // démarrage
   const hash = (location.hash || '').slice(1);
