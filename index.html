@@ -554,13 +554,13 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
       <div class="form">
         <div class="field"><label for="aScore">Score minimum pour entrer</label><input id="aScore" type="number" inputmode="numeric" step="5"></div>
         <div class="field"><label for="aMinAge">Âge minimum du coin (s)</label><input id="aMinAge" type="number" inputmode="numeric" step="10"><span class="hint">Laisse passer la vague des snipers</span></div>
-        <div class="field"><label for="aAge">Âge maximum du coin (min)</label><input id="aAge" type="number" inputmode="numeric" step="1"></div>
+        <div class="field"><label for="aAge">Âge maximum du coin (min)</label><input id="aAge" type="number" inputmode="numeric" step="1"><span class="hint">Vaut pour toutes les entrées auto, radar compris</span></div>
         <div class="field"><label for="aHour">Entrées maximum par heure</label><input id="aHour" type="number" inputmode="numeric" step="1"></div>
         <div class="field"><label for="aCool">Pause après une perte (min)</label><input id="aCool" type="number" inputmode="numeric" step="1"></div>
       </div>
       <label class="toggle"><span>Exiger un lien X vérifié<small>Tweet ou compte existant, pas copié d'un autre coin</small></span><input type="checkbox" id="aReqX"></label>
       <label class="toggle"><span>Entrer sur les nouveaux coins<small>Coins sortis il y a moins de 20 min</small></span><input type="checkbox" id="aNew"></label>
-      <label class="toggle"><span>Entrer aussi sur les « intéressants » du radar</span><input type="checkbox" id="aRadar"></label>
+      <label class="toggle"><span>Entrer aussi sur les « intéressants » du radar<small>Seulement s'ils respectent la fenêtre d'âge</small></span><input type="checkbox" id="aRadar"></label>
       <p class="note">Comment le score se calcule : part du créateur au lancement, lien X vérifié (et s'il parle du coin), Telegram et site, nombre de traders, achats contre ventes, acheteurs organiques, historique du créateur, concentration des portefeuilles. Un seul signal rouge (copie de lien X, créateur en série, mint ou freeze actif, coin signalé suspect) rejette le coin. Avant chaque achat, le bot refait ses propres contrôles : test de revente, coût d'un aller-retour, plafonds.</p>
     </div>
   </section>
@@ -3741,6 +3741,16 @@ function NewCoins(h, radar, bot) {
 
   /* ---------- mode auto ---------- */
   function autoOn() { return !!A.cfg.on; }
+  function ageOk(t) {
+    const born = t && t.created;
+    if (!fin(born) || born <= 0) return false;
+    const a = (now() - born) / 1000;
+    return a >= A.cfg.minAgeSec && a <= A.cfg.maxAgeMin * 60;
+  }
+  function windowTxt() {
+    const lo = A.cfg.minAgeSec, hi = A.cfg.maxAgeMin;
+    return `${lo < 60 ? lo + ' s' : Math.round(lo / 60) + ' min'} à ${hi} min`;
+  }
   async function autoTick() {
     const c = A.cfg;
     try {
@@ -3754,22 +3764,25 @@ function NewCoins(h, radar, bot) {
       if (lc && lc.net < 0 && now() - lc.t1 < c.cooldown * 60000) { N.status = `Pause de ${c.cooldown} min après une perte`; return; }
       if (bot.openCount() >= bot.cfg().maxPos) { N.status = 'Nombre maximum de positions atteint'; return; }
       const cands = [];
+      // Fenêtre d'âge appliquée à TOUTES les entrées auto (nouveaux coins et radar).
+      // L'âge vient de la date de création réelle du coin ; sans date connue, pas d'entrée.
       if (c.useNew) for (const t of N.list) {
-        const a = (now() - t.nc.t0) / 1000;
-        if (t.nc.status === 'cand' && a >= c.minAgeSec && a <= c.maxAgeMin * 60 && !t.nc.autoTried && !bot.traded(t.mint)) cands.push({ t, score: t.nc.score, src: 'nouveau coin' });
+        if (t.nc.status === 'cand' && ageOk(t) && !t.nc.autoTried && !bot.traded(t.mint)) cands.push({ t, score: t.nc.score, src: 'nouveau coin' });
       }
       if (c.useRadar) for (const t of radar.R.tokens.values()) {
         if (t.verdict !== 'buy' || t.autoTried || bot.traded(t.mint) || (t.sources && t.sources.has('démo'))) continue;
+        if (!ageOk(t)) continue;
         if (c.requireX) { ensureSocial(t); if (!xVerified(t)) continue; }
         cands.push({ t, score: t.score, src: 'radar' });
       }
-      if (!cands.length) { N.status = 'En veille : aucun candidat assez solide'; return; }
+      if (!cands.length) { N.status = `En veille : aucun candidat solide sorti il y a ${windowTxt()}`; return; }
       cands.sort((a, b) => b.score - a.score);
       const pick = cands[0], t = pick.t;
+      if (!ageOk(t)) return; // dernier contrôle juste avant l'achat
       t.autoTried = true; if (t.nc) t.nc.autoTried = true;
       N.busy = true; N.status = `Entrée en cours sur ${t.symbol || '?'}…`;
       try {
-        await bot.autoJoin(t.mint, null, `Mode auto (${pick.src}, score ${pick.score})`);
+        await bot.autoJoin(t.mint, null, `Mode auto (${pick.src}, score ${pick.score}, sorti il y a ${ageTxt(now() - t.created)})`);
         A.entries.push(now()); save();
         if (t.nc) t.nc.status = 'bought';
         h.notify(`Mode auto : achat ${t.symbol || ''}`, 'long');
@@ -3840,10 +3853,11 @@ function NewCoins(h, radar, bot) {
         <div class="kv"><div class="k">Mise par trade</div><div class="v">${String(bc.size).replace('.', ',')} SOL</div></div>
         <div class="kv"><div class="k">Perte / gain</div><div class="v">−${bc.sl} % / +${bc.tp1} %</div></div>
         <div class="kv"><div class="k">Entrées cette heure</div><div class="v">${inHour} / ${c.perHour}</div></div>
+        <div class="kv"><div class="k">Âge du coin à l'entrée</div><div class="v">${windowTxt()}</div></div>
       </div>
       <p class="note">Positions ${bot.openCount()} / ${bc.maxPos} · arrêt automatique après ${String(bc.dayLoss).replace('.', ',')} SOL de perte dans la journée. Mise, perte et gain se règlent dans la carte du bot (onglet Mèmes).${bot.unlocked() ? '' : ' <strong>Bot verrouillé : rien ne peut se passer.</strong>'}</p>
       <div class="row-btns">${c.on ? '<button class="btn danger" data-a="off">Couper le mode auto</button>' : '<button class="btn pri" data-a="arm">Activer le mode auto</button>'}<button class="btn" data-a="bot">Voir le bot</button></div>
-      ${N.confirm && !c.on ? `<div class="advice" data-l="warn" style="margin-top:10px"><h3>Le bot va décider seul</h3><p>Il achètera sans te demander les coins qui passent tous les contrôles (score ≥ ${c.minScore}${c.requireX ? ', lien X vérifié' : ''}), jusqu'à ${c.perHour} fois par heure, avec ${String(bc.size).replace('.', ',')} SOL par trade, et revendra seul. Les nouveaux coins sont les plus risqués : la plupart perdent tout en quelques minutes.</p>
+      ${N.confirm && !c.on ? `<div class="advice" data-l="warn" style="margin-top:10px"><h3>Le bot va décider seul</h3><p>Il achètera sans te demander les coins qui passent tous les contrôles (score ≥ ${c.minScore}${c.requireX ? ', lien X vérifié' : ''}, sortis il y a ${windowTxt()}), jusqu'à ${c.perHour} fois par heure, avec ${String(bc.size).replace('.', ',')} SOL par trade, et revendra seul. Les nouveaux coins sont les plus risqués : la plupart perdent tout en quelques minutes.</p>
         <div class="row-btns"><button class="btn pri" data-a="arm-yes">Oui, mode auto</button><button class="btn" data-a="arm-no">Annuler</button></div></div>` : ''}
       ${logs ? `<h3 class="w-h">Dernières actions du bot</h3><div class="b-logs">${logs}</div>` : ''}`;
   }
@@ -3893,7 +3907,7 @@ function NewCoins(h, radar, bot) {
     setInterval(autoTick, 4000);
     setInterval(() => { if (curVisible()) render(); }, 1500);
   }
-  return { start, render, onNew, socialHtml, autoOn, _test: { xLink, mentions, evaluate, copyInfo, xVerified, N, A } };
+  return { start, render, onNew, socialHtml, autoOn, _test: { xLink, mentions, evaluate, copyInfo, xVerified, ageOk, autoTick, N, A } };
 }
 if (typeof module !== 'undefined') module.exports = { NewCoins, XCheck };
 
