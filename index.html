@@ -4831,6 +4831,22 @@ function StrategyLab(h, radar, live, bot) {
   const MOMO = C('prix pas en baisse à l\'entrée (dernière minute, sinon 5 min)',
     (t, f) => (f.px60 != null ? f.px60 >= 0 : !(fin(f.ch5) && f.ch5 <= 0)),
     (t, f) => (f.px60 != null ? Math.round(f.px60 * 1000) / 10 + ' % sur 1 min' : fin(f.ch5) ? f.ch5 + ' % sur 5 min' : null));
+  // Filtre anti-bots (demandé le 14/10) : beaucoup de transactions pour peu de traders = activité gonflée par des bots.
+  // Calé sur le journal du 13-14/10 : les coins à 4 transactions par trader ou plus (et au moins 30 transactions sur 5 min,
+  // score organique bas) chutaient de −25 % avant de monter de +30 % dans 41 % des cas, contre 18 % pour les autres.
+  // Aucune mémoire de créateur ni de compte X : seul le coin du moment est jugé. Données manquantes : on laisse passer.
+  // Chaque coin écarté est noté dans l'entonnoir du laboratoire (nom et mesures), exporté avec le journal.
+  const BOT_RATIO = 4, BOT_TX = 30;
+  const botLike = f => {
+    if (!(fin(f.tx5) && fin(f.traders) && f.traders > 0)) return false;
+    const human = (fin(f.organic) && f.organic >= 20) || f.orgLabel === 'medium' || f.orgLabel === 'high';
+    return f.tx5 >= BOT_TX && f.tx5 / f.traders >= BOT_RATIO && !human;
+  };
+  const BOTS = C(`activité pas gonflée par des bots (moins de ${BOT_RATIO} transactions par trader sur 5 min)`,
+    (t, f) => !botLike(f),
+    (t, f) => (fin(f.tx5) && fin(f.traders) && f.traders > 0
+      ? `${t.symbol || (t.mint || '').slice(0, 6)} : ${(Math.round(f.tx5 / f.traders * 10) / 10).toString().replace('.', ',')} tx par trader (${f.tx5} tx, ${f.traders} traders), organique ${fin(f.organic) ? Math.round(f.organic) : f.orgLabel || '?'}`
+      : null));
   const byId = id => STRATS.find(s => s.id === id);
   // Réglages de sortie testés en parallèle sur chaque entrée : les tiens, et deux autres pour comparer
   const EXIT_KEYS = ['sl', 'tp1', 'tp1Part', 'trail', 'tp2', 'beAt', 'beFloor', 'drop', 'npMin', 'npNeed'];
@@ -4887,13 +4903,14 @@ function StrategyLab(h, radar, live, bot) {
       liq: pick(m.liq), fromHi: t.life && fin(t.life.fromHi) ? t.life.fromHi : null,
       liveOk: !lf || lf.n < 3 || lf.buy >= lf.sell, // si le flux temps réel est là : pas plus de ventes que d'achats sur 1 min
       px60: live && live.fresh(t) ? live.pxChange(t, 60000) : null, // variation du prix sur la dernière minute (temps réel)
+      organic: pick(J.organic, j.organic), orgLabel: J.label || j.label || null, // score « organique » (activité de vrais humains)
       top: pick(J.top, j.top), dev: pick(J.dev, j.dev), devMints: pick(J.devMints, j.devMints), mintOff: J.mintOff != null ? J.mintOff : j.mintOff, freezeOff: J.freezeOff != null ? J.freezeOff : j.freezeOff
     };
   }
   const xNeeded = () => !!(h.requireX && h.requireX());
   // Toutes les conditions d'une stratégie, dans l'ordre : renvoie le rang de la première qui échoue (-1 si tout passe)
   function check(s, t, f) {
-    const list = [...SAFE, C('âge dans la fenêtre de la stratégie', (tt, ff) => ff.age != null && ff.age >= s.age[0] && ff.age <= s.age[1], (tt, ff) => (ff.age != null ? Math.round(ff.age) : null)), ...s.conds, MOMO];
+    const list = [...SAFE, C('âge dans la fenêtre de la stratégie', (tt, ff) => ff.age != null && ff.age >= s.age[0] && ff.age <= s.age[1], (tt, ff) => (ff.age != null ? Math.round(ff.age) : null)), ...s.conds, MOMO, BOTS];
     if (xNeeded()) list.push(C('lien X vérifié (réglage du mode auto)', tt => !!(h.xOk && h.xOk(tt))));
     for (let i = 0; i < list.length; i++) {
       let ok = false;
