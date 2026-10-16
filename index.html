@@ -26,6 +26,8 @@
   --accent:#9ba7ff; --accent-ink:#0a0f15; --accent-soft:#9ba7ff1f;
   --long:#33cf95; --long-soft:#33cf9521; --short:#ff5d6e; --short-soft:#ff5d6e21; --warn:#f2b84b; --warn-soft:#f2b84b22;
   --ema9:#9ba7ff; --ema21:#d39af0; --vwapc:#c9b27a; color-scheme:dark } }
+:root[data-text="lg"]{font-size:18px}
+:root[data-text="lg"] body{font-size:16.5px}
 :root[data-theme="dark"]{
   --bg:#0a0f15; --panel:#111820; --panel2:#17202b; --line:#233041; --fg:#e3e9f1; --muted:#8592a4;
   --accent:#9ba7ff; --accent-ink:#0a0f15; --accent-soft:#9ba7ff1f;
@@ -222,9 +224,9 @@ main{padding:12px 16px calc(84px + env(safe-area-inset-bottom,0px));max-width:76
 .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:.86rem}
 
 /* barre d'onglets */
-.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(9,1fr);padding:6px 2px calc(6px + env(safe-area-inset-bottom,0px))}
-.tabbar button{border:0;background:none;display:grid;justify-items:center;gap:2px;padding:4px 0;font-size:.56rem;min-width:0;overflow:hidden;color:var(--muted);letter-spacing:.02em;position:relative}
-.tabbar svg{width:22px;height:22px}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(10,1fr);padding:6px 2px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabbar button{border:0;background:none;display:grid;justify-items:center;gap:2px;padding:4px 0;font-size:.5rem;min-width:0;overflow:hidden;color:var(--muted);letter-spacing:0;position:relative;white-space:nowrap}
+.tabbar svg{width:21px;height:21px}
 /* ---------- copie de wallets ---------- */
 .cp-list{display:grid;gap:6px;margin-bottom:4px}
 .cp-w{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel)}
@@ -236,6 +238,53 @@ main{padding:12px 16px calc(84px + env(safe-area-inset-bottom,0px));max-width:76
 .cp-seg button{flex:1;font-size:.86rem;padding:8px 11px}
 .cp-tx{font-size:.72rem;color:var(--muted);align-self:center}
 #cpAddr,#cpLabel{text-transform:none;font-family:var(--f-mono)}
+.cp-rank{display:grid;gap:6px}
+#copyBody .pos,#feeBody .pos,#banBody .pos,#tab-bag .pos{color:var(--long)}
+#copyBody .neg,#feeBody .neg,#banBody .neg,#tab-bag .neg{color:var(--short)}
+/* onglet Bag */
+.bg-orders{display:grid;gap:8px;margin-top:8px}
+.bg-o{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.bg-om{flex:1 1 170px;min-width:0;display:grid;gap:2px}
+.bg-om b{font-family:var(--f-display);font-size:1rem}
+.bg-om small,.bg-l small{color:var(--muted);font-size:.78rem;line-height:1.35}
+.bg-stack{display:flex;height:12px;border-radius:999px;overflow:hidden;background:var(--panel2);margin:6px 0 8px}
+.bg-stack i{display:block;height:100%}
+.bg-tl{display:grid;gap:4px}
+.bg-t{display:flex;align-items:center;gap:8px;font-size:.86rem}
+.bg-t b{min-width:44px;font-family:var(--f-mono)}
+.bg-tv{color:var(--muted);font-family:var(--f-mono);font-size:.8rem}
+.bg-dot{width:10px;height:10px;border-radius:3px;flex:none}
+.bg-total{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.bg-total b{font-family:var(--f-display);font-size:1.6rem}
+.bg-lines{display:grid;gap:2px;margin:4px 0 6px}
+.bg-l{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px solid var(--line)}
+.bg-l>div{flex:1;min-width:0;display:grid}
+.bg-l b{font-size:.92rem;overflow-wrap:anywhere}
+.bg-lv{text-align:right;font-family:var(--f-mono);font-size:.88rem;display:grid}
+.bg-lv small{color:var(--muted);font-size:.74rem}
+#tab-bag .add select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 6px;font-family:var(--f-mono)}
+#tab-bag .add{flex-wrap:wrap}
+#tab-bag .add input{flex:1 1 90px}
+#tab-bag #bgAddr{text-transform:none}
+.bg-ana{display:grid;gap:8px}
+.bg-a{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel)}
+.bg-ah{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.bg-ah b{font-family:var(--f-display);font-size:1.02rem}
+.bg-ah span:not(.chip){font-family:var(--f-mono);font-size:.86rem}
+.bg-ah .chip{margin-left:auto}
+.bg-ag{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:.8rem;color:var(--muted);font-family:var(--f-mono)}
+.bg-tw{overflow-x:auto;margin:6px 0}
+.bg-tb{border-collapse:collapse;width:100%;font-family:var(--f-mono);font-size:.76rem}
+.bg-tb th,.bg-tb td{padding:5px 4px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+.bg-tb th:first-child{text-align:left;font-family:var(--f-body)}
+.bg-chart{width:100%;height:180px;display:block;margin:6px 0}
+.bg-chips{display:flex;flex-wrap:wrap;gap:6px}
+.bg-ck{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-family:var(--f-mono);font-size:.84rem;background:var(--panel)}
+.cp-r{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.cp-rk{font-family:var(--f-mono);font-weight:600;color:var(--muted);min-width:1.2em;text-align:center}
+.cp-rm{display:grid;gap:2px;min-width:0}
+.cp-rm b{font-family:var(--f-display);font-size:1rem;overflow-wrap:anywhere}
+.cp-rm span{font-size:.78rem;color:var(--muted)}
 .tabbar button[aria-selected="true"]{color:var(--accent)}
 .tabbar .dot{position:absolute;top:2px;left:calc(50% + 8px);width:8px;height:8px;border-radius:50%;background:var(--short)}
 
@@ -250,6 +299,16 @@ main{padding:12px 16px calc(84px + env(safe-area-inset-bottom,0px));max-width:76
 
 .toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:.9rem;max-width:calc(100% - 32px);box-shadow:0 8px 24px #0000003a}
 .toast.long{background:var(--long)} .toast.short{background:var(--short)}
+/* bandeau « trade pris » : coin et détenteurs en direct */
+.tradepop{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:61;width:calc(100% - 32px);max-width:520px;display:flex;flex-direction:column;gap:8px}
+.tp-item{position:relative;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-left:5px solid var(--long);border-radius:12px;padding:10px 40px 10px 14px;box-shadow:0 10px 28px #00000040;cursor:pointer;line-height:1.35}
+.tp-k{display:block;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--long)}
+.tp-item.sim{border-left-color:var(--warn)} .tp-item.sim .tp-k{color:var(--warn)}
+.tp-sym{font-family:var(--f-display);font-size:1.08rem}
+.tp-h{font-weight:600}
+.tp-h .pos{color:var(--long)} .tp-h .neg{color:var(--short)} .tp-h .muted{color:var(--muted)}
+.tp-sub{display:block;color:var(--muted);font-size:.78rem;margin-top:2px}
+.tp-x{position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;border-radius:8px;background:var(--panel2);color:var(--fg);font-size:1.1rem;line-height:1}
 .foot{font-size:.76rem;color:var(--muted);text-align:center;margin:4px 0 0;padding:0 8px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 @media (min-width:700px){ .v-word{font-size:3.6rem} }
@@ -679,7 +738,7 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
     <div class="card">
       <h2>Comment ça marche</h2>
       <ol class="i-steps">
-        <li><b>Tu colles l'adresse d'un wallet Solana.</b> Vigie relit ses transactions toutes les 4 s environ, tant que l'appli est ouverte. Ce wallet est seulement observé : rien n'est jamais signé avec lui.</li>
+        <li><b>Tu colles l'adresse d'un wallet Solana.</b> Vigie relit ses soldes toutes les 8 s environ (via Jupiter), tant que l'appli est ouverte. Ce wallet est seulement observé : rien n'est jamais signé avec lui.</li>
         <li><b>Quand il achète un jeton</b> (0,05 SOL ou plus), la simulation entre aussitôt avec la mise du bot. Mêmes contrôles que le bot (sécurité, prix pas en baisse, anti-bots), mêmes sorties, plus une sortie dès qu'il revend la moitié de ses jetons ou plus.</li>
         <li><b>En réel</b>, seulement si tu l'actives : le wallet du bot mèmes achète et revend de la même façon. Les limites du bot s'appliquent : nombre de positions en même temps, perte maximale du jour.</li>
       </ol>
@@ -687,8 +746,47 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
     </div>
   </section>
 
+  <!-- ===== BAG : plan quotidien d'un panier de cryptos ===== -->
+  <section class="tab" id="tab-bag" hidden>
+    <div class="card" id="bagPlanCard">
+      <h2>Plan du jour <span class="sp" id="bagState"></span></h2>
+      <div id="bagPlan"><p class="note" style="margin:0">Démarrage…</p></div>
+    </div>
+    <div class="card">
+      <h2>Ton portefeuille</h2>
+      <div id="bagWallet"></div>
+    </div>
+    <div class="card">
+      <h2>Analyse des actifs</h2>
+      <div id="bagAna"></div>
+    </div>
+    <div class="card">
+      <h2>Le plan testé sur l'historique</h2>
+      <div id="bagBt"></div>
+    </div>
+    <div class="card">
+      <h2>Réglages du plan</h2>
+      <div id="bagSet"></div>
+    </div>
+    <div class="card">
+      <h2>Les règles, sans surprise</h2>
+      <ol class="i-steps">
+        <li><b>Tendance sur 3 horizons</b> (20, 60 et 120 jours). On achète un actif quand les trois montent, on le garde tant que la majorité monte, on vend tout vers USDC quand deux sur trois baissent.</li>
+        <li><b>Taille de chaque ligne</b> : plus l'actif est calme, plus il pèse ; 50 % du plan au plus. L'agitation totale est plafonnée selon ton niveau de risque, le reste attend en USDC.</li>
+        <li><b>Peu d'ordres</b> : les ventes « tendance cassée » se font le jour même ; les achats et ajustements seulement le lundi, et seulement si l'écart dépasse 10 % du capital.</li>
+        <li><b>Calcul sur la clôture de la veille</b> (minuit UTC), avec les prix Binance. Ton wallet est seulement lu : c'est toi qui passes les ordres (lien Jupiter fourni).</li>
+      </ol>
+      <p class="note">Les frais comptent énormément : le test suppose 0,2 % par ordre. L'échange intégré de Phantom prend bien plus (autour de 0,85 %) : passe plutôt par jup.ag (bouton « Ouvrir dans Jupiter ») ou une plateforme à frais bas. En France, échanger une crypto contre une autre (USDC compris) n'est en principe pas imposable ; seule la conversion en euros l'est. À vérifier selon ta situation.</p>
+      <p class="note">Ce plan applique des règles, il ne prédit pas l'avenir. Ce n'est pas un conseil financier : n'investis que ce que tu peux te permettre de voir baisser fortement.</p>
+    </div>
+  </section>
+
   <!-- ===== STATS ===== -->
   <section class="tab" id="tab-stats" hidden>
+    <div class="card" id="feeCard">
+      <h2>Bilan des frais <span class="sp">bot mèmes</span></h2>
+      <div id="feeBody"></div>
+    </div>
     <div class="card">
       <h2>Calibration <span class="sp" id="calInfo"></span></h2>
       <p class="note" style="margin:0 0 12px">L'appli teste 4 setups de scalping sur les 3000 dernières bougies de la paire, frais compris. Elle choisit les réglages sur les 60 % les plus anciens, puis les vérifie sur les 40 % récents. Seuls les setups qui gagnent aussi sur cette période de contrôle donnent des signaux.</p>
@@ -735,14 +833,27 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
       <label class="toggle"><span>Vibration</span><input type="checkbox" id="aVib"></label>
       <label class="toggle"><span>Notifications sur le téléphone<small>Quand Vigie est ouverte mais pas à l'écran. Écran éteint, Android la met en pause au bout de quelques minutes</small></span><input type="checkbox" id="aNotif"></label>
       <div id="notifState"></div>
+      <label class="toggle"><span>Notification à la prise de trade<small>Coin acheté et son nombre de détenteurs, sur le téléphone quand Vigie n'est pas à l'écran (avec « Notifications sur le téléphone » activé). Le bandeau dans l'appli s'affiche toujours</small></span><input type="checkbox" id="aNotifTrade"></label>
       <label class="toggle"><span>Garder l'écran allumé</span><input type="checkbox" id="aWake"></label>
       <div class="row-btns"><button class="btn sm" id="aTest">Tester l'alerte</button></div>
+    </div>
+    <div class="card" id="lookCard">
+      <h2>Apparence</h2>
+      <div class="q-set">
+        <div class="q-row"><span class="q-lab">Thème</span><div class="seg" id="lookTheme"><button data-look-theme="auto">Auto</button><button data-look-theme="light">Clair</button><button data-look-theme="dark">Sombre</button></div></div>
+        <div class="q-row"><span class="q-lab">Taille du texte</span><div class="seg" id="lookText"><button data-look-text="md">Normal</button><button data-look-text="lg">Grand</button></div></div>
+      </div>
+      <p class="note">Auto suit le réglage clair ou sombre du téléphone.</p>
+    </div>
+    <div class="card" id="banCard">
+      <h2>Liste noire</h2>
+      <div id="banBody"></div>
     </div>
     <div class="card">
       <h2>Diagnostic de connexion</h2>
       <div class="journal" id="diag"></div>
     </div>
-    <p class="foot"><strong>Version 2 · setups calibrés.</strong> Vigie Scalp aide à décider, il ne décide pas à ta place. Ce n'est pas un conseil financier. Les signaux se trompent souvent : place toujours ton stop, et ne risque que ce que tu peux perdre.</p>
+    <p class="foot"><strong>Version 2 · setups calibrés.</strong> Mise à jour du 16 octobre 2026, nuit (onglet Bag). Vigie Scalp aide à décider, il ne décide pas à ta place. Ce n'est pas un conseil financier. Les signaux se trompent souvent : place toujours ton stop, et ne risque que ce que tu peux perdre.</p>
   </section>
 </main>
 
@@ -754,6 +865,7 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
   <button role="tab" data-tab="new" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg>Nouveaux<span class="cnt" id="newDot" hidden></span></button>
   <button role="tab" data-tab="perps" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l5-5 4 3 8-8"/><path d="M3 21h18"/><path d="M16 7h4v4"/></svg>Futures<span class="dot" id="perpsDot" hidden></span></button>
   <button role="tab" data-tab="copy" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Copie<span class="dot" id="copyDot" hidden></span></button>
+  <button role="tab" data-tab="bag" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>Bag</button>
   <button role="tab" data-tab="stats" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Stats</button>
   <button role="tab" data-tab="set" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Réglages</button>
 </nav>
@@ -771,6 +883,7 @@ a.btn{text-decoration:none;color:inherit;display:inline-block}
   <div class="sheet-in md" role="dialog" aria-label="Ordre"><div id="tradeBody"></div></div>
 </div>
 <div class="toast" id="toast" hidden></div>
+<div class="tradepop" id="tradePop" role="status" aria-live="polite" hidden></div>
 
 <script>
 /* ================= MOTEUR D'ANALYSE v2 =================
@@ -1457,6 +1570,135 @@ function poller(feed, sym, tf, htf, h) {
 const EXCHANGES = { binance: Binance, bybit: Bybit, demo: Demo };
 if (typeof module !== 'undefined') module.exports = { Binance, Bybit, Demo, TF_MS, HTF_OF };
 
+/* ================= ACTIVITÉ FACTICE : le cap monte, les détenteurs ne suivent pas =================
+   Le cap grimpe mais le nombre de détenteurs ne bouge pas : ce sont les mêmes quelques wallets (des bots) qui se
+   rachètent entre eux pour gonfler le prix. Un vrai engouement fait monter les détenteurs avec le cap.
+   Sur des mèmes, tout se joue en secondes : on juge au plus serré que les données le permettent.
+   1) Fenêtre la plus courte : dès qu'il y a deux relevés de détenteurs de la même source espacés d'au moins 25 s
+      (Jupiter les donne toutes les 30 s à 1 min, pas plus vite), on compare le dernier au précédent ; puis aux plus
+      anciens, pour attraper aussi une montée lente. Pas de fenêtre figée.
+   2) Bond du cap : le prix arrive en continu (courbe pump.fun en direct, 1 point par seconde ; sinon DexScreener,
+      toutes les 8 à 10 s). Si le cap bondit fort en quelques secondes alors que les détenteurs sont restés collés
+      sur les derniers relevés, ce sont des bots. Sur la courbe on voit chaque achat : il en faut plusieurs
+      (un seul gros achat peut être une vraie baleine).
+   0) En direct, sur la courbe pump.fun : chaque achat et chaque wallet acheteur sont vus à la seconde (connexion Solana
+      gratuite, changements de solde des comptes du jeton). Si le cap bondit de +20 % en 5 s au plus, en 3 achats ou plus,
+      faits par 1 ou 2 wallets seulement : les wallets n'augmentent pas, ce sont des bots. On ne juge que si le suivi
+      des wallets tournait déjà avant le bond et qu'il a bien vu passer des changements de solde pendant le bond.
+   Une fois repéré, le coin reste bloqué (le bond passé, la manipulation reste).
+   Garde-fou : un seul relevé, détenteurs inconnus, relevés trop rapprochés ou trop vieux : on laisse passer.
+   Chaque relevé de détenteurs garde le cap du même instant (holdHist). Seuils prudents, à ajuster avec le journal. */
+const FAKE_MIN_SPAN = 25000;       // 1) deux relevés de détenteurs espacés d'au moins 25 s
+const FAKE_MIN_CAP_UP = 30;        // 1) le cap a monté d'au moins +30 % entre les deux relevés…
+const FAKE_MAX_HOLD_UP = 3;        // …et les détenteurs de 3 % au plus…
+const FAKE_MIN_ADD = 2;            // …ou de 2 détenteurs au plus (petits coins). Sert aussi de tolérance « collé » en 2)
+const FAKE_JUMP_WIN = 15000;       // 2) bond mesuré sur 15 s au plus
+const FAKE_JUMP_UP = 20;           // 2) bond d'au moins +20 % du cap
+const FAKE_JUMP_RECENT = 60000;    // 2) bond survenu dans la dernière minute
+const FAKE_JUMP_BUYS = 3;          // 2) sur la courbe en direct : au moins 3 achats dans le bond
+const FAKE_STUCK_N = 3;            // 2) détenteurs collés sur les 3 derniers relevés…
+const FAKE_STUCK_FRESH = 90000;    // …dont le dernier a moins de 90 s
+const FAKE_LIVE_WIN = 5000;        // 0) en direct : « quelques secondes », 5 s au plus
+const FAKE_LIVE_UP = 20;           // 0) cap +20 % au moins dans ces secondes…
+const FAKE_LIVE_BUYS = 3;          // 0) …fait d'au moins 3 achats…
+const FAKE_LIVE_WALLETS = 2;       // 0) …par 2 wallets différents au plus : ce sont des bots
+function capOf(t) {
+  if (!t) return null;
+  const v = (t.pair && (t.pair.marketCap || t.pair.fdv)) || (t.jup && t.jup.mcap) || (t.nc && t.nc.j && t.nc.j.mcap) || null;
+  return Number.isFinite(+v) && +v > 0 ? +v : null;
+}
+const fakeDur = ms => (ms < 90000 ? Math.max(1, Math.round(ms / 1000)) + ' s' : Math.round(ms / 60000) + ' min');
+const fakeN = n => Math.round(n).toLocaleString('fr-FR');
+// 1) détenteurs à plat entre deux relevés : du plus proche (≥ 25 s) au plus ancien
+function fakeWindow(t) {
+  const H = t.holdHist;
+  if (!H || H.length < 2) return null;
+  const last = H[H.length - 1];
+  if (!(last.mc > 0) || !(last.n > 0)) return null;
+  for (let i = H.length - 2; i >= 0; i--) {
+    const x = H[i];
+    if (x.src !== last.src || !(x.mc > 0) || !(x.n > 0) || last.t - x.t < FAKE_MIN_SPAN) continue;
+    const capUp = (last.mc / x.mc - 1) * 100;
+    if (capUp < FAKE_MIN_CAP_UP) continue;
+    if (last.n - x.n > Math.max(FAKE_MIN_ADD, x.n * FAKE_MAX_HOLD_UP / 100)) continue;
+    return { kind: 'plat', why: 'Détenteurs à plat alors que le cap monte : activité factice probable',
+      v: `cap +${Math.round(capUp)} % en ${fakeDur(last.t - x.t)}, détenteurs ${fakeN(x.n)} → ${fakeN(last.n)}` };
+  }
+  return null;
+}
+// 2) le cap bondit en quelques secondes, les détenteurs restent collés
+function fakeJump(t, tn) {
+  const H = t.holdHist;
+  if (!H || H.length < FAKE_STUCK_N) return null;
+  const last = H[H.length - 1];
+  if (!(last.n > 0) || tn - last.t > FAKE_STUCK_FRESH) return null;
+  const S = H.filter(x => x.src === last.src && x.n > 0).slice(-FAKE_STUCK_N);
+  if (S.length < FAKE_STUCK_N || last.t - S[0].t < FAKE_MIN_SPAN) return null;
+  const ns = S.map(x => x.n);
+  if (Math.max(...ns) - Math.min(...ns) > FAKE_MIN_ADD) return null;
+  // série de prix la plus fine disponible (un rapport de prix = un rapport de cap)
+  const L = t.live, live = !!(L && L.pts && L.pts.length >= 2 && tn - L.at < 20000);
+  const from = Math.max(S[0].t, tn - FAKE_JUMP_RECENT);
+  const src = live ? L.pts : (t.hist || []), P = [];
+  for (let k = src.length - 1; k >= 0; k--) {
+    const p = src[k], pt = live ? p.t : p.ts;
+    if (pt < from - FAKE_JUMP_WIN) break;
+    P.unshift({ t: pt, v: live ? p.px : +p.px });
+  }
+  const ev = live && Array.isArray(L.ev) ? L.ev.filter(e => e.d > 0 && e.t >= from - FAKE_JUMP_WIN) : null;
+  let best = null;
+  for (let j = P.length - 1; j > 0 && P[j].t >= from; j--) {
+    for (let i = j - 1; i >= 0 && P[j].t - P[i].t <= FAKE_JUMP_WIN && P[i].t >= S[0].t; i--) {
+      if (!(P[i].v > 0) || !(P[j].v > 0)) continue;
+      const up = (P[j].v / P[i].v - 1) * 100;
+      if (up < FAKE_JUMP_UP || (best && up <= best.up)) continue;
+      // un seul gros achat peut être une vraie baleine : il faut plusieurs achats
+      if (ev) { const a = P[i].t - 1000, b = P[j].t + 1000; if (ev.filter(e => e.t >= a && e.t <= b).length < FAKE_JUMP_BUYS) continue; }
+      best = { up, ms: P[j].t - P[i].t };
+    }
+  }
+  if (!best) return null;
+  return { kind: 'bond', why: 'Le cap bondit sans nouveaux détenteurs : bots probables',
+    v: `cap +${Math.round(best.up)} % en ${fakeDur(best.ms)}, détenteurs collés à ${fakeN(last.n)} sur ${S.length} relevés (${fakeDur(last.t - S[0].t)})` };
+}
+// 0) bond du cap en quelques secondes, porté par 1 ou 2 wallets (suivi en direct des wallets acheteurs)
+function fakeLive(t, tn) {
+  const L = t.live;
+  if (!L || !L.walOn || !L.wal || !Array.isArray(L.wal.ev) || !L.pts || L.pts.length < 2 || !Array.isArray(L.ev)) return null;
+  const from = Math.max(L.walOn + 1000, tn - FAKE_JUMP_RECENT); // seulement pendant que le suivi des wallets tournait
+  const P = [];
+  for (let k = L.pts.length - 1; k >= 0 && L.pts[k].t >= from; k--) P.unshift(L.pts[k]);
+  if (P.length < 2) return null;
+  const buysIn = (a, b) => L.ev.filter(e => e.d > 0 && e.t >= a && e.t <= b).length;
+  let best = null;
+  for (let j = P.length - 1; j > 0; j--) {
+    for (let i = j - 1; i >= 0 && P[j].t - P[i].t <= FAKE_LIVE_WIN; i--) {
+      if (!(P[i].px > 0) || !(P[j].px > 0)) continue;
+      const up = (P[j].px / P[i].px - 1) * 100;
+      if (up < FAKE_LIVE_UP || (best && up <= best.up)) continue;
+      const a = P[i].t, b = P[j].t + 1000; // un point = la dernière valeur de sa seconde
+      const n = buysIn(a, b);
+      if (n < FAKE_LIVE_BUYS) continue;
+      // wallets dont le solde monte (ou change, sens inconnu) pendant le bond ; aucun changement vu = flux muet, on ne juge pas
+      const W = L.wal.ev.filter(e => e.d >= 0 && e.t >= a - 500 && e.t <= b + 500);
+      if (!W.length) continue;
+      const ws = new Set(W.map(e => e.own)).size;
+      if (ws > FAKE_LIVE_WALLETS) continue;
+      best = { up, ms: Math.max(1000, P[j].t - P[i].t), n, ws };
+    }
+  }
+  if (!best) return null;
+  return { kind: 'direct', why: 'Le cap bondit avec 1 ou 2 wallets seulement : bots',
+    v: `cap +${Math.round(best.up)} % en ${fakeDur(best.ms)} : ${best.n} achats par ${best.ws} wallet${best.ws > 1 ? 's' : ''}` };
+}
+function fakeActivity(t) {
+  if (!t) return null;
+  if (t.fakeHit) return t.fakeHit;
+  const r = fakeLive(t, Date.now()) || fakeWindow(t) || fakeJump(t, Date.now());
+  if (r) t.fakeHit = Object.assign({ at: Date.now() }, r);
+  return r ? t.fakeHit : null;
+}
+
 /* ================= RADAR MÈMES (Solana) =================
    Découverte : Pump.fun (PumpPortal, nouveaux jetons + migrations), DexScreener (profils, boosts,
    reprises communautaires), GeckoTerminal (nouveaux pools).
@@ -1644,14 +1886,15 @@ function MemeRadar(h) {
 
   /* ---------- détenteurs, achats et ventes (coins détenus) ---------- */
   // Relevés successifs du nombre de détenteurs, pour en voir l'évolution
-  function noteHolders(t, n, src) {
+  function noteHolders(t, n, src, mc) {
     if (!t || !fin(n) || n <= 0) return;
     const H = t.holdHist || (t.holdHist = []);
     const last = H[H.length - 1];
-    if (last && last.src === src && now() - last.t < 4000) { last.n = n; return; }
+    const cap = fin(+mc) && +mc > 0 ? +mc : capOf(t);
+    if (last && last.src === src && now() - last.t < 4000) { last.n = n; if (cap) last.mc = Math.round(cap); return; }
     // Jupiter compte mieux que RugCheck en temps réel : on ne mélange pas les deux pour la tendance
     if (src === 'rug' && H.some(x => x.src === 'jup')) return;
-    H.push({ t: now(), n: Math.round(n), src });
+    H.push({ t: now(), n: Math.round(n), src, mc: cap ? Math.round(cap) : null });
     if (H.length > 200) H.splice(0, H.length - 200);
   }
   function flow(mint) {
@@ -1795,7 +2038,7 @@ function MemeRadar(h) {
           top: a.topHoldersPercentage, dev: a.devBalancePercentage, devMints: a.devMints, holders: x.holderCount, decimals: x.decimals, verified: !!x.isVerified,
           orgBuyers5: s5.numOrganicBuyers, traders5: s5.numTraders, launchpad: x.launchpad || null,
           buys5: s5.numBuys, sells5: s5.numSells, buys1: s1.numBuys, sells1: s1.numSells, hch5: s5.holderChange, hch1: s1.holderChange, px: +x.usdPrice || null, mcap: +x.mcap || null, at: now() };
-        noteHolders(t, +x.holderCount, 'jup');
+        noteHolders(t, +x.holderCount, 'jup', +x.mcap);
         if (t.pair) analyze(t);
       }
       setSrc('jup', 'on', 'audit et score organique actifs');
@@ -2010,6 +2253,7 @@ function MemeRadar(h) {
     if (s && s.mutable) risks.push('Nom et image du jeton encore modifiables');
     if (onCurve) risks.push('Encore sur la courbe pump.fun : très volatil, ordres en SOL uniquement');
 
+    { const fk = fakeActivity(t); if (fk) fails.push(fk.why + ' (' + fk.v + ')'); }
     t.why = why; t.risks = risks; t.fails = fails;
 
     // pré-filtre : on ne vérifie la sécurité que des jetons qui vivent
@@ -2337,7 +2581,8 @@ function JupClient(getKey) {
         run();
       });
     },
-    post(path, body) { return raw(BASE + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }, 70000); }
+    post(path, body) { return raw(BASE + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }, 70000); },
+    pending: () => q.high.length + q.low.length
   };
 }
 
@@ -2723,7 +2968,8 @@ function WalletTrader(h, radar, jup) {
       p.cost += sol; p.costUsd += sol * su; p.qtyIn += qty; p.last = now;
       addSpend(sol);
       book.trades.unshift({ t: now, addr: W.addr, mint: my.mint, sym: my.sym, side: 'buy', sol, qty, sig: res.signature });
-      h.toast(`Achat confirmé : ${fQty(qty)} ${my.sym} pour ${fSol(sol)}`, 'long');
+      if (h.tradeTaken) h.tradeTaken({ mint: my.mint, sym: my.sym, sub: `${fSol(sol)} → ${fQty(qty)} jetons · achat à la main, ton wallet ${walletName()}` });
+      else h.toast(`Achat confirmé : ${fQty(qty)} ${my.sym} pour ${fSol(sol)}`, 'long');
     } else {
       const qty = fin(my.dec) ? inRaw / Math.pow(10, my.dec) : my.qtyUi, sol = outRaw / 1e9;
       if (p && !p.closed) { p.solOut += sol; p.usdOut += sol * su; p.qtyOut += qty; p.last = now; if (my.pct >= 100) { p.closed = true; p.closedAt = now; p.closedWhy = 'Vendu'; } }
@@ -2995,7 +3241,7 @@ function CurveLive(h, radar) {
     W.ws = ws; W.status = 'wait';
     const to = setTimeout(() => { if (!W.open) try { ws.close(); } catch {} }, 8000);
     ws.onopen = () => {
-      clearTimeout(to); W.open = true; W.fails = 0; W.status = 'on'; W.okUrl = url; W.msg = host(url);
+      clearTimeout(to); W.open = true; W.fails = 0; W.status = 'on'; W.okUrl = url; W.msg = host(url); W.walOff = false;
       for (const s of W.subs.values()) { s.sid = null; send(s); }
       clearInterval(W.timer);
       W.timer = setInterval(() => { if (W.open) try { ws.send(JSON.stringify({ jsonrpc: '2.0', id: 0, method: 'getHealth' })); } catch {} }, 40000);
@@ -3005,7 +3251,21 @@ function CurveLive(h, radar) {
       let m; try { m = JSON.parse(ev.data); } catch { return; }
       if (m.id && W.pend.has(m.id)) {
         const s = W.pend.get(m.id); W.pend.delete(m.id);
-        if (m.result != null && W.subs.get(s.key) === s) { s.sid = m.result; W.bySid.set(m.result, s); }
+        if (m.result != null && W.subs.get(s.key) === s) {
+          s.sid = m.result; s.err = null; W.bySid.set(m.result, s);
+          if (s.kind === 'wal') { const t = radar.get(s.mint); if (t) { const L = liveOf(t); if (!L.walOn) L.walOn = now(); } W.walErr = ''; }
+        } else if (m.error && s.kind === 'wal') {
+          s.err = String(m.error.message || 'refusé').slice(0, 80); W.walErr = s.err; W.walOff = true; W.walHost = host(url);
+          // plus de nouvelle demande sur cette connexion ; abonnements refusés retirés
+          for (const x of [...W.subs.values()]) if (x.kind === 'wal' && x.sid == null) W.subs.delete(x.key);
+          if (!W.walWarned) { W.walWarned = true; if (h.onWalRefused) try { h.onWalRefused(W.walErr, W.walHost); } catch {} }
+        }
+        return;
+      }
+      if (m.method === 'programNotification' && m.params) {
+        const s = W.bySid.get(m.params.subscription);
+        const v = m.params.result && m.params.result.value;
+        if (s && v && v.pubkey && v.account && Array.isArray(v.account.data)) applyWal(s, v.pubkey, b64(v.account.data[0]));
         return;
       }
       if (m.method === 'accountNotification' && m.params) {
@@ -3019,6 +3279,8 @@ function CurveLive(h, radar) {
     ws.onclose = () => {
       clearTimeout(to); clearInterval(W.timer);
       const was = W.open;
+      // coupure : des changements de solde ont pu passer inaperçus, le suivi des wallets repart de zéro
+      for (const x of W.subs.values()) if (x.kind === 'wal') { const t = radar.get(x.mint); if (t && t.live) t.live.walOn = 0; }
       W.ws = null; W.open = false; W.bySid.clear(); W.pend.clear();
       W.status = 'off'; W.msg = was ? 'coupé, reconnexion' : 'injoignable : ' + host(url);
       if (!was) W.idx++;
@@ -3031,11 +3293,15 @@ function CurveLive(h, radar) {
     if (!W.open || !W.ws) return;
     const id = ++W.id;
     W.pend.set(id, s);
-    try { W.ws.send(JSON.stringify({ jsonrpc: '2.0', id, method: 'accountSubscribe', params: [s.acct, { encoding: 'base64', commitment: 'processed' }] })); } catch {}
+    // 'wal' : tous les comptes de ce jeton (un par wallet détenteur), chaque achat ou vente en direct, avec le wallet
+    const req = s.kind === 'wal'
+      ? { jsonrpc: '2.0', id, method: 'programSubscribe', params: [s.acct, { encoding: 'base64', commitment: 'processed', filters: [{ memcmp: { offset: 0, bytes: s.mint } }] }] }
+      : { jsonrpc: '2.0', id, method: 'accountSubscribe', params: [s.acct, { encoding: 'base64', commitment: 'processed' }] };
+    try { W.ws.send(JSON.stringify(req)); } catch {}
   }
   function drop(s) {
     W.subs.delete(s.key);
-    if (s.sid != null) { W.bySid.delete(s.sid); if (W.open) try { W.ws.send(JSON.stringify({ jsonrpc: '2.0', id: ++W.id, method: 'accountUnsubscribe', params: [s.sid] })); } catch {} }
+    if (s.sid != null) { W.bySid.delete(s.sid); if (W.open) try { W.ws.send(JSON.stringify({ jsonrpc: '2.0', id: ++W.id, method: s.kind === 'wal' ? 'programUnsubscribe' : 'accountUnsubscribe', params: [s.sid] })); } catch {} }
   }
   async function sub(key, acct, kind, mint, tag) {
     let s = W.subs.get(key);
@@ -3044,7 +3310,7 @@ function CurveLive(h, radar) {
     W.subs.set(key, s);
     if (W.open) send(s); else connect();
     // état initial (l'abonnement ne l'envoie qu'au prochain changement)
-    if (h.rpc) h.rpc('getAccountInfo', [acct, { encoding: 'base64', commitment: 'processed' }])
+    if (kind !== 'wal' && h.rpc) h.rpc('getAccountInfo', [acct, { encoding: 'base64', commitment: 'processed' }])
       .then(r => { if (W.subs.get(key) === s) { const v = r && r.value; apply(s, v && Array.isArray(v.data) ? b64(v.data[0]) : null, true); } }).catch(() => {});
     return s;
   }
@@ -3091,6 +3357,33 @@ function CurveLive(h, radar) {
     emit(s.mint);
   }
   function emit(mint) { for (const f of W.listeners) { try { f(mint); } catch {} } }
+  // Changement de solde d'un compte du jeton : qui (wallet propriétaire) et dans quel sens.
+  // Compte de jeton : mint (0-32), propriétaire (32-64), quantité u64 (64-72), même début en Token-2022.
+  const RESERVE_RAW = 100000000000000n; // ≥ 10 % de l'offre pump.fun (1 milliard × 10^6) : courbe ou réserve, pas un acheteur
+  function applyWal(s, pubkey, bytes) {
+    const t = radar.get(s.mint);
+    if (!t) return;
+    const L = liveOf(t), tn = now();
+    const V = L.wal || (L.wal = { acc: new Map(), ev: [], prog: null });
+    // le coin n'utilise qu'un des deux programmes de jetons : on coupe l'abonnement inutile
+    if (!V.prog) { V.prog = s.acct; for (const x of [...W.subs.values()]) if (x.kind === 'wal' && x.mint === s.mint && x.acct !== s.acct) drop(x); }
+    let own = null, amt = 0n;
+    if (bytes && bytes.length >= 72) {
+      let bin = ''; for (let i = 32; i < 64; i++) bin += String.fromCharCode(bytes[i]);
+      own = btoa(bin);
+      try { amt = new DataView(bytes.buffer, bytes.byteOffset + 64, 8).getBigUint64(0, true); } catch { return; }
+    }
+    const prev = V.acc.get(pubkey);
+    if (!own && prev) own = prev.own; // compte fermé : tout vendu
+    if (V.acc.size > 3000 && !prev) V.acc.delete(V.acc.keys().next().value);
+    V.acc.set(pubkey, { own, amt });
+    if (!own || amt >= RESERVE_RAW || (prev && prev.amt >= RESERVE_RAW)) return;
+    // sens : +1 achat, −1 vente, 0 inconnu (premier changement vu sur ce compte)
+    const d = prev ? (amt > prev.amt ? 1 : amt < prev.amt ? -1 : 0) : 0;
+    V.ev.push({ t: tn, own, d });
+    if (V.ev.length > 800) V.ev.splice(0, V.ev.length - 800);
+    if (V.ev[0] && tn - V.ev[0].t > 3 * 60000) V.ev = V.ev.filter(e => tn - e.t <= 3 * 60000);
+  }
 
   /* ---------- suivi ---------- */
   async function watch(mint, tag) {
@@ -3102,8 +3395,10 @@ function CurveLive(h, radar) {
       const acct = t.curveKey || await curveAddr(t);
       t.curveKey = acct;
       await sub('c:' + mint, acct, 'curve', mint, tag);
-      liveOf(t);
+      const L = liveOf(t);
       await watchDev(t, tag);
+      // wallets qui achètent, en direct (gratuit, même connexion) : les deux programmes de jetons tant qu'on ne sait pas lequel
+      if (!W.walOff) for (const prog of L.wal && L.wal.prog ? [L.wal.prog] : [Curve.TOKEN, Curve.TOKEN22]) await sub('w:' + mint + ':' + prog, prog, 'wal', mint, tag);
       return true;
     } catch (e) { W.msg = e.message; return false; }
   }
@@ -3150,8 +3445,8 @@ function CurveLive(h, radar) {
   return {
     watch, unwatch, watching, tagged, fresh, flowOf, devSoldSince, sellValue, pxChange,
     onUpdate: f => W.listeners.push(f),
-    status: () => ({ s: W.status, msg: W.msg, subs: [...W.subs.values()].filter(s => s.kind === 'curve').length, last: W.lastMsg }),
-    _test: { apply, W, liveOf }
+    status: () => { const wl = [...W.subs.values()].filter(s => s.kind === 'wal'); return { s: W.status, msg: W.msg, subs: [...W.subs.values()].filter(s => s.kind === 'curve').length, last: W.lastMsg, wal: { on: new Set(wl.filter(s => s.sid != null).map(s => s.mint)).size, asked: new Set(wl.map(s => s.mint)).size, err: W.walErr || '', off: !!W.walOff, host: W.walHost || '' } }; },
+    _test: { apply, applyWal, W, liveOf }
   };
 }
 if (typeof module !== 'undefined') module.exports = { Curve, CurveLive };
@@ -3372,6 +3667,8 @@ function TradeBot(h, radar, jup, tr) {
     if (day().pnl <= -c.dayLoss) throw stop(`Perte du jour atteinte (${fSol(day().pnl)}) : pas de nouveau trade avant demain`);
     if (t && t.sources && t.sources.has('démo')) throw stop('Jeton fictif (démo)');
     if (t && t.verdict === 'reject') throw stop('Jeton écarté : ' + ((t.fails && t.fails[0]) || ''));
+    if (opt.auto && h.banned && h.banned(t || { mint })) throw stop('Coin ou créateur sur ta liste noire');
+    if (t) { const fk = fakeActivity(t); if (fk) throw stop(fk.why + ' (' + fk.v + ')'); }
     let known = true;
     try { await refresh(); } catch (e) { known = false; log(`Solde du bot illisible (${e.message}) : Jupiter vérifiera les fonds`, 'warn'); }
     const had = known && B.hold.has(mint);
@@ -3396,7 +3693,7 @@ function TradeBot(h, radar, jup, tr) {
     const res = await execOrder(o);
     const qty = +res.totalOutputAmount;
     const p = S.pos[mint] = {
-      mint, sym, dec, t0: Date.now(), state: 'open', why: why || 'Choisi par toi', strat: opt.strat || null, prof: opt.prof || null, profName: opt.profName || null, exits: opt.exits || null, auto: !!opt.auto,
+      mint, sym, dec, t0: Date.now(), state: 'open', why: why || 'Choisi par toi', strat: opt.strat || null, src: opt.src || null, prof: opt.prof || null, profName: opt.profName || null, exits: opt.exits || null, auto: !!opt.auto,
       cost: +res.totalInputAmount / 1e9 + NET_FEE, rent: had ? 0 : RENT, costReal: false,
       qtyRaw: String(res.totalOutputAmount), realized: 0, tp1Done: false, peakTot: null, hist: [], sigs: [res.signature], rt,
       px0: px > 0 ? px : null, pxPeak: px > 0 ? px : null, events: [{ t: Date.now(), side: 'buy', px: px > 0 ? px : null }]
@@ -3404,7 +3701,8 @@ function TradeBot(h, radar, jup, tr) {
     day().n++;
     save();
     log(`Achat ${sym} : ${fSol(+res.totalInputAmount / 1e9)} → ${fQty(fin(dec) ? qty / Math.pow(10, dec) : qty)} jetons. Aller-retour estimé ${fPct(-rt)}.`, 'buy');
-    h.notify(`Bot : achat ${sym} (${fSol(sol)})`, 'long');
+    if (h.tradeTaken) h.tradeTaken({ mint, sym, sub: `${fSol(+res.totalInputAmount / 1e9)} · ${opt.auto ? p.why : 'bot · ' + p.why}` });
+    else h.notify(`Bot : achat ${sym} (${fSol(sol)})`, 'long');
     radar.track(mint);
     if (live()) live().watch(mint, 'bot');
     realCost(p, res.signature, had);
@@ -3462,7 +3760,7 @@ function TradeBot(h, radar, jup, tr) {
   function decide(p) { return decideCore(p, cfgFor(p), curV(p)); }
   function decideCore(p, c, V) {
     const now = Date.now();
-    if (p.closeReq) return { pct: 100, urgent: true, why: 'Fermeture demandée par toi' };
+    if (p.closeReq) return { pct: 100, urgent: true, why: 'Vendu à la main' };
     if (p.exitReq) return { pct: 100, urgent: true, why: p.exitReq }; // ex. : le wallet copié a revendu
     const t = radar.get(p.mint), lv = live();
     if (t && t.verdict === 'reject' && (t.fails || []).some(f => /geler|imprimer|rug|retirable|suspect|initiés|arnaque/i.test(f)))
@@ -3503,6 +3801,19 @@ function TradeBot(h, radar, jup, tr) {
   }
 
   /* ---------- sortie ---------- */
+  // Vente à la main d'une position : la même vente d'urgence que le bot. Ne coupe ni le mode auto ni la copie ;
+  // comme après toute sortie, le bot ne reprend pas ce coin dans les 24 h.
+  function manualSell(mint) {
+    const p = S.pos[mint];
+    if (!p || p.state === 'closed') return 'none';
+    if (p.frozen) return 'frozen';
+    if (p.state === 'selling' || p.busy) return 'selling';
+    p.closeReq = true; B.ui.sellAsk = null; save();
+    log(`Vente à la main demandée sur ${p.sym}`, 'warn');
+    if (!kp) return 'locked'; // la vente partira dès que le bot est déverrouillé (il faut le code pour signer)
+    sell(p, { pct: 100, urgent: true, why: 'Vendu à la main' });
+    return 'ok';
+  }
   async function sell(p, d) {
     if (p.busy) return;
     p.busy = true; p.state = 'selling'; render();
@@ -3571,7 +3882,7 @@ function TradeBot(h, radar, jup, tr) {
     p.state = 'closed'; p.closedAt = Date.now(); p.exitWhy = why;
     const net = p.realized - p.cost;
     day().pnl += net;
-    S.hist.unshift({ mint: p.mint, sym: p.sym, t0: p.t0, t1: p.closedAt, cost: p.cost, back: p.realized, net, pnl: net / p.cost, why, sigs: p.sigs.slice(-4), strat: p.strat || null, prof: p.prof || null, auto: !!p.auto });
+    S.hist.unshift({ mint: p.mint, sym: p.sym, t0: p.t0, t1: p.closedAt, cost: p.cost, back: p.realized, net, pnl: net / p.cost, why, sigs: p.sigs.slice(-4), strat: p.strat || null, src: p.src || null, rt: fin(p.rt) ? p.rt : null, prof: p.prof || null, auto: !!p.auto });
     if (live()) live().unwatch(p.mint, 'bot');
     S.hist = S.hist.slice(0, 60);
     delete S.pos[p.mint];
@@ -3616,7 +3927,7 @@ function TradeBot(h, radar, jup, tr) {
     const now = Date.now();
     B.props = B.props.filter(x => { const t = radar.get(x.mint); return t && t.verdict === 'buy' && now - x.t < 4 * 60000 && !S.pos[x.mint]; });
     for (const t of radar.R.tokens.values()) {
-      if (t.verdict !== 'buy' || S.pos[t.mint] || (S.ignored[t.mint] && now - S.ignored[t.mint] < 2 * 3600e3) || (S.done && S.done[t.mint] && now - S.done[t.mint] < DONE_MS) || B.props.some(x => x.mint === t.mint) || (t.sources && t.sources.has('démo'))) continue;
+      if (t.verdict !== 'buy' || (h.banned && h.banned(t)) || fakeActivity(t) || S.pos[t.mint] || (S.ignored[t.mint] && now - S.ignored[t.mint] < 2 * 3600e3) || (S.done && S.done[t.mint] && now - S.done[t.mint] < DONE_MS) || B.props.some(x => x.mint === t.mint) || (t.sources && t.sources.has('démo'))) continue;
       if (t.flaggedAt && now - t.flaggedAt > 4 * 60000) continue;
       B.props.unshift({ mint: t.mint, sym: t.symbol || short(t.mint), score: t.score, t: now });
       radar.life(t.mint).catch(() => {});
@@ -3695,7 +4006,7 @@ function TradeBot(h, radar, jup, tr) {
     }
     if (!kp) {
       const P = openPos();
-      box.innerHTML = `${P.length ? `<div class="advice" data-l="danger" style="margin:0 0 10px"><h3>${P.length} position${P.length > 1 ? 's' : ''} sans surveillance</h3><p>Déverrouille le bot pour qu'il puisse vendre : ${P.map(p => esc(p.sym)).join(', ')}.</p></div>` : ''}
+      box.innerHTML = `${P.length ? `<div class="advice" data-l="danger" style="margin:0 0 10px"><h3>${P.length} position${P.length > 1 ? 's' : ''} sans surveillance</h3><p>Déverrouille le bot pour qu'il puisse vendre, seul ou à la main (le code sert à signer la vente) : ${P.map(p => esc(p.sym)).join(', ')}.</p></div>` : ''}
         <div class="add" style="margin:0"><input id="bPin" type="password" autocomplete="current-password" placeholder="Code du bot"><button class="btn pri" data-b="unlock">Déverrouiller</button></div>
         <p class="note">Wallet du bot : <span class="mono">${esc(short(S.pub))}</span></p>`;
       restore(); return;
@@ -3705,6 +4016,12 @@ function TradeBot(h, radar, jup, tr) {
     const props = B.props.map(x => { const t = radar.get(x.mint); const mc = t && t.pair ? (t.pair.marketCap || t.pair.fdv) : null; return `<div class="p-card" data-l="ok"><div class="p-head"><button class="p-sym" data-open="${esc(x.mint)}">${esc(x.sym)}</button><span class="muted small">score ${x.score}${mc ? ' · cap ' + MemeChart.fmtUsd(mc) + ' $' : ''}</span><span></span></div>
       <p class="p-life">${esc(radar.lifeText(t))}</p>
       <div class="row-btns" style="margin:0"><button class="btn sm pri" data-bjoin="${esc(x.mint)}">Rejoindre avec ${fSol(c.size)}</button><button class="btn sm" data-bign="${esc(x.mint)}">Ignorer</button></div></div>`; }).join('');
+    // Sortie à la main : visible sur chaque position, y compris celles du mode auto et des copies
+    const sellBtn = p => p.frozen ? '<p class="note" style="margin:0">Compte gelé par le créateur : vente impossible.</p>'
+      : p.state === 'selling' || p.busy ? '<div class="row-btns" style="margin:0"><button class="btn sm" disabled>Vente en cours…</button></div>'
+      : p.closeReq ? '<div class="row-btns" style="margin:0"><button class="btn sm" disabled>Vente demandée…</button></div>'
+      : B.ui.sellAsk === p.mint ? `<div class="confirm" style="margin:0"><span>Vendre ${esc(p.sym)} au prix du marché ?</span><button class="btn sm danger" data-bclose="${esc(p.mint)}">Confirmer la vente</button><button class="btn sm" data-b="sell-no">Annuler</button></div>`
+      : `<div class="row-btns" style="margin:0;align-items:center"><button class="btn sm danger" data-bsell="${esc(p.mint)}">Vendre maintenant</button><span class="muted small">ne ferme que cette position${p.strat === 'copy' ? ', la copie continue' : p.auto ? ', le mode auto continue' : ''}</span></div>`;
     const pos = P.map(p => {
       const V = fin(p.vEst) && p.estAt > p.vAt ? p.vEst : p.v, tot = fin(V) ? V + p.realized : NaN, pnl = fin(tot) ? tot / p.cost - 1 : NaN;
       const pc = cfgFor(p), st = p.state === 'selling' ? 'vente en cours…' : p.frozen ? 'compte gelé' : p.tp1Done ? `gain visé pris · suiveur −${pc.trail} %` : `${p.profName ? p.profName + ' · ' : ''}perte max −${pc.sl} % · gain visé +${pc.tp1} %`;
@@ -3714,7 +4031,7 @@ function TradeBot(h, radar, jup, tr) {
         <p class="p-life">${esc(radar.lifeText(radar.get(p.mint)))}</p>
         ${radar.flowHtml ? radar.flowHtml(p.mint) : ''}
         <canvas class="b-chart" data-mint="${esc(p.mint)}" aria-label="Graphique de ${esc(p.sym)}"></canvas>
-        <div class="row-btns" style="margin:0"><button class="btn sm danger" data-bclose="${esc(p.mint)}" ${p.state === 'selling' ? 'disabled' : ''}>Fermer maintenant</button></div></div>`;
+        ${sellBtn(p)}</div>`;
     }).join('');
     const chip = (k, v, label, cur) => `<button class="btn sm ${cur ? 'pri' : ''}" data-bq="${k}" data-v="${v}" aria-pressed="${cur}">${label}</button>`;
     const slList = [10, 15, 20, 25, 30, 50], tpList = [20, 30, 40, 60, 100, 200];
@@ -3787,7 +4104,7 @@ function TradeBot(h, radar, jup, tr) {
     if (h.inFrame || !S.pub || (t.sources && t.sources.has('démo'))) return '';
     if (!kp) return '<div class="t-box bot"><b>Bot</b><p class="note" style="margin:4px 0 0">Déverrouille le bot en haut de l\'onglet pour lui confier ce trade.</p></div>';
     const p = S.pos[t.mint], c = S.cfg;
-    if (p && p.state !== 'closed') return `<div class="t-box bot"><b>Le bot gère ce trade</b><p class="note" style="margin:4px 0 8px">${fin(p.pnl) ? fPct(p.pnl) + ' net de frais. ' : ''}Perte acceptée −${c.sl} %, gain visé +${c.tp1} %, vente d'urgence si −${c.drop} % en 1 min.</p><button class="btn sm danger" data-bclose="${esc(t.mint)}">Fermer maintenant</button></div>`;
+    if (p && p.state !== 'closed') return `<div class="t-box bot"><b>Le bot gère ce trade</b><p class="note" style="margin:4px 0 8px">${fin(p.pnl) ? fPct(p.pnl) + ' net de frais. ' : ''}Perte acceptée −${c.sl} %, gain visé +${c.tp1} %, vente d'urgence si −${c.drop} % en 1 min.</p><button class="btn sm danger" data-bsell="${esc(t.mint)}">Vendre maintenant</button></div>`;
     if (t.verdict === 'reject') return '';
     return `<div class="t-box bot"><b>Confier au bot</b><p class="note" style="margin:4px 0 8px">Il achète ${fSol(c.size)} tout de suite, sans validation, puis revend seul : ${c.tp1Part < 100 ? 'moitié' : 'tout'} à +${c.tp1} % net, perte acceptée −${c.sl} %, vente d'urgence si chute rapide. Réglages dans la carte du bot.</p><button class="btn sm pri" data-bjoin="${esc(t.mint)}">Rejoindre avec ${fSol(c.size)}</button></div>`;
   }
@@ -3810,11 +4127,22 @@ function TradeBot(h, radar, jup, tr) {
       return;
     }
     if (b.dataset.bign) { S.ignored[b.dataset.bign] = Date.now(); B.props = B.props.filter(x => x.mint !== b.dataset.bign); save(); render(); return; }
+    // « Vendre maintenant » : un premier appui demande confirmation, le second vend
+    if (b.dataset.bsell) {
+      const mint = b.dataset.bsell;
+      if (b.closest('#botBody')) { B.ui.sellAsk = mint; render(); return; }
+      // ailleurs (fiche du coin) : le bouton se change lui-même en confirmation pendant 6 s
+      b.textContent = 'Confirmer la vente'; delete b.dataset.bsell; b.dataset.bclose = mint;
+      setTimeout(() => { if (b.isConnected && b.dataset.bclose) { b.textContent = 'Vendre maintenant'; delete b.dataset.bclose; b.dataset.bsell = mint; } }, 6000);
+      return;
+    }
     if (b.dataset.bclose) {
-      const p = S.pos[b.dataset.bclose];
-      if (p) { p.closeReq = true; log(`Fermeture immédiate demandée sur ${p.sym}`, 'warn'); save(); if (!p.busy) sell(p, { pct: 100, urgent: true, why: 'Fermeture demandée par toi' }); }
+      const r = manualSell(b.dataset.bclose);
+      if (r === 'locked') h.toast('Bot verrouillé : la vente partira dès que tu entres ton code', 'short');
+      else if (r === 'frozen') h.toast('Compte gelé par le créateur : vente impossible', 'short');
       render(); return;
     }
+    if (b.dataset.b === 'sell-no') { B.ui.sellAsk = null; render(); return; }
     if (b.dataset.bq) { setQuick(b.dataset.bq, +b.dataset.v); return; }
     const a = b.dataset.b;
     if (a === 'qapply') {
@@ -3919,6 +4247,7 @@ function TradeBot(h, radar, jup, tr) {
   return { start, render, detailHtml, unlocked: () => !!kp, openCount: () => openPos().length, S,
     autoJoin, dayLossHit: () => day().pnl <= -S.cfg.dayLoss,
     // Sortie demandée de l'extérieur (copie de wallets) : appliquée au prochain passage de la boucle, comme une sortie urgente
+    manualSell,
     requestExit: (mint, why) => { const p = S.pos[mint]; if (!p || p.state === 'closed' || p.exitReq) return false; p.exitReq = why; save(); return true; }, lastClosed: () => S.hist[0] || null, cfg: () => S.cfg, hasWallet: () => !!S.pub,
     traded: mint => !!(S.pos[mint] && S.pos[mint].state !== 'closed') || !!(S.ignored[mint] && Date.now() - S.ignored[mint] < 2 * 3600e3) || !!(S.done && S.done[mint] && Date.now() - S.done[mint] < DONE_MS), logMsg: (m, l) => log(m, l), applyExits, decideCore, NET_FEE, onLive, _test: { decide, curV, pushHist, b58enc, b58dec } };
 }
@@ -4132,7 +4461,7 @@ function NewCoins(h, radar, bot) {
         for (const t of list) {
           const x = by.get(t.mint);
           if (!x) continue;
-          t.nc.j = jupFields(x); if (radar.noteHolders) radar.noteHolders(t, +x.holderCount, 'jup');
+          t.nc.j = jupFields(x); if (radar.noteHolders) radar.noteHolders(t, +x.holderCount, 'jup', +x.mcap);
           if (!t.nc.metaDone || !t.nc.social.x) setLinks(t, { twitter: x.twitter, website: x.website, telegram: x.telegram });
           evaluate(t);
         }
@@ -4151,7 +4480,7 @@ function NewCoins(h, radar, bot) {
           const t = radar.addToken(x.id, { source: 'Jupiter', name: x.name, symbol: x.symbol, created: born, icon: x.icon });
           if (!t || N.list.includes(t)) continue;
           onNew(t);
-          t.nc.metaDone = true; t.nc.j = jupFields(x); if (radar.noteHolders) radar.noteHolders(t, +x.holderCount, 'jup');
+          t.nc.metaDone = true; t.nc.j = jupFields(x); if (radar.noteHolders) radar.noteHolders(t, +x.holderCount, 'jup', +x.mcap);
           setLinks(t, { twitter: x.twitter, website: x.website, telegram: x.telegram });
           evaluate(t);
         }
@@ -4225,6 +4554,7 @@ function NewCoins(h, radar, bot) {
       if (j.label === 'low' && tr >= 30) { sc -= 8; risks.push('Activité surtout faite par des bots'); }
     } else if (age > 90) risks.push('Pas encore de données de trading');
     if (t.sec && t.fails && t.fails.length && t.verdict === 'reject') fails.push(...t.fails.slice(0, 2));
+    { const fk = fakeActivity(t); if (fk && !fails.some(x => x.startsWith(fk.why))) fails.push(fk.why + ' (' + fk.v + ')'); }
     c.score = Math.round(clamp(sc, 0, 100));
     c.why = why; c.risks = risks; c.fails = [...new Set(fails)];
     if (c.fails.length) c.status = 'reject';
@@ -4252,6 +4582,8 @@ function NewCoins(h, radar, bot) {
     const c = A.cfg;
     try {
       if (!c.on) { N.status = 'Mode auto coupé'; return; }
+      // minimum au-dessus du maximum : aucun coin ne peut passer, on le dit au lieu d'attendre en silence
+      if (c.minAgeSec >= c.maxAgeMin * 60) { N.status = `Fenêtre d'âge impossible : minimum ${secTxt(c.minAgeSec)}, maximum ${c.maxAgeMin} min. Aucun achat possible : baisse le minimum ou monte le maximum.`; return; }
       if (N.busy) return;
       if (!bot.unlocked()) { N.status = 'Bot verrouillé : déverrouille-le dans l\'onglet Mèmes'; return; }
       if (bot.dayLossHit()) { c.on = false; save(); bot.logMsg('Mode auto coupé : perte du jour atteinte', 'bad'); h.notify('Mode auto coupé : perte du jour atteinte', 'short'); return; }
@@ -4275,7 +4607,6 @@ function NewCoins(h, radar, bot) {
           await bot.autoJoin(t.mint, null, `Mode auto · ${pk.s.name} (simulation : ${pk.txt}), sorti il y a ${ageTxt(now() - t.created)}`, { strat: pk.s.id, exits: pk.exits || pk.s.exits, prof: pk.prof ? pk.prof.id : null, profName: pk.prof && pk.prof.id !== 'toi' ? pk.prof.name : null });
           A.entries.push(now()); save();
           if (t.nc) t.nc.status = 'bought';
-          h.notify(`Mode auto : achat ${t.symbol || ''} (${pk.s.name}${pk.prof && pk.prof.id !== 'toi' ? ', ' + pk.prof.name : ''})`, 'long');
         } catch (e) {
           if (t.nc) { t.nc.fails = ['Entrée refusée : ' + e.message]; t.nc.status = 'reject'; }
         } finally { N.busy = false; }
@@ -4298,7 +4629,6 @@ function NewCoins(h, radar, bot) {
           const mAgo = fin(t.migratedAt) ? Math.round((now() - t.migratedAt) / 1000) : null;
           await bot.autoJoin(t.mint, null, `Mode auto (${pick.src}${mAgo != null ? `, migré il y a ${mAgo < 120 ? mAgo + ' s' : Math.round(mAgo / 60) + ' min'}` : ''})`);
           A.entries.push(now()); save();
-          h.notify(`Mode auto : achat ${t.symbol || ''} (${pick.src})`, 'long');
         } catch (e) {} finally { N.busy = false; }
         return;
       }
@@ -4323,7 +4653,6 @@ function NewCoins(h, radar, bot) {
         await bot.autoJoin(t.mint, null, `Mode auto (${pick.src}, score ${pick.score}, sorti il y a ${ageTxt(now() - t.created)})`);
         A.entries.push(now()); save();
         if (t.nc) t.nc.status = 'bought';
-        h.notify(`Mode auto : achat ${t.symbol || ''}`, 'long');
       } catch (e) {
         if (t.nc) { t.nc.fails = ['Entrée refusée : ' + e.message]; t.nc.status = 'reject'; }
       } finally { N.busy = false; }
@@ -4362,6 +4691,14 @@ function NewCoins(h, radar, bot) {
     if (r.ok) return `<span class="chip long">X ✓ ${h2}${s.mention ? ' · cite le coin' : ''}</span>`;
     return r.ok === false ? `<span class="chip short">X ✕ ${h2}</span>` : `<span class="chip">X ${h2} ?</span>`;
   }
+  // Détenteurs (toutes sources) et tendance : pour juger d'un coup d'œil si le coin vit encore
+  function holdKpi(fl) {
+    if (!fl || !fin(fl.holders)) return '<span>Détenteurs <b>—</b></span>';
+    const d = fin(fl.dH) && fl.dH !== 0 ? fl.dH : null, dp = d == null && fin(fl.dHp) && Math.abs(fl.dHp) >= 0.5 ? fl.dHp : null;
+    const col = v => `style="color:var(${v > 0 ? '--long' : '--short'});font-weight:600"`;
+    const tr = d != null ? ` <small ${col(d)}>${d > 0 ? '+' : '−'}${Math.abs(d)}</small>` : dp != null ? ` <small ${col(dp)}>${dp > 0 ? '+' : '−'}${Math.abs(Math.round(dp))} %</small>` : '';
+    return `<span>Détenteurs <b>${fl.holders.toLocaleString('fr-FR')}</b>${tr}</span>`;
+  }
   function card(t) {
     const c = t.nc, j = c.j, age = now() - c.t0;
     const fl = radar.flow ? radar.flow(t.mint) : null, bp = bot.S && bot.S.pos && bot.S.pos[t.mint], mine = c.status === 'bought' || !!(bp && bp.state !== 'closed');
@@ -4374,8 +4711,8 @@ function NewCoins(h, radar, bot) {
       <div class="m-head"><span class="m-ava">${esc((t.symbol || '?').slice(0, 2).toUpperCase())}${img ? `<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</span>
         <span class="m-name"><b>${esc(t.symbol || '?')}</b><small>sorti il y a ${ageTxt(age)} · ${esc((t.name || '').slice(0, 24))}</small></span>${st}</div>
       <div class="m-kpis"><span>Cap <b>${usd(mc)}</b></span>${mine
-        ? `<span>Traders <b>${j && fin(j.traders) ? j.traders : '—'}</b></span><span>Prix 5 min <b class="${j && j.ch5 > 0 ? 'pos' : j && j.ch5 < 0 ? 'neg' : ''}">${j && fin(j.ch5) ? (j.ch5 > 0 ? '+' : '') + n1(j.ch5) + ' %' : '—'}</b></span><span>Créateur <b>${fin(t.devBuyPct) ? n1(t.devBuyPct) + ' %' : '—'}</b></span>`
-        : `<span>Détenteurs <b>${fl && fin(fl.holders) ? fl.holders.toLocaleString('fr-FR') : '—'}</b></span><span>Traders <b>${j && fin(j.traders) ? j.traders : '—'}</b></span><span>Achats/ventes <b>${fl && fin(fl.b5) ? fl.b5 + '/' + (fl.s5 || 0) : j && fin(j.buys) ? j.buys + '/' + (j.sells || 0) : '—'}</b></span>`}</div>
+        ? `${holdKpi(fl)}<span>Prix 5 min <b class="${j && j.ch5 > 0 ? 'pos' : j && j.ch5 < 0 ? 'neg' : ''}">${j && fin(j.ch5) ? (j.ch5 > 0 ? '+' : '') + n1(j.ch5) + ' %' : '—'}</b></span><span>Créateur <b>${fin(t.devBuyPct) ? n1(t.devBuyPct) + ' %' : '—'}</b></span>`
+        : `${holdKpi(fl)}<span>Traders <b>${j && fin(j.traders) ? j.traders : '—'}</b></span><span>Achats/ventes <b>${fl && fin(fl.b5) ? fl.b5 + '/' + (fl.s5 || 0) : j && fin(j.buys) ? j.buys + '/' + (j.sells || 0) : '—'}</b></span>`}</div>
       <div class="n-soc">${xChip(t)}${c.social.tg ? '<span class="chip">Telegram</span>' : ''}${c.social.web ? '<span class="chip">site</span>' : ''}${!mine && fin(t.devBuyPct) ? `<span class="chip">créateur ${n1(t.devBuyPct)} %</span>` : ''}</div>
       ${mine && radar.flowHtml ? radar.flowHtml(t.mint) : ''}
       <div class="m-score"><span class="bar"><i style="width:${c.score}%"></i></span><span>score ${c.score}</span></div>
@@ -4437,7 +4774,7 @@ function NewCoins(h, radar, bot) {
     for (const [id, k, mn, mx] of F) {
       const el = $(id); if (!el) continue;
       el.value = A.cfg[k];
-      el.addEventListener('change', () => { const v = parseFloat(String(el.value).replace(',', '.')); if (fin(v) && v >= mn && v <= mx) { A.cfg[k] = v; save(); N.list.forEach(evaluate); render(); } else { el.value = A.cfg[k]; h.toast(`Valeur hors limites (${mn} à ${mx}).`); } });
+      el.addEventListener('change', () => { const v = parseFloat(String(el.value).replace(',', '.')); if (fin(v) && v >= mn && v <= mx) { A.cfg[k] = v; save(); N.list.forEach(evaluate); render(); if ((k === 'minAgeSec' || k === 'maxAgeMin') && A.cfg.minAgeSec >= A.cfg.maxAgeMin * 60) h.toast(`Fenêtre impossible : minimum ${secTxt(A.cfg.minAgeSec)} au-dessus du maximum ${A.cfg.maxAgeMin} min. Le mode auto n'achètera rien.`, 'short'); } else { el.value = A.cfg[k]; h.toast(`Valeur hors limites (${mn} à ${mx}).`); } });
     }
     for (const [id, k] of [['#aReqX', 'requireX'], ['#aNew', 'useNew'], ['#aRadar', 'useRadar'], ['#aLab', 'needLab'], ['#aMigr', 'migrOnly']]) {
       const el = $(id); if (!el) continue;
@@ -4533,7 +4870,7 @@ function TradeJournal(h, radar, live, bot, X) {
       tx5: f ? f.tx5 : null, b5: fl.b5 != null ? fl.b5 : null, s5: fl.s5 != null ? fl.s5 : null, b1: fl.b1 != null ? fl.b1 : null, s1: fl.s1 != null ? fl.s1 : null,
       share5: f && fin(f.share) ? r4(f.share) : null, traders5: f ? f.traders : null, orgBuyers5: fin(Jp.orgBuyers5) ? Jp.orgBuyers5 : fin(j.org) ? j.org : null,
       organic: fin(Jp.organic) ? Math.round(Jp.organic) : fin(j.organic) ? Math.round(j.organic) : null, organicLabel: Jp.label || j.label || null,
-      ch5: f && fin(f.ch5) ? r1(f.ch5) : null, ch1: fin(m.ch1) ? r1(m.ch1) : null, vol5: fin(m.v5) ? Math.round(m.v5) : null, volH: fin(m.vh) ? Math.round(m.vh) : null,
+      ch5: f && fin(f.ch5) ? r1(f.ch5) : null, fakeAct: (() => { const r = fakeActivity(t); return r ? r.v : null; })(), walLive: !!(t.live && t.live.walOn), ch1: fin(m.ch1) ? r1(m.ch1) : null, vol5: fin(m.v5) ? Math.round(m.v5) : null, volH: fin(m.vh) ? Math.round(m.vh) : null,
       holders: fl.holders || null, holdersD: fl.dH != null ? fl.dH : null, holdersWinS: fl.win ? Math.round(fl.win / 1000) : null, holdersChg5Pct: fin(fl.dHp) ? r1(fl.dHp) : null,
       fromHi: t.life && fin(t.life.fromHi) ? r4(t.life.fromHi) : null, lifeHiMinAgo: t.life && t.life.hiT ? Math.round((now() - t.life.hiT) / 60000) : null,
       live: !!(live && live.fresh(t)), flow60: lf ? { buy: r4(lf.buy), sell: r4(lf.sell), big: r4(lf.big), n: lf.n } : null, flow180: lf3 ? { buy: r4(lf3.buy), sell: r4(lf3.sell), n: lf3.n } : null,
@@ -4895,6 +5232,12 @@ function StrategyLab(h, radar, live, bot) {
   ];
   // Condition commune ajoutée après analyse du journal du 13-14/10 (106 trades simulés) :
   // les entrées sur un prix en baisse faisaient −17 % en moyenne (3 gagnants sur 24), les autres −2 %.
+  // Journal du 13-15/10 : 24 entrées sur des coins dont le nombre de détenteurs baissait : −13 % en moyenne, 12 % de gagnants
+  // (contre −3,6 % et 24 % quand il était stable ou en hausse). Tendance inconnue : on laisse passer.
+  const holdTrend = t => { const fl = radar.flow ? radar.flow(t.mint) : null; if (!fl) return null; if (fl.dH != null) return { v: fl.dH, txt: `${fl.dH > 0 ? '+' : fl.dH < 0 ? '−' : ''}${Math.abs(fl.dH)} en ${Math.max(1, Math.round(fl.win / 60000))} min` }; if (fin(fl.dHp)) return { v: fl.dHp, txt: `${fl.dHp > 0 ? '+' : fl.dHp < 0 ? '−' : ''}${String(Math.round(Math.abs(fl.dHp) * 10) / 10).replace('.', ',')} % sur 5 min` }; return null; };
+  const HOLDDN = C('détenteurs pas en baisse à l\'entrée',
+    t => { const h0 = holdTrend(t); return !(h0 && h0.v < 0); },
+    t => { const h0 = holdTrend(t); return h0 ? `${t.symbol || (t.mint || '').slice(0, 6)} : détenteurs ${h0.txt}` : null; });
   const MOMO = C('prix pas en baisse à l\'entrée (dernière minute, sinon 5 min)',
     (t, f) => (f.px60 != null ? f.px60 >= 0 : !(fin(f.ch5) && f.ch5 <= 0)),
     (t, f) => (f.px60 != null ? Math.round(f.px60 * 1000) / 10 + ' % sur 1 min' : fin(f.ch5) ? f.ch5 + ' % sur 5 min' : null));
@@ -4914,6 +5257,11 @@ function StrategyLab(h, radar, live, bot) {
     (t, f) => (fin(f.tx5) && fin(f.traders) && f.traders > 0
       ? `${t.symbol || (t.mint || '').slice(0, 6)} : ${(Math.round(f.tx5 / f.traders * 10) / 10).toString().replace('.', ',')} tx par trader (${f.tx5} tx, ${f.traders} traders), organique ${fin(f.organic) ? Math.round(f.organic) : f.orgLabel || '?'}`
       : null));
+  // Liste noire manuelle (coins et créateurs que tu as bannis toi-même)
+  const BAN = C('coin et créateur pas sur ta liste noire', t => !(h.banned && h.banned(t)), t => (h.banned && h.banned(t) ? 'banni par toi' : null));
+  const FAKE = C('pas de bots : le cap ne monte pas sans nouveaux wallets (détenteurs à plat, bond par 1 ou 2 wallets)',
+    t => !fakeActivity(t),
+    t => { const r = fakeActivity(t); return r ? `${t.symbol || (t.mint || '').slice(0, 6)} : ${r.v}` : null; });
   const byId = id => STRATS.find(s => s.id === id);
   // Réglages de sortie testés en parallèle sur chaque entrée : les tiens, et deux autres pour comparer
   const EXIT_KEYS = ['sl', 'tp1', 'tp1Part', 'trail', 'tp2', 'beAt', 'beFloor', 'drop', 'npMin', 'npNeed'];
@@ -4926,6 +5274,10 @@ function StrategyLab(h, radar, live, bot) {
       desc: 'perte −25 %, gain visé +30 % (vend la moitié, le reste suit avec un stop à −25 % du plus haut), chute rapide −30 %' },
     { id: 'patient', name: 'Patient', auto: true, vals: { sl: 35, tp1: 50, tp1Part: 50, trail: 30, tp2: 300, beAt: 1000, beFloor: 3, drop: 40 },
       desc: 'perte −35 %, gain visé +50 % (vend la moitié, le reste suit avec un stop à −30 % du plus haut), chute rapide −40 %' },
+    // journal du 13-15/10 : 20 trades montés à +20 % en moyenne sont repartis en perte (−20 % en moyenne).
+    // Sur les mêmes entrées, protéger le gain dès +15 % (sortie si retombé à +5 %) : −7,0 % par trade au lieu de −8,5 %, 34 % de gagnants au lieu de 21 %.
+    { id: 'protege', name: 'Protégé', auto: true, vals: { sl: 25, tp1: 30, tp1Part: 50, trail: 25, tp2: 150, beAt: 15, beFloor: 5, drop: 30 },
+      desc: 'comme Équilibré, mais dès +15 % le gain est protégé : sortie s\'il retombe à +5 %' },
     { id: 'patient10', name: 'Patient, 10 min sans hausse', test: true, vals: { sl: 35, tp1: 50, tp1Part: 50, trail: 30, tp2: 300, beAt: 1000, beFloor: 3, drop: 40, npMin: 10, npNeed: 10 },
       desc: 'comme Patient, mais attend 10 min (au lieu de ta règle) avant de sortir un coin qui n\'a pas monté' }
   ];
@@ -4977,7 +5329,7 @@ function StrategyLab(h, radar, live, bot) {
   const xNeeded = () => !!(h.requireX && h.requireX());
   // Toutes les conditions d'une stratégie, dans l'ordre : renvoie le rang de la première qui échoue (-1 si tout passe)
   function check(s, t, f) {
-    const list = [...SAFE, ...(s.age ? [C('âge dans la fenêtre de la stratégie', (tt, ff) => ff.age != null && ff.age >= s.age[0] && ff.age <= s.age[1], (tt, ff) => (ff.age != null ? Math.round(ff.age) : null))] : []), ...s.conds, MOMO, BOTS];
+    const list = [...SAFE, BAN, ...(s.age ? [C('âge dans la fenêtre de la stratégie', (tt, ff) => ff.age != null && ff.age >= s.age[0] && ff.age <= s.age[1], (tt, ff) => (ff.age != null ? Math.round(ff.age) : null))] : []), ...s.conds, MOMO, HOLDDN, BOTS, FAKE];
     if (xNeeded() && !s.manual) list.push(C('lien X vérifié (réglage du mode auto)', tt => !!(h.xOk && h.xOk(tt))));
     for (let i = 0; i < list.length; i++) {
       let ok = false;
@@ -5042,12 +5394,14 @@ function StrategyLab(h, radar, live, bot) {
   /* ---------- moteur ---------- */
   function open(s, t, f) {
     const size = bot.cfg().size, grp = ++L.seq, keys = new Set();
+    // copie : on retient quel wallet a déclenché le trade, pour classer les wallets ensuite
+    const src = s.id === 'copy' && h.copy && h.copy() ? ((h.copy().recentBuy(t.mint) || {}).w || null) : null;
     let primary = null;
     for (const pr of PROFILES) {
       const cfg = cfgFor(s.id, pr.id), key = keyOf(cfg);
       if (keys.has(key)) continue;
       keys.add(key);
-      const p = { id: ++L.seq, grp, strat: s.id, prof: pr.id, key, cfg, mint: t.mint, sym: t.symbol || t.mint.slice(0, 4), t0: now(), state: 'pending', fillAt: now() + 4000,
+      const p = { id: ++L.seq, grp, strat: s.id, src, prof: pr.id, key, cfg, mint: t.mint, sym: t.symbol || t.mint.slice(0, 4), t0: now(), state: 'pending', fillAt: now() + 4000,
         cost: size + NETF, size, q: 0, realized: 0, hist: [], peakTot: null, tp1Done: false, pnl: 0 };
       if (jr) {
         if (!primary) { p.jid = jr.open('s' + p.id + '-' + p.strat, 'sim', s.id, t, f || feat(t), { prof: pr.id, key }).id; primary = p; }
@@ -5058,12 +5412,14 @@ function StrategyLab(h, radar, live, bot) {
     dirty = true;
     radar.pin(t.mint, 'lab', { symbol: t.symbol, name: t.name, created: t.created });
     if (live) live.watch(t.mint, 'lab');
+    if (h.tradeTaken) try { h.tradeTaken({ mint: t.mint, sym: t.symbol || t.mint.slice(0, 4), sim: true, strat: s.name, sub: `simulation · mise ${fSol(size)}` }); } catch {}
   }
   function finish(p, why, gap) {
     p.state = 'closed';
     const net = p.realized - p.cost;
-    if (p.paused && !gap) { gap = 'pause'; why = 'interrompu : appli en pause pendant le trade (pas compté) · ' + why; }
-    L.closed.unshift({ id: p.id, grp: p.grp, jid: p.jid || null, strat: p.strat, prof: p.prof || 'toi', key: p.key || null, mint: p.mint, sym: p.sym, t0: p.t0, t1: now(), cost: p.cost, net, pnl: net / p.cost, why, gap: !!gap, peak: p.peakTot ? p.peakTot / p.cost - 1 : null });
+    // pause de l'appli (écran éteint) : même si le prix a ensuite manqué, c'est la pause qui a coupé le suivi
+    if (p.paused) { gap = 'pause'; if (!/^interrompu/.test(why)) why = 'interrompu : appli en pause pendant le trade (pas compté) · ' + why; }
+    L.closed.unshift({ id: p.id, grp: p.grp, jid: p.jid || null, strat: p.strat, src: p.src || null, rt: fin(p.rt0) ? Math.round(p.rt0 * 1e4) / 1e4 : null, prof: p.prof || 'toi', key: p.key || null, mint: p.mint, sym: p.sym, t0: p.t0, t1: now(), cost: p.cost, net, pnl: net / p.cost, why, gap: !!gap, peak: p.peakTot ? p.peakTot / p.cost - 1 : null });
     if (jr && p.jid) jr.close(jr.byId(p.jid), why, gap ? NaN : net / p.cost, gap ? NaN : net, gap ? { gap: gap === 'pause' ? 'pause' : true } : null);
     if (jr && p.jparent) jr.alt(jr.byId(p.jparent), { prof: p.prof, key: p.key, pnl: gap ? null : Math.round(net / p.cost * 1e4) / 1e4, why, holdS: p.tOpen ? Math.round((now() - p.tOpen) / 1000) : null, peak: p.peakTot ? Math.round((p.peakTot / p.cost - 1) * 1e4) / 1e4 : null });
     if (L.closed.length > 400) L.closed.length = 400;
@@ -5077,7 +5433,7 @@ function StrategyLab(h, radar, live, bot) {
     if (p.state === 'pending') {
       if (now() < p.fillAt) return;
       const q = buyQty(t, p.size);
-      if (fin(q) && q > 0) { p.q = q; p.state = 'open'; p.tOpen = now(); p.t0 = now(); const v0 = value(t, q); pushHist(p, v0); if (jr && p.jid) jr.fill(jr.byId(p.jid), pxSol(t), p.cost, v0); dirty = true; }
+      if (fin(q) && q > 0) { p.q = q; p.state = 'open'; p.tOpen = now(); p.t0 = now(); const v0 = value(t, q); if (fin(v0) && p.cost > 0) p.rt0 = 1 - v0 / p.cost; pushHist(p, v0); if (jr && p.jid) jr.fill(jr.byId(p.jid), pxSol(t), p.cost, v0); dirty = true; }
       else if (now() - p.fillAt > 30000) { p.realized = p.cost; finish(p, 'annulé : pas de prix au moment de l\'achat'); }
       return;
     }
@@ -5101,6 +5457,31 @@ function StrategyLab(h, radar, live, bot) {
       else { p.state = 'open'; dirty = true; }
     }
   }
+  // Clôture à la main d'un trade simulé : toutes ses variantes (autres réglages de sortie testés) sortent au même moment,
+  // comme une vente d'urgence ; le journal note « Clôturé à la main ». Aucun wallet n'est utilisé.
+  let askClose = null;
+  function manualClose(id) {
+    const p0 = L.open.find(x => x.id === id);
+    if (!p0) return false;
+    const g = p0.grp || p0.id;
+    for (const q of L.open.filter(x => (x.grp || x.id) === g)) {
+      if (q.state === 'pending') { q.realized = q.cost; finish(q, 'annulé à la main avant l\'achat'); continue; }
+      if (q.state === 'open') { const d = { pct: 100, urgent: true, why: 'Clôturé à la main' }; q.state = 'exiting'; q.exitAt = now(); q.exitD = d; if (jr && q.jid) jr.exitDecision(jr.byId(q.jid), d, q.pnl); }
+    }
+    for (const q of L.open.slice()) if ((q.grp || q.id) === g && q.state === 'exiting') { try { step(q); } catch {} }
+    askClose = null; dirty = true; save();
+    return true;
+  }
+  // Onglet Nouveaux : pas de confirmation, la clôture part au premier appui (demandé : la confirmation fait perdre du temps)
+  const simCloseHtml = p => (p.state === 'exiting' ? '<div class="mono">sortie en cours…</div>'
+    : `<div class="row-btns" style="margin:4px 0 0"><button class="btn sm danger" data-lclose="${p.id}">Clôturer</button></div>`);
+  // Détenteurs d'un coin et leur tendance (toutes sources : Jupiter, RugCheck, relevés du radar)
+  const holdTxt = mint => {
+    const fl = radar.flow ? radar.flow(mint) : null;
+    if (!fl || !fin(fl.holders)) return 'détenteurs : inconnu';
+    const tr = fin(fl.dH) && fl.dH !== 0 ? ` (${fl.dH > 0 ? '+' : '−'}${Math.abs(fl.dH)} en ${Math.max(1, Math.round(fl.win / 60000))} min)` : fin(fl.dHp) && Math.abs(fl.dHp) >= 0.5 ? ` (${fl.dHp > 0 ? '+' : '−'}${Math.abs(Math.round(fl.dHp))} % sur 5 min)` : '';
+    return `${fl.holders.toLocaleString('fr-FR')} détenteurs${tr}`;
+  };
   function onLive(mint) { for (const p of L.open) if (p.mint === mint && p.state !== 'pending') { if (now() - (p.lastLive || 0) >= 700) { p.lastLive = now(); step(p); } } }
 
   function scan() {
@@ -5220,7 +5601,8 @@ function StrategyLab(h, radar, live, bot) {
     const box = $('#labBody');
     if (!box) return;
     const ls = live ? live.status() : null, size = bot.cfg().size;
-    $('#labState').innerHTML = ls ? `<span class="chip ${ls.s === 'on' ? 'long' : ls.s === 'wait' ? 'warn' : ''}">${ls.s === 'on' ? 'temps réel' : ls.s === 'wait' ? 'connexion…' : ls.subs ? 'temps réel coupé' : 'prêt'}</span>` : '';
+    $('#labState').innerHTML = ls ? `<span class="chip ${ls.s === 'on' ? 'long' : ls.s === 'wait' ? 'warn' : ''}">${ls.s === 'on' ? 'temps réel' : ls.s === 'wait' ? 'connexion…' : ls.subs ? 'temps réel coupé' : 'prêt'}</span>`
+      + (ls.wal && ls.wal.on ? ` <span class="chip long" title="Wallets acheteurs suivis en direct sur ${ls.wal.on} coin${ls.wal.on > 1 ? 's' : ''}">wallets en direct · ${ls.wal.on}</span>` : ls.wal && ls.wal.err && ls.s === 'on' ? ` <span class="chip warn" title="${esc(ls.wal.err)}">wallets : refusé par le RPC</span>` : '') : '';
     const pk = pick();
     const opened0 = new Set([...box.querySelectorAll('details.l-row[open]')].map(d => d.dataset.id));
     const rows = STRATS.map(s => {
@@ -5232,14 +5614,15 @@ function StrategyLab(h, radar, live, bot) {
         <p class="note">${s.age ? `Âge d'entrée : ${ageTxt(s.age[0])} à ${ageTxt(s.age[1])}. ` : ''}${migrOnly() && !s.manual && !MIGR_IDS.includes(s.id) ? '<b>Option « uniquement après migration » : simulée, mais jamais en argent réel.</b> ' : ''}${s.manual ? '<b>Jamais choisie par le mode auto : l\'argent réel se règle dans l\'onglet Copie.</b> ' : ''}Avec tes réglages : ${exitTxt(cfgFor(s.id, 'toi'))}${s.exits.stallMin ? `, sortie si moins de +${s.exits.stallNeed} % après ${s.exits.stallMin} min` : ''}${s.exits.flowExit ? ', sortie si les vendeurs dominent' : ''}, sortie immédiate si le créateur vend, ${s.exits.maxHold} min maximum.</p>
         <p class="note"><b>Mêmes entrées, autres sorties :</b> ${profStats(s.id).filter(x => !x.mine || autoMode()).map(x => `${esc(x.pr.name)} ${x.st.n ? `${fPct(x.st.avg)} sur ${x.st.n} trades` : 'pas encore de trade'}`).join(' · ')}</p></details>`;
     }).join('');
-    const opened = L.open.filter(p => p.state !== 'pending' && (p.prof || 'toi') === 'toi').slice(0, 6).map(p => `<div class="j-row"><span class="chip">${esc((byId(p.strat) || {}).name || p.strat)}</span><div class="j-mid"><div>${esc(p.sym)} · en cours</div><div class="mono">depuis ${ago(now() - p.t0)}</div></div><span class="j-r ${p.pnl > 0 ? 'pos' : p.pnl < 0 ? 'neg' : ''}">${fPct(p.pnl)}</span></div>`).join('');
+    const opened = L.open.filter(p => p.state !== 'pending' && (p.prof || 'toi') === 'toi').slice(0, 6).map(p => `<div class="j-row"><span class="chip">${esc((byId(p.strat) || {}).name || p.strat)}</span><div class="j-mid"><div>${esc(p.sym)} · en cours</div><div class="mono">depuis ${ago(now() - p.t0)} · ${esc(holdTxt(p.mint))}</div>${simCloseHtml(p)}</div><span class="j-r ${p.pnl > 0 ? 'pos' : p.pnl < 0 ? 'neg' : ''}">${fPct(p.pnl)}</span></div>`).join('');
     const diagOf = x => { const e = jr && x.jid ? jr.byId(x.jid) : null; return e && e.diag ? e.diag.filter(d => d.lvl !== 'ok' || d.c === 'sortie_justifiee').slice(0, 3) : []; };
     const last = L.closed.filter(x => (x.prof || 'toi') === 'toi').slice(0, 8).map(x => { const dg = diagOf(x); return `<div class="j-row"><span class="chip ${x.gap ? '' : x.net >= 0 ? 'long' : 'short'}">${x.gap ? 'sans prix' : fPct(x.pnl)}</span><div class="j-mid"><div>${esc(x.sym)} · ${esc((byId(x.strat) || {}).name || x.strat)}</div><div class="mono">${ago(now() - x.t1)} · ${esc(x.why)}</div>${dg.length ? `<ul class="l-diag">${dg.map(d => `<li data-l="${d.lvl}">${esc(d.txt)}</li>`).join('')}</ul>` : ''}</div><span class="j-r ${x.net >= 0 ? 'pos' : 'neg'}">${x.gap ? '—' : fSol(x.net)}</span></div>`; }).join('');
     const sg = suggestion();
     const sgHtml = !sg ? '' : sg.pr.test && autoMode()
       ? `<div class="advice" data-l="info" style="margin:0 0 10px"><h3>Ta règle « pas de hausse » coupe des gagnants</h3><p>Sur « ${esc(sg.s.name)} », attendre 10 min au lieu de ${bot.cfg().npMin} min fait ${fPct(sg.st.avg)} en moyenne sur ${sg.st.n} trades simulés, contre ${fPct(sg.me.avg)}. C'est toi qui décides.</p><div class="row-btns"><button class="btn sm pri" data-lnp="10">Passer à 10 min</button></div></div>`
       : `<div class="advice" data-l="info" style="margin:0 0 10px"><h3>D'autres réglages de sortie feraient mieux</h3><p>Sur « ${esc(sg.s.name)} », les réglages « ${esc(sg.pr.name)} » (${esc(sg.pr.desc)}) font ${fPct(sg.st.avg)} en moyenne sur ${sg.st.n} trades simulés, contre ${fPct(sg.me.avg)} avec les tiens. C'est toi qui décides.</p><div class="row-btns"><button class="btn sm pri" data-lprof="${sg.pr.id}">Appliquer ces réglages au bot</button></div></div>`;
-    box.innerHTML = `${sgHtml}<div class="advice" data-l="${pk.ok ? 'ok' : 'warn'}" style="margin:0 0 10px"><h3>${pk.ok ? `Argent réel : « ${esc(pk.s.name)} »${pk.prof && autoMode() ? ` en « ${esc(pk.prof.name)} »` : ''}` : 'Simulation seulement'}</h3><p>${pk.ok ? `${esc(pk.txt)}, ${Math.round(pk.st.wins / pk.st.n * 100)} % gagnants. Le mode auto n'entre qu'avec cette stratégie, tant qu'elle reste rentable.` : esc(pk.reason)}</p></div>
+    const walMsg = ls && ls.wal && ls.wal.off && !ls.wal.on ? `<div class="advice" data-l="warn" style="margin:0 0 10px"><h3>Suivi des wallets en direct bloqué</h3><p>Le serveur Solana ${esc(ls.wal.host || '')} refuse ce suivi (« ${esc(ls.wal.err)} »). La règle « cap qui bondit avec 1 ou 2 wallets » ne peut pas s'appliquer ; les autres contrôles anti-bots continuent. Si ce message reste affiché, demande à Claude de retirer le flux des wallets en direct.</p></div>` : '';
+    box.innerHTML = `${walMsg}${sgHtml}<div class="advice" data-l="${pk.ok ? 'ok' : 'warn'}" style="margin:0 0 10px"><h3>${pk.ok ? `Argent réel : « ${esc(pk.s.name)} »${pk.prof && autoMode() ? ` en « ${esc(pk.prof.name)} »` : ''}` : 'Simulation seulement'}</h3><p>${pk.ok ? `${esc(pk.txt)}, ${Math.round(pk.st.wins / pk.st.n * 100)} % gagnants. Le mode auto n'entre qu'avec cette stratégie, tant qu'elle reste rentable.` : esc(pk.reason)}</p></div>
       <p class="note">Mise simulée : ${fSol(size)} par trade, comme le bot. Frais, glissement et 3 à 5 s de délai inclus. Résultats des 24 dernières heures.${autoMode() ? ' Perte et gain : le labo choisit, pour chaque stratégie, entre Rapide, Équilibré et Patient. Ta règle « pas de hausse » reste un maximum.' : ''}</p>
       <div class="l-list">${rows}</div>
       ${opened ? `<h3 class="w-h">Trades simulés en cours</h3><div class="journal">${opened}</div>` : ''}
@@ -5248,6 +5631,9 @@ function StrategyLab(h, radar, live, bot) {
       <p class="note">Chaque trade, simulé ou réel, est enregistré avec la photo complète du coin à l'entrée, le trajet du prix, la sortie, les 15 min qui suivent et ce qui n'allait pas. Plus l'entonnoir : à quelle condition chaque stratégie bloque. ${jr ? jr.entries().length + ' trades enregistrés.' : ''}</p>
       <div class="row-btns"><button class="btn sm pri" id="labExport">Exporter le journal (fichier)</button><button class="btn sm" id="labReset">Remettre le laboratoire à zéro</button></div>`;
     for (const b of box.querySelectorAll('[data-lprof]')) b.onclick = () => applyProfile(b.dataset.lprof);
+    for (const b of box.querySelectorAll('[data-lclose]')) b.onclick = () => { b.disabled = true; manualClose(+b.dataset.lclose); render(); };
+    for (const b of box.querySelectorAll('[data-lclose-no]')) b.onclick = () => { askClose = null; render(); };
+    for (const b of box.querySelectorAll('[data-lclose-yes]')) b.onclick = () => { manualClose(+b.dataset.lcloseYes); render(); };
     for (const b of box.querySelectorAll('[data-lnp]')) b.onclick = () => { bot.applyExits({ npMin: +b.dataset.lnp }, `Sortie sans hausse passée à ${b.dataset.lnp} min depuis le laboratoire`); render(); };
     const eb = $('#labExport');
     if (eb && jr) eb.onclick = async () => { eb.disabled = true; try { const r = await jr.exportFile(); if (r.ok && h.toast) h.toast(`Journal exporté (${r.how}) : ${r.name}, ${Math.round(r.size / 1024)} ko`, 'long'); } catch (e) { if (h.toast) h.toast('Export impossible : ' + e.message, 'short'); } eb.disabled = false; };
@@ -5284,7 +5670,19 @@ function StrategyLab(h, radar, live, bot) {
   const describe = () => STRATS.map(s => ({ id: s.id, name: s.name, age: s.age, exits: s.exits, profiles: profStats(s.id).map(x => ({ id: x.pr.id, key: x.key, mine: x.mine, cfg: Object.fromEntries(EXIT_KEYS.map(k => [k, x.cfg[k]])), stats: x.st })), conditions: [...SAFE.map(c => c.l), 'âge dans la fenêtre', ...s.conds.map(c => c.l), ...(xNeeded() ? ['lien X vérifié'] : [])] }));
   const allStats = () => Object.fromEntries(STRATS.map(s => [s.id, Object.assign({ name: s.name }, stats(s.id), { closed: L.closed.filter(x => x.strat === s.id).length })]));
   if (typeof TradeJournal === 'function') jr = TradeJournal(h, radar, live, bot, { pxSol, feat, exitsOf: id => (byId(id) || {}).exits, describe, allStats });
-  return { start, render, pick, candidates, stats, STRATS, byId, L, journal: () => jr, PROFILES, profStats, suggestion, pairs, cfgFor, MIGR_IDS,
+  function copyRank() {
+    const lim = Math.max(now() - DAY, L.resetAt || 0), k = userKey('copy'), M = new Map();
+    for (const x of L.closed) {
+      if (x.strat !== 'copy' || !x.src || x.t1 < lim || x.gap || /^annulé|^données manquantes|^interrompu/.test(x.why)) continue;
+      if (!(x.key ? x.key === k : (x.prof || 'toi') === 'toi')) continue;
+      const e = M.get(x.src) || { n: 0, wins: 0, sum: 0, net: 0, open: 0 };
+      e.n++; if (x.pnl > 0) e.wins++; e.sum += x.pnl; e.net += x.net; M.set(x.src, e);
+    }
+    for (const p of L.open) if (p.strat === 'copy' && p.src && (p.prof || 'toi') === 'toi') { const e = M.get(p.src) || { n: 0, wins: 0, sum: 0, net: 0, open: 0 }; e.open++; M.set(p.src, e); }
+    for (const e of M.values()) e.avg = e.n ? e.sum / e.n : 0;
+    return M;
+  }
+  return { start, render, pick, candidates, stats, STRATS, byId, L, journal: () => jr, PROFILES, profStats, suggestion, pairs, cfgFor, MIGR_IDS, manualClose, copyRank, NETF,
     copyCheck: t => { const s0 = byId('copy'), f = feat(t), r = check(s0, t, f); if (r.i < 0) return null; let v = null; try { v = r.c.v ? r.c.v(t, f) : null; } catch {} return { why: r.c.l, v }; }, _test: { feat, safe, passes, check, step, open, scan, value, buyQty, qualifies, finish, pxSol, tick } };
 }
 if (typeof module !== 'undefined') module.exports = StrategyLab;
@@ -5310,13 +5708,15 @@ function CopyTrade(h, radar, bot, rpc) {
   const MAX_W = 5;
   const lab = () => (h.lab ? h.lab() : null);
 
-  const BLANK = { v: 1, wallets: [], view: 'sim', real: false, ev: [], seen: [] };
+  const BLANK = { v: 1, wallets: [], view: 'sim', real: false, ev: [], seen: [], alerts: true, alerted: {} };
+  const JUDGE = 6; // en dessous de 6 copies terminées, pas de pourcentage : ce serait du hasard
   const S = Object.assign({}, BLANK, h.store.get('copy', {}));
   if (!Array.isArray(S.wallets)) S.wallets = [];
   if (!Array.isArray(S.ev)) S.ev = [];
   if (!Array.isArray(S.seen)) S.seen = [];
+  if (!S.alerted || typeof S.alerted !== 'object') S.alerted = {};
   const seen = new Set(S.seen);
-  const save = () => h.store.set('copy', { v: 1, wallets: S.wallets, view: S.view, real: !!S.real, ev: S.ev.slice(0, 120), seen: [...seen].slice(-500) });
+  const save = () => h.store.set('copy', { v: 1, wallets: S.wallets, view: S.view, real: !!S.real, ev: S.ev.slice(0, 120), seen: [...seen].slice(-500), alerts: S.alerts !== false, alerted: S.alerted });
   const C = { buys: new Map(), sells: new Map(), busy: false, lastOk: 0, err: '', confirm: false, started: false };
 
   /* ---------- formats ---------- */
@@ -5366,7 +5766,63 @@ function CopyTrade(h, radar, bot, rpc) {
     return out;
   }
 
-  /* ---------- surveillance ---------- */
+  /* ---------- surveillance ----------
+     Sans RPC perso, les RPC publics gratuits refusent vite (« Rate limit exceeded ») un relevé toutes les quelques
+     secondes, et leur refus prive aussi le bot de RPC. On lit donc les soldes du wallet copié chez Jupiter (un appel
+     par wallet toutes les 8 s environ) et on compare au relevé précédent : jeton qui apparaît ou augmente = achat,
+     jeton qui baisse = vente. Avec ton RPC perso : lecture des transactions (montants exacts) ; s'il flanche,
+     repli sur Jupiter. */
+  const SNAP = new Map(); // adresse → { sol, tok: Map(mint → { raw, dec }) } : dernier relevé Jupiter (en mémoire seulement)
+  const ownRpc = () => !!(h.ownRpc && h.ownRpc());
+  const errTxt = m => (/429|rate|limit|too many/i.test(m || '') ? 'trop d\'appels, Jupiter fait patienter' : /délai|répond pas/i.test(m || '') ? 'Jupiter ne répond pas' : /injoignable/i.test(m || '') ? 'pas de réseau' : String(m || 'erreur').replace(/^Jupiter : /, '').slice(0, 80));
+  async function pollJupWallet(w) {
+    const j = await h.jup('/ultra/v1/holdings/' + w.addr, 'high');
+    if (!j || typeof j !== 'object') throw new Error('réponse Jupiter vide');
+    const tok = new Map();
+    for (const [mint, arr] of Object.entries(j.tokens || {})) {
+      let raw = 0n, dec = 6;
+      for (const x of Array.isArray(arr) ? arr : []) { try { raw += BigInt(x.amount || '0'); } catch {} if (fin(+x.decimals)) dec = +x.decimals; }
+      tok.set(mint, { raw, dec });
+    }
+    const sol = fin(+j.uiAmount) ? +j.uiAmount : fin(+j.amount) ? +j.amount / 1e9 : 0;
+    const prev = SNAP.get(w.addr);
+    SNAP.set(w.addr, { sol, tok });
+    w.checkedAt = now(); w.err = ''; w.via = 'Jupiter';
+    if (!prev) return; // premier relevé : on note les soldes sans rien rejouer (on ne copie qu'à partir de maintenant)
+    const raw1 = m => (tok.get(m) || { raw: 0n }).raw, raw0 = m => (prev.tok.get(m) || { raw: 0n }).raw;
+    const d = m => raw1(m) - raw0(m);
+    const decOf = m => (tok.get(m) || prev.tok.get(m) || { dec: 6 }).dec;
+    const solD = sol - prev.sol + Number(d(WSOL)) / 1e9;
+    const usdD = STABLE.reduce((a, m) => a + Number(d(m)) / Math.pow(10, decOf(m)), 0);
+    const ups = [], downs = [];
+    for (const m of new Set([...tok.keys(), ...prev.tok.keys()])) {
+      if (BASE.has(m)) continue;
+      const dd = d(m);
+      if (dd > 0n) ups.push(m); else if (dd < 0n) downs.push(m);
+    }
+    const paid = solD < -0.001 || usdD < -0.5, got = solD > 0.0005 || usdD > 0.5;
+    for (const m of downs) {
+      const p0 = raw0(m), frac = p0 > 0n ? Math.min(1, Number((-d(m) * 10000n) / p0) / 10000) : 1;
+      onEvent(w, null, { side: got || ups.length ? 'sell' : 'out', mint: m, frac, sol: got && !ups.length && downs.length === 1 ? solD : null }, null);
+    }
+    // jetons reçus sans rien payer (transfert, airdrop) : pas un achat, sauf échange contre un autre jeton vendu au même moment
+    if (!paid && !downs.length) return;
+    for (const m of ups) onEvent(w, null, { side: 'buy', mint: m, sol: paid && solD < 0 && ups.length === 1 ? -solD : null, usd: paid && usdD < 0 && ups.length === 1 ? -usdD : null }, null);
+  }
+  async function pollOne(w) {
+    if (ownRpc()) {
+      try {
+        if (w.via !== 'RPC') w.base = false; // retour sur ton RPC : on repart de maintenant, sans rejouer
+        await pollWallet(w);
+        w.via = 'RPC'; SNAP.delete(w.addr);
+        return;
+      } catch (e) { w.rpcErr = e.message; }
+    }
+    if (w.via === 'RPC') SNAP.delete(w.addr); // passage sur Jupiter : nouveau relevé de départ
+    // le bot passe avant : si la file Jupiter est chargée (ventes, cotations), ce relevé attend le tour suivant
+    if (h.jupBusy && h.jupBusy() > 3) return;
+    await pollJupWallet(w);
+  }
   function mark(sig) { seen.add(sig); if (seen.size > 800) seen.delete(seen.values().next().value); }
   async function pollWallet(w) {
     const sigs = await rpc('getSignaturesForAddress', [w.addr, { limit: 20, commitment: 'confirmed' }]);
@@ -5389,7 +5845,14 @@ function CopyTrade(h, radar, bot, rpc) {
     C.busy = true;
     try {
       for (const w of S.wallets.filter(w => w.on)) {
-        try { await pollWallet(w); } catch (e) { w.err = e.message; C.err = e.message; }
+        if (w.retryAt && now() < w.retryAt) continue;
+        try { await pollOne(w); w.fails = 0; w.retryAt = 0; }
+        catch (e) {
+          // on espace les essais (8 s, 16 s, 32 s, puis 60 s) au lieu d'insister
+          w.fails = (w.fails || 0) + 1;
+          const wait = Math.min(60000, 8000 * Math.pow(2, w.fails - 1));
+          w.retryAt = now() + wait; w.err = errTxt(e.message); C.err = w.err;
+        }
       }
       if (S.wallets.some(w => w.on && !w.err)) { C.lastOk = now(); C.err = ''; }
       // ménage : les jetons copiés il y a plus de 15 min ne sont plus suivis de près pour la copie
@@ -5400,7 +5863,7 @@ function CopyTrade(h, radar, bot, rpc) {
   }
   function loop() {
     const k = S.wallets.filter(w => w.on).length;
-    const next = k ? 4000 + 1500 * (k - 1) : 8000; // limite les appels au RPC public
+    const next = !k ? 8000 : ownRpc() ? 4000 + 1500 * (k - 1) : 8000 + 3000 * (k - 1); // Jupiter sans clé : environ 30 appels par minute pour toute l'appli
     setTimeout(async () => { try { if (k) await poll(); } catch {} loop(); }, next);
   }
 
@@ -5416,6 +5879,7 @@ function CopyTrade(h, radar, bot, rpc) {
       else {
         C.buys.set(e.mint, { t: now(), w: w.addr, sol: e.sol, sig });
         radar.pin(e.mint, 'copy', {});
+        buyAlert(w, e);
         ev.act = 'sim'; ev.why = 'trade simulé dans le laboratoire, si les contrôles passent';
         if (S.real) realBuy(w, e.mint, ev);
       }
@@ -5433,6 +5897,16 @@ function CopyTrade(h, radar, bot, rpc) {
     S.ev.unshift(ev);
     if (S.ev.length > 120) S.ev.length = 120;
   }
+  // Alerte « X vient d'acheter Y » : demandée pour les wallets suivis (à part de la règle « seulement les trades pris »)
+  function buyAlert(w, e) {
+    if (S.alerts === false || !h.alert) return;
+    const k = w.addr + '|' + e.mint;
+    for (const [kk, t] of Object.entries(S.alerted)) if (now() - t > 24 * 3600e3) delete S.alerted[kk];
+    if (S.alerted[k]) return;
+    S.alerted[k] = now(); save();
+    // quelques secondes pour que le radar trouve le nom du coin
+    setTimeout(() => { try { h.alert(`${nameOf(w.addr)} vient d'acheter ${symOf(e.mint)}${fin(e.sol) ? ' pour ' + fSol(e.sol) : ''}`); } catch {} }, 4000);
+  }
   // Achat réel : le wallet du bot mèmes entre si le coin passe les mêmes contrôles que la simulation
   async function realBuy(w, mint, ev) {
     try {
@@ -5446,7 +5920,7 @@ function CopyTrade(h, radar, bot, rpc) {
       if (!t) throw new Error('coin introuvable');
       const L = lab(), chk = L && L.copyCheck ? L.copyCheck(t) : null;
       if (chk) throw new Error(`écarté par les contrôles (${chk.why}${chk.v != null && chk.v !== '' ? ' : ' + chk.v : ''})`);
-      await bot.autoJoin(mint, null, `Copie de ${nameOf(w.addr)}`, { strat: 'copy' });
+      await bot.autoJoin(mint, null, `Copie de ${nameOf(w.addr)}`, { strat: 'copy', src: w.addr });
       ev.act = 'real'; ev.why = 'acheté pour de vrai par le wallet du bot (et simulé)';
     } catch (e) {
       ev.why = 'simulé seulement · réel : ' + e.message; // la simulation, elle, suit son cours
@@ -5465,7 +5939,28 @@ function CopyTrade(h, radar, bot, rpc) {
     const [lab0, cls] = ACT[ev.act] || ['', ''];
     const sym = (radar.get(ev.mint) || {}).symbol || ev.sym;
     const what = ev.side === 'buy' ? `achète ${esc(sym)}${fin(ev.sol) ? ' pour ' + fSol(ev.sol) : fin(ev.usd) ? ' pour ' + n(ev.usd, 0) + ' $' : ''}` : `${ev.side === 'sell' ? 'vend' : 'sort'} ${esc(sym)}${fin(ev.frac) ? ' (' + Math.round(ev.frac * 100) + ' %)' : ''}`;
-    return `<div class="j-row"><span class="chip ${cls}">${lab0}</span><div class="j-mid"><div>${esc(nameOf(ev.w))} ${what}</div><div class="mono">il y a ${ago(now() - ev.tx)} · ${esc(ev.why)}</div></div><a class="cp-tx" href="https://solscan.io/tx/${esc(ev.sig)}" target="_blank" rel="noopener">tx</a></div>`;
+    return `<div class="j-row"><span class="chip ${cls}">${lab0}</span><div class="j-mid"><div>${esc(nameOf(ev.w))} ${what}</div><div class="mono">il y a ${ago(now() - ev.tx)} · ${esc(ev.why)}</div></div>${ev.sig ? `<a class="cp-tx" href="https://solscan.io/tx/${esc(ev.sig)}" target="_blank" rel="noopener">tx</a>` : `<a class="cp-tx" href="https://solscan.io/account/${esc(ev.w)}" target="_blank" rel="noopener">wallet</a>`}</div>`;
+  }
+  // Classement des wallets suivis : copies simulées terminées sur 24 h, du meilleur au pire
+  function rankHtml() {
+    const L = lab();
+    if (!S.wallets.length || !L || !L.copyRank) return '';
+    const M = L.copyRank();
+    const real = new Map();
+    for (const x of ((bot.S && bot.S.hist) || [])) if (x.strat === 'copy' && x.src && now() - x.t1 < 24 * 3600e3) { const e = real.get(x.src) || { n: 0, net: 0 }; e.n++; e.net += x.net; real.set(x.src, e); }
+    const rows = S.wallets.map(w => ({ w, e: M.get(w.addr) || { n: 0, wins: 0, avg: 0, net: 0, open: 0 }, r: real.get(w.addr) }));
+    const judged = rows.filter(x => x.e.n >= JUDGE).sort((a, b) => b.e.avg - a.e.avg);
+    const wait = rows.filter(x => x.e.n < JUDGE).sort((a, b) => b.e.n - a.e.n);
+    const line = (x, i) => {
+      const e = x.e, ok = e.n >= JUDGE;
+      const res = ok ? `${e.n} copies · ${Math.round(e.wins / e.n * 100)} % gagnantes · moyenne <b class="${e.avg > 0 ? 'pos' : 'neg'}">${fPct(e.avg)}</b> · total <b class="${e.net >= 0 ? 'pos' : 'neg'}">${e.net > 0 ? '+' : e.net < 0 ? '−' : ''}${fSol(Math.abs(e.net))}</b>`
+        : `encore trop peu de trades pour juger (${e.n}/${JUDGE})`;
+      const chip = ok ? (e.avg > 0 ? '<span class="chip long">à copier</span>' : '<span class="chip short">fait perdre</span>') : '<span class="chip">en test</span>';
+      return `<div class="cp-r"><span class="cp-rk">${ok ? i + 1 : '–'}</span><div class="cp-rm"><b>${esc(x.w.label || short(x.w.addr))}</b><span>${res}${e.open ? ` · ${e.open} en cours` : ''}${x.r ? ` · réel : ${x.r.n} trade${x.r.n > 1 ? 's' : ''}, ${fSol(x.r.net)}` : ''}</span></div>${chip}</div>`;
+    };
+    return `<h3 class="w-h" style="margin-top:0">Classement des wallets (simulation, 24 h)</h3>
+      <div class="cp-rank">${[...judged.map(line), ...wait.map(x => line(x, 0))].join('')}</div>
+      <p class="note" style="margin:6px 0 12px">Copies simulées avec ta mise et tes réglages de sortie, frais compris. Il faut au moins ${JUDGE} copies terminées avant de juger un wallet.</p>`;
   }
   function statsHtml(st) {
     return `<div class="w-top">
@@ -5473,6 +5968,14 @@ function CopyTrade(h, radar, bot, rpc) {
       <div class="kv"><div class="k">Gagnants</div><div class="v">${st.n ? Math.round(st.wins / st.n * 100) + ' %' : '—'}</div></div>
       <div class="kv"><div class="k">Moyenne nette</div><div class="v ${st.avg > 0 ? 'pos' : st.avg < 0 ? 'neg' : ''}">${st.n ? fPct(st.avg) : '—'}</div></div>
     </div>`;
+  }
+  // Vente à la main d'une copie réelle : même vente d'urgence que le bot (un appui, puis confirmation)
+  function realSellHtml(p) {
+    if (p.frozen) return '<div class="mono neg">compte gelé par le créateur : vente impossible</div>';
+    if (p.state === 'selling' || p.busy) return '<div class="row-btns" style="margin:4px 0 0"><button class="btn sm" disabled>Vente en cours…</button></div>';
+    if (p.closeReq) return `<div class="mono">${bot.unlocked() ? 'vente demandée…' : 'vente demandée : elle partira dès que tu entres ton code (onglet Mèmes)'}</div>`;
+    if (C.ask === 'r:' + p.mint) return `<div class="confirm" style="margin:4px 0 0"><span>Vendre ${esc(p.sym)} au prix du marché ?</span><button class="btn sm danger" data-cask-yes="r:${esc(p.mint)}">Confirmer la vente</button><button class="btn sm" data-cask-no="1">Annuler</button></div>`;
+    return `<div class="row-btns" style="margin:4px 0 0"><button class="btn sm danger" data-cask="r:${esc(p.mint)}">Vendre maintenant</button></div>`;
   }
   function render() {
     const box = $('#copyBody');
@@ -5484,7 +5987,7 @@ function CopyTrade(h, radar, bot, rpc) {
     if (h.inFrame) { box.innerHTML = '<p class="note" style="margin:0">La copie de wallets ne tourne pas dans l\'aperçu Claude. Utilise la version hébergée de l\'appli.</p>'; return; }
     const L = lab(), st = L ? L.stats('copy') : { n: 0, wins: 0, avg: 0, sum: 0, open: 0 };
     const on = S.wallets.filter(w => w.on);
-    const wl = S.wallets.map(w => `<div class="cp-w${w.on ? '' : ' off'}"><div class="cp-wm"><b>${esc(w.label || short(w.addr))}</b><span class="mono">${esc(short(w.addr))}${w.on ? (w.err ? ` · <span class="neg">${esc(w.err)}</span>` : w.checkedAt ? ` · relevé il y a ${ago(now() - w.checkedAt)}` : ' · premier relevé…') : ' · en pause'} · ${w.buys || 0} achat${(w.buys || 0) > 1 ? 's vus' : ' vu'}</span></div>
+    const wl = S.wallets.map(w => `<div class="cp-w${w.on ? '' : ' off'}"><div class="cp-wm"><b>${esc(w.label || short(w.addr))}</b><span class="mono">${esc(short(w.addr))}${w.on ? (w.err ? ` · <span class="neg">${esc(w.err)}${w.retryAt > now() ? `, nouvel essai dans ${Math.max(1, Math.round((w.retryAt - now()) / 1000))} s` : ''}</span>` : w.checkedAt ? ` · ${w.via === 'RPC' ? 'via ton RPC' : 'via Jupiter'} · relevé il y a ${ago(now() - w.checkedAt)}` : ' · premier relevé…') : ' · en pause'} · ${w.buys || 0} achat${(w.buys || 0) > 1 ? 's vus' : ' vu'}</span></div>
       <label class="pp-sw"><input type="checkbox" data-cw-on="${esc(w.addr)}"${w.on ? ' checked' : ''}>Suivre</label><button class="btn sm" data-cw-del="${esc(w.addr)}">Retirer</button></div>`).join('');
     const addHtml = S.wallets.length < MAX_W ? `<div class="add"><input id="cpAddr" placeholder="Adresse Solana du wallet à copier" autocomplete="off" spellcheck="false"></div>
       <div class="add" style="margin-top:6px"><input id="cpLabel" placeholder="Nom (facultatif)" autocomplete="off" maxlength="24"><button class="btn pri" data-c="add">Ajouter</button></div>` : `<p class="note">Maximum ${MAX_W} wallets.</p>`;
@@ -5496,7 +5999,7 @@ function CopyTrade(h, radar, bot, rpc) {
       const cl = L ? L.L.closed.filter(x => x.strat === 'copy' && (x.prof || 'toi') === 'toi').slice(0, 8) : [];
       body = `<p class="note" style="margin:0 0 8px">Chaque achat du wallet copié ouvre un trade simulé, sans argent : mise de ${fSol(bot.cfg().size)}, mêmes contrôles et mêmes sorties que le bot, plus une sortie quand le wallet revend. Résultats des 24 dernières heures.</p>
         ${statsHtml(st)}
-        ${op.length ? `<h3 class="w-h">Copies simulées en cours</h3><div class="journal">${op.map(p => `<div class="j-row"><span class="chip">en cours</span><div class="j-mid"><div>${esc(p.sym)}</div><div class="mono">depuis ${ago(now() - p.t0)}</div></div><span class="j-r ${p.pnl > 0 ? 'pos' : p.pnl < 0 ? 'neg' : ''}">${fPct(p.pnl)}</span></div>`).join('')}</div>` : ''}
+        ${op.length ? `<h3 class="w-h">Copies simulées en cours</h3><div class="journal">${op.map(p => `<div class="j-row"><span class="chip">en cours</span><div class="j-mid"><div>${esc(p.sym)}</div><div class="mono">depuis ${ago(now() - p.t0)}</div>${p.state === 'exiting' ? '<div class="mono">sortie en cours…</div>' : C.ask === 's:' + p.id ? `<div class="confirm" style="margin:4px 0 0"><span>Clôturer cette copie simulée ?</span><button class="btn sm danger" data-cask-yes="s:${p.id}">Clôturer</button><button class="btn sm" data-cask-no="1">Annuler</button></div>` : `<div class="row-btns" style="margin:4px 0 0"><button class="btn sm" data-cask="s:${p.id}">Clôturer à la main</button></div>`}</div><span class="j-r ${p.pnl > 0 ? 'pos' : p.pnl < 0 ? 'neg' : ''}">${fPct(p.pnl)}</span></div>`).join('')}</div>` : ''}
         ${cl.length ? `<h3 class="w-h">Dernières copies simulées</h3><div class="journal">${cl.map(x => `<div class="j-row"><span class="chip ${x.gap ? '' : x.net >= 0 ? 'long' : 'short'}">${x.gap ? 'sans prix' : fPct(x.pnl)}</span><div class="j-mid"><div>${esc(x.sym)}</div><div class="mono">il y a ${ago(now() - x.t1)} · ${esc(x.why)}</div></div><span class="j-r ${x.net >= 0 ? 'pos' : 'neg'}">${x.gap ? '—' : fSol(x.net)}</span></div>`).join('')}</div>` : ''}`;
     } else {
       const pub = bot.S && bot.S.pub;
@@ -5512,13 +6015,16 @@ function CopyTrade(h, radar, bot, rpc) {
           <div class="row-btns">${S.real ? '<button class="btn danger" data-c="off">Couper la copie réelle</button>' : '<button class="btn pri" data-c="arm">Copier pour de vrai</button>'}</div>
           ${C.confirm && !S.real ? `<div class="confirm"><span>Le bot achètera seul, avec de l'argent réel, chaque coin acheté par ${on.length > 1 ? 'les wallets suivis' : 'le wallet suivi'}, dans la limite de ${bot.cfg().maxPos} positions et de sa perte maximale du jour. Tu entres quelques secondes après lui, souvent à un prix moins bon.</span><button class="btn sm danger" data-c="arm-yes">Oui, copier</button><button class="btn sm" data-c="arm-no">Annuler</button></div>` : ''}</div>
         ${statsHtml(st)}
-        ${pos.length ? `<h3 class="w-h">Copies réelles en cours</h3><div class="journal">${pos.map(p => `<div class="j-row"><span class="chip long">réel</span><div class="j-mid"><div>${esc(p.sym)}</div><div class="mono">depuis ${ago(now() - p.t0)}${p.exitReq ? ' · sortie demandée' : ''}</div></div><span class="j-r"></span></div>`).join('')}</div>` : ''}
+        ${pos.length ? `<h3 class="w-h">Copies réelles en cours</h3><div class="journal">${pos.map(p => `<div class="j-row"><span class="chip long">réel</span><div class="j-mid"><div>${esc(p.sym)}</div><div class="mono">depuis ${ago(now() - p.t0)}${p.exitReq && !p.closeReq ? ' · sortie demandée (le wallet copié a revendu)' : ''}</div>${realSellHtml(p)}</div><span class="j-r ${p.pnl > 0 ? 'pos' : p.pnl < 0 ? 'neg' : ''}">${fin(p.pnl) ? fPct(p.pnl) : ''}</span></div>`).join('')}</div>
+          <p class="note">« Vendre maintenant » ne ferme que cette position : la copie réelle continue pour les prochains achats.</p>` : ''}
         ${hist.length ? `<h3 class="w-h">Dernières copies réelles</h3><div class="journal">${hist.map(x => `<div class="j-row"><span class="chip ${x.net >= 0 ? 'long' : 'short'}">${fPct(x.pnl)}</span><div class="j-mid"><div>${esc(x.sym)}</div><div class="mono">il y a ${ago(now() - x.t1)} · ${esc(x.why || '')}</div></div><span class="j-r ${x.net >= 0 ? 'pos' : 'neg'}">${fSol(x.net)}</span></div>`).join('')}</div>` : ''}`;
     }
-    box.innerHTML = `<h3 class="w-h" style="margin-top:0">Wallets suivis</h3>
+    const rk = rankHtml();
+    box.innerHTML = `${rk}<h3 class="w-h"${rk ? '' : ' style="margin-top:0"'}>Wallets suivis</h3>
       ${wl ? `<div class="cp-list">${wl}</div>` : '<p class="note" style="margin:0">Aucun wallet suivi. Colle l\'adresse d\'un wallet Solana dont tu veux reproduire les trades.</p>'}
       ${addHtml}
-      ${on.length && C.err && !C.lastOk ? `<p class="note neg">${esc(C.err)}</p>` : ''}
+      ${S.wallets.length ? `<label class="toggle" style="margin-top:6px"><span>Alerte quand un wallet suivi achète<small>« Baleine vient d'acheter X », une fois par wallet et par coin. Sur l'écran verrouillé seulement si « Notifications sur le téléphone » est activé (Réglages), et tant qu'Android laisse tourner Vigie</small></span><input type="checkbox" id="cpAlert"${S.alerts !== false ? ' checked' : ''}></label>` : ''}
+      ${on.length && !ownRpc() ? '<p class="note" style="margin:6px 0 0">Suivi par Jupiter : un relevé des soldes toutes les 8 s environ par wallet. Les achats apparaissent donc avec quelques secondes de retard.</p>' : ''}
       <div style="margin:14px 0 8px">${seg}</div>
       ${body}
       <h3 class="w-h">Ce que font les wallets suivis</h3>
@@ -5545,6 +6051,17 @@ function CopyTrade(h, radar, bot, rpc) {
       if (!b) return;
       try {
         if (b.dataset.cv) { S.view = b.dataset.cv; save(); }
+        else if (b.dataset.cask) C.ask = b.dataset.cask;
+        else if (b.dataset.caskNo) C.ask = null;
+        else if (b.dataset.caskYes) {
+          const k = b.dataset.caskYes; C.ask = null;
+          if (k.startsWith('s:')) { const L = lab(); if (L && L.manualClose) L.manualClose(+k.slice(2)); }
+          else {
+            const r = bot.manualSell ? bot.manualSell(k.slice(2)) : 'none';
+            if (r === 'locked') h.toast && h.toast('Bot verrouillé : la vente partira dès que tu entres ton code dans l\'onglet Mèmes', 'short');
+            else if (r === 'frozen') h.toast && h.toast('Compte gelé par le créateur : vente impossible', 'short');
+          }
+        }
         else if (b.dataset.cwDel) { const a = b.dataset.cwDel; S.wallets = S.wallets.filter(w => w.addr !== a); save(); }
         else if (b.dataset.c === 'add') { const a = $('#cpAddr'), l = $('#cpLabel'); addWallet(a && a.value, l && l.value); h.toast && h.toast('Wallet ajouté : ses opérations seront copiées en simulation à partir de maintenant', 'long'); }
         else if (b.dataset.c === 'arm') C.confirm = true;
@@ -5557,6 +6074,7 @@ function CopyTrade(h, radar, bot, rpc) {
     });
     box.addEventListener('change', e => {
       const el = e.target;
+      if (el && el.id === 'cpAlert') { S.alerts = el.checked; save(); el.blur(); render(); return; }
       if (!el.dataset || !el.dataset.cwOn) return;
       const w = S.wallets.find(x => x.addr === el.dataset.cwOn);
       if (w) { w.on = el.checked; if (w.on) { w.base = false; if (C.started) setTimeout(() => poll().catch(() => {}), 300); } save(); }
@@ -5572,9 +6090,10 @@ function CopyTrade(h, radar, bot, rpc) {
   function start() {
     if (C.started || h.inFrame) return;
     C.started = true;
+    for (const w of S.wallets) { w.err = ''; w.fails = 0; w.retryAt = 0; }
     loop();
   }
-  return { start, render, bindUI, recentBuy, leaderExit, S, _test: { parse, onEvent, poll, addWallet, C, realBuy } };
+  return { start, render, bindUI, recentBuy, leaderExit, S, addWallet: (a, l) => { addWallet(a, l); render(); }, has: a => S.wallets.some(w => w.addr === a), _test: { parse, onEvent, poll, addWallet, C, realBuy, SNAP } };
 }
 if (typeof module !== 'undefined') module.exports = CopyTrade;
 
@@ -5750,6 +6269,541 @@ const HL = (() => {
   return api;
 })();
 if (typeof module !== 'undefined') module.exports = HL;
+
+/* ================= BAG : plan quotidien d'un panier de cryptos majeures =================
+   Règles fixes, choisies avant de regarder les résultats et testées sur 2018-2026 (données journalières) :
+   - Tendance sur trois horizons : 20, 60 et 120 jours. On ENTRE sur un actif quand les trois montent ;
+     on le GARDE tant que la majorité monte ; on SORT (vente totale vers USDC) quand deux sur trois baissent.
+   - Poids : plus l'actif est calme (volatilité 30 jours), plus il pèse ; 50 % au plus par actif.
+   - Risque du panier plafonné (volatilité cible) : le reste attend en USDC.
+   - Sorties : n'importe quel jour. Achats et ajustements : le lundi seulement, et seulement si l'écart
+     avec la cible dépasse 10 % du capital (peu d'ordres, donc peu de frais).
+   Le test dans l'onglet rejoue exactement ces règles sur l'historique Binance, frais de 0,2 % par ordre compris. */
+const BAG_ASSETS = [
+  { id: 'BTC', name: 'Bitcoin', pair: 'BTCUSDT', sol: ['cbBTC', 'WBTC', 'zBTC', 'tBTC'], buy: 'cbBTC' },
+  { id: 'ETH', name: 'Ethereum', pair: 'ETHUSDT', sol: ['WETH', 'ETH'], buy: 'WETH' },
+  { id: 'SOL', name: 'Solana', pair: 'SOLUSDT', sol: ['SOL', 'WSOL'], buy: 'SOL' },
+  { id: 'BNB', name: 'BNB', pair: 'BNBUSDT', sol: [] },
+  { id: 'XRP', name: 'XRP', pair: 'XRPUSDT', sol: [] },
+  { id: 'LINK', name: 'Chainlink', pair: 'LINKUSDT', sol: [] },
+  { id: 'DOGE', name: 'Dogecoin', pair: 'DOGEUSDT', sol: [] },
+  { id: 'ADA', name: 'Cardano', pair: 'ADAUSDT', sol: [] },
+  { id: 'AVAX', name: 'Avalanche', pair: 'AVAXUSDT', sol: [] },
+  { id: 'SUI', name: 'Sui', pair: 'SUIUSDT', sol: [] }
+];
+const BAG_STABLES = ['USDC', 'USDT', 'PYUSD', 'USDG', 'USDS', 'USD1', 'FDUSD'];
+const BAG_P = { mom: [20, 60, 120], volWin: 30, covWin: 60, cap: 0.5, band: 0.10, cost: 0.002, minOrder: 10, rebalDow: 1 };
+const BAG_VT = { prudent: 0.4, normal: 0.6, dynamique: 0.8 };
+const BAG_DAY = 86400000;
+const BAG_MINT = { SOL: 'So11111111111111111111111111111111111111112', USDC: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' };
+
+/* ---------- moteur (sans affichage : testable à part) ---------- */
+const BagEngine = {
+  // hist : { days: [t…] (minuit UTC), px: { BTC: [clôture | null…] } } ; ids : actifs du panier
+  prepare(hist, ids) {
+    const n = hist.days.length, M = Math.max(...BAG_P.mom), S = {}, H = {}, R = {};
+    for (const a of ids) {
+      const c = hist.px[a] || [];
+      const sc = new Array(n).fill(null), held = new Array(n).fill(false), lr = new Array(n).fill(null);
+      let h = false;
+      for (let i = 0; i < n; i++) {
+        if (i > 0 && c[i] > 0 && c[i - 1] > 0) lr[i] = Math.log(c[i] / c[i - 1]);
+        if (i >= M && c[i] > 0 && BAG_P.mom.every(m => c[i - m] > 0)) {
+          const s = BAG_P.mom.reduce((x, m) => x + (c[i] > c[i - m] ? 1 : -1), 0) / BAG_P.mom.length;
+          sc[i] = s;
+          h = s >= 1 - 1e-9 || (h && s > 0); // entrée : 3 sur 3 ; on garde tant que la majorité monte
+        } else h = false;
+        held[i] = h;
+      }
+      S[a] = sc; H[a] = held; R[a] = lr;
+    }
+    return { S, H, R };
+  },
+  // poids cibles au jour i (clôture connue), pour les actifs tenus
+  weights(prep, ids, i, vt) {
+    const { S, H, R } = prep, P = BAG_P;
+    const ok = a => { for (let k = i - P.covWin + 1; k <= i; k++) if (R[a][k] == null) return false; return true; };
+    const el = ids.filter(a => H[a][i] && i >= P.covWin && ok(a));
+    const w = {};
+    if (!el.length) return w;
+    const sd = x => { const m = x.reduce((s, v) => s + v, 0) / x.length; return Math.sqrt(x.reduce((s, v) => s + (v - m) * (v - m), 0) / x.length); };
+    const vol = el.map(a => sd(R[a].slice(i - P.volWin + 1, i + 1)) * Math.sqrt(365));
+    let ww = el.map((a, j) => Math.max(S[a][i], 1 / 3) / (vol[j] || 1));
+    const tot = ww.reduce((s, v) => s + v, 0);
+    ww = ww.map(v => Math.min(P.cap, v / tot));
+    // volatilité du panier (covariance des 60 derniers jours) ramenée à la cible
+    const X = el.map(a => R[a].slice(i - P.covWin + 1, i + 1)), mu = X.map(x => x.reduce((s, v) => s + v, 0) / x.length);
+    let pv = 0;
+    for (let p = 0; p < el.length; p++) for (let q = 0; q < el.length; q++) {
+      let c = 0; for (let k = 0; k < P.covWin; k++) c += (X[p][k] - mu[p]) * (X[q][k] - mu[q]);
+      pv += ww[p] * ww[q] * c / (P.covWin - 1) * 365;
+    }
+    const k = Math.min(1, vt / Math.sqrt(Math.max(pv, 1e-12)));
+    el.forEach((a, j) => { w[a] = ww[j] * k; });
+    return w;
+  },
+  // rejoue les règles jour par jour : ordres exécutés le lendemain du signal, frais compris
+  backtest(hist, ids, vt, from) {
+    const prep = this.prepare(hist, ids), n = hist.days.length, P = BAG_P;
+    const need = Math.max(...P.mom) + P.covWin;
+    let start = from != null ? from : n;
+    if (from == null) for (let i = 0; i < n; i++) if (ids.some(a => prep.S[a][i] != null && i >= need)) { start = i; break; }
+    if (start >= n - 2) return null;
+    let cash = 1, trades = 0, pend = null;
+    const u = {}; ids.forEach(a => { u[a] = 0; });
+    const eq = [], expo = [];
+    for (let i = start; i < n; i++) {
+      const px = a => hist.px[a][i];
+      const value = () => cash + ids.reduce((s, a) => s + (px(a) > 0 ? u[a] * px(a) : 0), 0);
+      let val = value();
+      if (pend) {
+        const dow = new Date(hist.days[i]).getUTCDay();
+        for (const a of ids) {
+          if (!(px(a) > 0)) continue;
+          const cur = u[a] * px(a) / val, inn = pend.held[a], tw = inn ? (pend.w[a] || 0) : 0;
+          const exit = !inn && u[a] > 0;
+          if (exit || (dow === P.rebalDow && Math.abs(tw - cur) > P.band)) {
+            const amt = (tw - cur) * val;
+            u[a] += amt / px(a); cash -= amt + Math.abs(amt) * P.cost; trades++;
+          }
+        }
+        val = value();
+      }
+      eq.push({ t: hist.days[i], v: val }); expo.push(1 - cash / val);
+      const held = {}; ids.forEach(a => { held[a] = prep.H[a][i]; });
+      pend = { held, w: this.weights(prep, ids, i, vt) };
+    }
+    return { eq, trades, expo: expo.reduce((s, v) => s + v, 0) / expo.length, start };
+  },
+  // garder sans rien faire : un actif seul, ou le panier à parts égales rééquilibré tous les 30 jours
+  hold(hist, ids, start) {
+    const n = hist.days.length, u = {}; let cash = 1, last = null; const eq = [];
+    for (let i = start; i < n; i++) {
+      const av = ids.filter(a => hist.px[a][i] > 0);
+      const val = () => cash + av.reduce((s, a) => s + (u[a] || 0) * hist.px[a][i], 0);
+      let v = val();
+      if (last == null || i - last >= 30) {
+        for (const a of av) { const cur = (u[a] || 0) * hist.px[a][i] / v, amt = (1 / av.length - cur) * v; u[a] = (u[a] || 0) + amt / hist.px[a][i]; cash -= amt + Math.abs(amt) * BAG_P.cost; }
+        last = i; v = val();
+      }
+      eq.push({ t: hist.days[i], v });
+    }
+    return eq;
+  },
+  stats(eq) {
+    if (!eq || eq.length < 2) return null;
+    const v = eq.map(x => x.v), yrs = (eq[eq.length - 1].t - eq[0].t) / (365 * BAG_DAY);
+    let peak = v[0], mdd = 0;
+    for (const x of v) { peak = Math.max(peak, x); mdd = Math.min(mdd, x / peak - 1); }
+    const r = []; for (let i = 1; i < v.length; i++) r.push(Math.log(v[i] / v[i - 1]));
+    const m = r.reduce((s, x) => s + x, 0) / r.length, sd = Math.sqrt(r.reduce((s, x) => s + (x - m) * (x - m), 0) / r.length);
+    const years = {};
+    let prev = v[0];
+    eq.forEach((x, i) => { const y = new Date(x.t).getUTCFullYear(); if (!years[y]) years[y] = { a: i ? prev : v[0] }; years[y].b = x.v; prev = x.v; });
+    const yr = {}; for (const y in years) yr[y] = years[y].b / years[y].a - 1;
+    return { total: v[v.length - 1] / v[0] - 1, cagr: yrs > 0 ? Math.pow(v[v.length - 1] / v[0], 1 / yrs) - 1 : 0, mdd, sharpe: sd > 0 ? m / sd * Math.sqrt(365) : 0, yrs, yr };
+  }
+};
+
+function BagPlan(h) {
+  const fin = Number.isFinite, esc = h.esc, $ = h.$;
+  const now = () => Date.now();
+  const BLANK = { v: 1, ids: ['BTC', 'ETH', 'SOL'], risk: 'normal', outMax: 20, addr: '', manual: [], cash: 0, snaps: [], notified: '' };
+  const S = Object.assign({}, BLANK, h.store.get('bag', {}));
+  if (!Array.isArray(S.ids) || !S.ids.length) S.ids = BLANK.ids.slice();
+  if (!Array.isArray(S.manual)) S.manual = [];
+  if (!Array.isArray(S.snaps)) S.snaps = [];
+  const save = () => h.store.set('bag', { v: 1, ids: S.ids, risk: S.risk, outMax: S.outMax, addr: S.addr, manual: S.manual, cash: S.cash, snaps: S.snaps.slice(-400), notified: S.notified });
+  const B = { hist: null, live: {}, loading: false, err: '', at: 0, wal: null, walAt: 0, walErr: '', walBusy: false, bt: null, btKey: '', mints: {}, plan: null, view: 'plan' };
+  const assetOf = id => BAG_ASSETS.find(a => a.id === id);
+
+  /* ---------- formats ---------- */
+  const nf = (x, d = 0) => (fin(x) ? x.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—');
+  const usd = x => (fin(x) ? (Math.abs(x) >= 1000 ? nf(x, 0) : Math.abs(x) >= 100 ? nf(x, 0) : nf(x, 2)) + ' $' : '—');
+  const pct = (x, d = 0) => (fin(x) ? (x > 0 ? '+' : x < 0 ? '−' : '') + nf(Math.abs(x * 100), d) + ' %' : '—');
+  const px = x => (fin(x) ? (x >= 1000 ? nf(x, 0) : x >= 1 ? nf(x, 2) : nf(x, 4)) + ' $' : '—');
+  const qty = x => (fin(x) ? (Math.abs(x) >= 100 ? nf(x, 1) : Math.abs(x) >= 1 ? nf(x, 3) : nf(x, 5)) : '—');
+  const share = x => (fin(x) ? nf(Math.max(0, x) * 100, 0) + ' %' : '—'); // part d'un total, sans signe
+  const dayKey = t => new Date(t).toISOString().slice(0, 10);
+  const short = a => (a ? a.slice(0, 4) + '…' + a.slice(-4) : '');
+
+  /* ---------- prix journaliers (Binance, gratuit, sans clé) ---------- */
+  const HOSTS = ['https://api.binance.com', 'https://data-api.binance.vision'];
+  async function klines(pair, pages, limit = 1000) {
+    let lastErr = null;
+    for (const host of HOSTS) {
+      try {
+        let end = null, out = [];
+        for (let p = 0; p < pages; p++) {
+          const r = await fetchJSON(`${host}/api/v3/klines?symbol=${pair}&interval=1d&limit=${limit}${end ? '&endTime=' + end : ''}`, 15000);
+          if (!Array.isArray(r) || !r.length) break;
+          out = r.concat(out); end = r[0][0] - 1;
+          if (r.length < limit) break;
+        }
+        if (out.length) return out.map(k => [k[0], +k[4], k[6]]);
+      } catch (e) { lastErr = e; }
+    }
+    throw lastErr || new Error('aucune donnée');
+  }
+  function cacheGet() { const c = h.store.get('bagpx', null); return c && c.data ? c : { data: {}, at: {} }; }
+  async function loadPrices(force) {
+    if (B.loading) return;
+    B.loading = true; B.err = ''; render();
+    const C = cacheGet();
+    try {
+      for (const id of S.ids) {
+        const a = assetOf(id); if (!a) continue;
+        const have = C.data[id], age = now() - ((C.at && C.at[id]) || 0);
+        if (have && have.length > 200 && !force && age < 15 * 60000) continue;
+        const rows = have && have.length > 200 ? await klines(a.pair, 1, 60) : await klines(a.pair, 3);
+        const m = new Map((have || []).map(r => [r[0], r]));
+        for (const r of rows) m.set(r[0], r);
+        C.data[id] = [...m.values()].sort((x, y) => x[0] - y[0]).slice(-3200);
+        C.at = C.at || {}; C.at[id] = now();
+      }
+      h.store.set('bagpx', C);
+    } catch (e) { B.err = 'Prix Binance indisponibles (' + e.message + ')'; }
+    buildHist(C);
+    B.loading = false; B.at = now();
+    compute();
+  }
+  function buildHist(C) {
+    const tn = now(), days = new Set();
+    const ids = S.ids.filter(id => C.data[id] && C.data[id].length);
+    for (const id of ids) for (const r of C.data[id]) if (r[2] < tn) days.add(r[0]); // journées terminées seulement
+    const D = [...days].sort((a, b) => a - b), idx = new Map(D.map((t, i) => [t, i]));
+    const pxs = {};
+    for (const id of ids) {
+      const arr = new Array(D.length).fill(null);
+      for (const r of C.data[id]) if (r[2] < tn && idx.has(r[0])) arr[idx.get(r[0])] = r[1];
+      pxs[id] = arr;
+      const last = C.data[id][C.data[id].length - 1];
+      B.live[id] = last ? last[1] : null; // prix du moment (bougie du jour en cours)
+    }
+    B.hist = D.length ? { days: D, px: pxs, ids } : null;
+  }
+
+  /* ---------- ton wallet (Solana, lu chez Jupiter) et tes autres avoirs ---------- */
+  function addr() { return (S.addr || (h.walletAddr && h.walletAddr()) || '').trim(); }
+  async function loadWallet() {
+    const a = addr();
+    if (!a || B.walBusy) { render(); return; }
+    B.walBusy = true; B.walErr = ''; render();
+    try {
+      const j = await h.jup('/ultra/v1/holdings/' + a, 'high');
+      const lines = [];
+      const sol = fin(+j.uiAmount) ? +j.uiAmount : fin(+j.amount) ? +j.amount / 1e9 : 0;
+      if (sol > 0) lines.push({ mint: BAG_MINT.SOL, ui: sol, native: true });
+      for (const [mint, arr] of Object.entries(j.tokens || {})) {
+        let ui = 0; for (const x of Array.isArray(arr) ? arr : []) ui += +x.uiAmount || 0;
+        if (ui > 0) { const l = lines.find(x => x.mint === mint && !x.native); if (l) l.ui += ui; else lines.push({ mint, ui }); }
+      }
+      // noms, prix, jetons vérifiés : recherche Jupiter par lots de 100
+      const info = new Map();
+      const mints = [...new Set(lines.map(l => l.mint))];
+      for (let k = 0; k < mints.length; k += 100) {
+        const r = await h.jup('/tokens/v2/search?query=' + mints.slice(k, k + 100).join(','), 'high');
+        for (const x of Array.isArray(r) ? r : []) info.set(x.id, x);
+      }
+      for (const l of lines) {
+        const x = info.get(l.mint) || {};
+        l.sym = l.native ? 'SOL' : x.symbol || short(l.mint); l.name = x.name || ''; l.verified = !!x.isVerified || l.native;
+        l.price = +x.usdPrice || (l.native || l.mint === BAG_MINT.SOL ? B.live.SOL || null : null);
+        l.usd = fin(l.price) ? l.ui * l.price : null;
+        l.cls = classify(l);
+        if (l.verified && l.cls !== 'OUT' && l.cls !== 'USD') B.mints[l.cls] = B.mints[l.cls] || l.mint;
+      }
+      B.wal = { addr: a, lines: lines.filter(l => !(fin(l.usd) && l.usd < 0.5)), at: now() };
+    } catch (e) { B.walErr = (e && e.message) || 'lecture impossible'; }
+    B.walBusy = false; B.walAt = now();
+    compute();
+  }
+  function classify(l) {
+    if (l.native || l.mint === BAG_MINT.SOL) return 'SOL';
+    if (!l.verified) return 'OUT';
+    if (BAG_STABLES.includes(l.sym)) return 'USD';
+    for (const a of BAG_ASSETS) if (a.sol.includes(l.sym) && (a.id !== 'ETH' || /ether/i.test(l.name || 'ether'))) return a.id;
+    return 'OUT';
+  }
+  // positions consolidées : wallet + avoirs ailleurs (saisis à la main) + argent prêt à investir
+  function positions() {
+    const pos = {}, out = [];
+    let cash = Math.max(0, +S.cash || 0), any = false;
+    for (const l of (B.wal && B.wal.lines) || []) {
+      if (!fin(l.usd)) continue;
+      any = true;
+      if (l.cls === 'USD') cash += l.usd;
+      else if (l.cls === 'OUT' || !S.ids.includes(l.cls)) out.push({ sym: l.sym, usd: l.usd, mint: l.mint, verified: l.verified, asset: l.cls !== 'OUT' ? l.cls : null });
+      else { const p = pos[l.cls] || (pos[l.cls] = { usd: 0, qty: 0, where: [] }); p.usd += l.usd; p.qty += l.ui; if (!p.where.includes('wallet')) p.where.push('wallet'); }
+    }
+    for (const m of S.manual) {
+      const lp = B.live[m.id];
+      if (!fin(+m.qty) || !(m.qty > 0)) continue;
+      if (m.id === 'USD') { cash += +m.qty; any = true; continue; }
+      if (!fin(lp)) continue;
+      any = true;
+      const v = m.qty * lp;
+      if (!S.ids.includes(m.id)) { out.push({ sym: m.id, usd: v, manual: true }); continue; }
+      const p = pos[m.id] || (pos[m.id] = { usd: 0, qty: 0, where: [] }); p.usd += v; p.qty += +m.qty; if (!p.where.includes(m.where || 'ailleurs')) p.where.push(m.where || 'ailleurs');
+    }
+    const plan = Object.values(pos).reduce((s, p) => s + p.usd, 0) + cash, outV = out.reduce((s, x) => s + x.usd, 0);
+    return { pos, cash, out: out.sort((a, b) => b.usd - a.usd), plan, outV, total: plan + outV, any };
+  }
+
+  /* ---------- analyse et plan du jour ---------- */
+  function analysis() {
+    const H = B.hist; if (!H) return null;
+    const ids = H.ids, prep = BagEngine.prepare(H, ids), i = H.days.length - 1;
+    const vt = BAG_VT[S.risk] || BAG_VT.normal;
+    const w = BagEngine.weights(prep, ids, i, vt);
+    const rows = ids.map(id => {
+      const c = H.px[id], ret = m => (c[i] > 0 && c[i - m] > 0 ? c[i] / c[i - m] - 1 : null);
+      let hi = 0; for (let k = Math.max(0, i - 364); k <= i; k++) if (c[k] > hi) hi = c[k];
+      const r = prep.R[id].slice(i - 29, i + 1).filter(fin);
+      const m = r.reduce((s, v) => s + v, 0) / (r.length || 1);
+      const vol = r.length > 10 ? Math.sqrt(r.reduce((s, v) => s + (v - m) * (v - m), 0) / r.length) * Math.sqrt(365) : null;
+      const sc = prep.S[id][i], held = prep.H[id][i], wasHeld = i > 0 ? prep.H[id][i - 1] : false;
+      const ups = sc == null ? null : Math.round((sc * 3 + 3) / 2);
+      return { id, price: B.live[id] || c[i], r20: ret(20), r60: ret(60), r120: ret(120), fromHi: hi > 0 ? c[i] / hi - 1 : null, vol, score: sc, ups, held, wasHeld, w: w[id] || 0, enough: sc != null };
+    });
+    const nIn = rows.filter(r => r.held).length, btc = rows.find(r => r.id === 'BTC');
+    const regime = nIn === 0 ? 'baissier' : nIn === rows.length && (!btc || btc.held) ? 'haussier' : 'mitigé';
+    return { rows, w, vt, day: H.days[i], regime, nIn, cashW: 1 - Object.values(w).reduce((s, v) => s + v, 0) };
+  }
+  function makePlan(A, P, monday) {
+    if (!A) return null;
+    const orders = [], cap = P.plan, band = BAG_P.band * cap;
+    // 1) sorties : tous les jours, vente totale vers USDC
+    for (const r of A.rows) {
+      const cur = (P.pos[r.id] || {}).usd || 0;
+      if (!r.held && cur >= BAG_P.minOrder) orders.push({ side: 'sell', id: r.id, usd: cur, all: true, why: r.ups != null ? `tendance cassée : ${r.ups === 0 ? 'les 3 tendances' : (3 - r.ups) + ' des 3 tendances'} (20, 60, 120 j) baissent` : 'pas assez d\'historique pour le suivre' });
+    }
+    // 2) lundi : ajustements vers la cible quand l'écart dépasse 10 % du capital
+    const adjust = [];
+    for (const r of A.rows) {
+      if (!r.held) continue;
+      const cur = (P.pos[r.id] || {}).usd || 0, tgt = r.w * cap, d = tgt - cur;
+      if (Math.abs(d) > band && Math.abs(d) >= BAG_P.minOrder) adjust.push({ side: d > 0 ? 'buy' : 'sell', id: r.id, usd: Math.abs(d), tgt, cur,
+        why: d > 0 ? (cur < BAG_P.minOrder ? `en tendance sur les 3 horizons : entrée à ${share(r.w)} du capital` : `sous sa cible (${share(cur / cap)} au lieu de ${share(r.w)})`) : `au-dessus de sa cible (${share(cur / cap)} au lieu de ${share(r.w)}) : on encaisse une partie` });
+    }
+    if (monday) orders.push(...adjust);
+    // 3) achats limités à ce qui est disponible (USDC + ventes du jour)
+    const sells = orders.filter(o => o.side === 'sell').reduce((s, o) => s + o.usd, 0);
+    const buys = orders.filter(o => o.side === 'buy');
+    const want = buys.reduce((s, o) => s + o.usd, 0), avail = P.cash + sells * (1 - BAG_P.cost);
+    let short = 0;
+    if (want > avail && want > 0) { const k = Math.max(0, avail) / want; short = want - avail; for (const o of buys) o.usd *= k; }
+    const keep = orders.filter(o => o.usd >= BAG_P.minOrder);
+    // 4) jetons hors plan (mèmes…) au-delà de la part maximale choisie
+    const outOrders = [];
+    if (S.outMax < 100 && P.total > 0 && P.outV / P.total > S.outMax / 100) {
+      let excess = P.outV - P.total * S.outMax / 100;
+      for (const x of P.out) { if (excess < BAG_P.minOrder) break; const v = Math.min(x.usd, excess); if (v >= BAG_P.minOrder) { outOrders.push({ side: 'sell', id: x.sym, usd: v, all: v >= x.usd * 0.98, out: true, mint: x.mint, why: `hors plan : tes jetons hors panier pèsent ${share(P.outV / P.total)} du total, au-delà de ta limite de ${S.outMax} %` }); excess -= v; } }
+    }
+    return { orders: keep.concat(outOrders), preview: monday ? [] : adjust, short, buyUsd: keep.filter(o => o.side === 'buy').reduce((s, o) => s + o.usd, 0), sellUsd: keep.concat(outOrders).filter(o => o.side === 'sell').reduce((s, o) => s + o.usd, 0) };
+  }
+  function compute() {
+    const A = analysis(), P = positions(), monday = new Date().getDay() === BAG_P.rebalDow;
+    B.A = A; B.P = P;
+    B.plan = A && P.any ? makePlan(A, P, monday) : null;
+    // relevé quotidien de la valeur totale (pour l'évolution)
+    if (P.any && P.total > 0) {
+      const k = dayKey(now()), last = S.snaps[S.snaps.length - 1];
+      if (last && last.d === k) { last.v = Math.round(P.total * 100) / 100; last.p = Math.round(P.plan * 100) / 100; }
+      else S.snaps.push({ d: k, v: Math.round(P.total * 100) / 100, p: Math.round(P.plan * 100) / 100 });
+      save();
+    }
+    // prévenir une fois par jour s'il y a quelque chose à faire
+    if (B.plan && B.plan.orders.length) {
+      const sig = dayKey(now()) + ':' + B.plan.orders.map(o => o.side + o.id).join(',');
+      if (S.notified !== sig) {
+        S.notified = sig; save();
+        const txt = B.plan.orders.slice(0, 3).map(o => `${o.side === 'buy' ? 'acheter' : 'vendre'} ${o.id} (≈ ${usd(o.usd)})`).join(', ');
+        if (h.notify) h.notify(`Bag : plan du jour — ${txt}${B.plan.orders.length > 3 ? '…' : ''}`, 'long');
+      }
+    }
+    // test sur l'historique : recalculé quand le panier ou le risque change
+    const key = B.hist ? S.ids.join(',') + '|' + S.risk + '|' + B.hist.days.length : '';
+    if (key && key !== B.btKey) { B.btKey = key; setTimeout(runBacktest, 30); }
+    render();
+  }
+  function runBacktest() {
+    const H = B.hist; if (!H) return;
+    const ids = H.ids, vt = BAG_VT[S.risk] || BAG_VT.normal;
+    const r = BagEngine.backtest(H, ids, vt);
+    if (!r) { B.bt = { none: true }; render(); return; }
+    const btc = H.px.BTC ? BagEngine.hold(H, ['BTC'], r.start) : null, ew = BagEngine.hold(H, ids, r.start);
+    B.bt = { s: BagEngine.stats(r.eq), b: btc ? BagEngine.stats(btc) : null, e: BagEngine.stats(ew), eq: r.eq, btc, ew, trades: r.trades, expo: r.expo, from: r.eq[0].t };
+    render();
+  }
+
+  /* ---------- affichage ---------- */
+  const jupLink = (o) => {
+    const a = assetOf(o.id), m = o.out ? o.mint : (B.mints[o.id] || (o.id === 'SOL' ? BAG_MINT.SOL : null));
+    const tok = m || (a && a.buy);
+    if (!tok) return '';
+    const url = o.side === 'buy' ? `https://jup.ag/swap/${BAG_MINT.USDC}-${tok}` : `https://jup.ag/swap/${tok}-${BAG_MINT.USDC}`;
+    return `<a class="btn sm" href="${esc(url)}" target="_blank" rel="noopener">Ouvrir dans Jupiter</a>`;
+  };
+  function orderHtml(o, A) {
+    const r = A && A.rows.find(x => x.id === o.id), p = r && r.price;
+    const q = fin(p) && p > 0 && !o.out ? ` · ≈ ${qty(o.usd / p)} ${esc(o.id)}` : '';
+    return `<div class="bg-o"><span class="chip ${o.side === 'buy' ? 'long' : 'short'}">${o.side === 'buy' ? 'ACHETER' : 'VENDRE'}</span>
+      <div class="bg-om"><b>${esc(o.id)} · ${usd(o.usd)}${o.all ? ' (tout)' : ''}</b><small>${esc(o.why)}${q}</small></div>${jupLink(o)}</div>`;
+  }
+  function bar(parts) {
+    return `<div class="bg-stack">${parts.filter(x => x.v > 0).map(x => `<i style="width:${Math.max(0.5, x.v * 100).toFixed(2)}%;background:${x.c}" title="${esc(x.l)} ${share(x.v)}"></i>`).join('')}</div>`;
+  }
+  const COL = { BTC: '#f2a33a', ETH: '#7b86e8', SOL: '#33c3a6', BNB: '#e0c341', XRP: '#5b8fd9', LINK: '#3f6fd8', DOGE: '#c9a659', ADA: '#4f7fbf', AVAX: '#e05555', SUI: '#58b7e8', USD: 'var(--muted)', OUT: '#b06ad9' };
+  function render() {
+    if (!h.visible || !h.visible()) return;
+    renderPlan(); renderWallet(); renderAna(); renderBt(); renderSet();
+  }
+  function renderPlan() {
+    const box = $('#bagPlan'); if (!box) return;
+    const A = B.A, P = B.P, plan = B.plan, st = $('#bagState');
+    if (st) st.innerHTML = A ? `<span class="chip ${A.regime === 'haussier' ? 'long' : A.regime === 'baissier' ? 'short' : 'warn'}">marché ${A.regime}</span>` : '';
+    if (!A) { box.innerHTML = `<p class="note" style="margin:0">${B.loading ? 'Chargement de l\'historique des prix (Binance)…' : esc(B.err || 'Prix pas encore chargés.')}</p>`; return; }
+    if (!P || !P.any) {
+      box.innerHTML = `<p class="note" style="margin:0 0 8px">Indique ton wallet Solana (ou tes avoirs) dans « Ton portefeuille » ci-dessous : le plan se calcule sur ce que tu détiens.</p>${targetHtml(A, null)}`;
+      return;
+    }
+    const monday = new Date().getDay() === BAG_P.rebalDow;
+    const head = plan.orders.length
+      ? `<div class="advice" data-l="${plan.orders.some(o => o.side === 'sell') ? 'warn' : 'ok'}" style="margin:0 0 10px"><h3>Aujourd'hui : ${plan.buyUsd >= BAG_P.minOrder ? `acheter pour ${usd(plan.buyUsd)}` : ''}${plan.buyUsd >= BAG_P.minOrder && plan.sellUsd >= BAG_P.minOrder ? ' · ' : ''}${plan.sellUsd >= BAG_P.minOrder ? `vendre pour ${usd(plan.sellUsd)}` : ''}</h3>
+        <div class="bg-orders">${plan.orders.map(o => orderHtml(o, A)).join('')}</div>
+        ${plan.short >= BAG_P.minOrder ? `<p class="small" style="margin:8px 0 0">Il manque ${usd(plan.short)} en USDC pour suivre complètement le plan : les achats ont été réduits d'autant. Ajoute des USDC dans ton wallet si tu veux le suivre à 100 %.</p>` : ''}</div>`
+      : `<div class="advice" data-l="ok" style="margin:0 0 10px"><h3>Aujourd'hui : rien à faire</h3><p>${monday ? 'Jour de rééquilibrage, mais ton portefeuille est déjà proche de la cible (écarts sous 10 %).' : 'Aucune tendance cassée sur tes actifs. Prochain rééquilibrage : lundi.'} Ne rien faire est souvent la bonne décision : chaque ordre coûte des frais.</p></div>`;
+    const prev = !monday && plan.preview.length ? `<p class="note" style="margin:0 0 8px"><b>Si rien ne change d'ici lundi :</b> ${plan.preview.map(o => `${o.side === 'buy' ? 'acheter' : 'vendre'} ${esc(o.id)} ≈ ${usd(o.usd)}`).join(', ')}.</p>` : '';
+    box.innerHTML = head + prev + targetHtml(A, P) + `<p class="small muted" style="margin:8px 0 0">Calculé sur la clôture du ${new Date(A.day).toLocaleDateString('fr-FR')} (journée terminée, heure UTC). Capital du plan : ${usd(P.plan)} (hors jetons hors panier).</p>`;
+  }
+  function targetHtml(A, P) {
+    const cap = P ? P.plan : 0;
+    const rows = A.rows.map(r => {
+      const cur = P && cap > 0 ? ((P.pos[r.id] || {}).usd || 0) / cap : null;
+      return `<div class="bg-t"><span class="bg-dot" style="background:${COL[r.id] || 'var(--muted)'}"></span><b>${esc(r.id)}</b><span class="bg-tv">cible ${share(r.w)}${cur != null ? ` · actuel ${share(cur)}` : ''}</span></div>`;
+    }).join('');
+    const cashCur = P && cap > 0 ? P.cash / cap : null;
+    return `<h3 class="w-h" style="margin-top:4px">Répartition visée</h3>${bar(A.rows.map(r => ({ v: r.w, c: COL[r.id], l: r.id })).concat([{ v: Math.max(0, A.cashW), c: COL.USD, l: 'USDC' }]))}
+      <div class="bg-tl">${rows}<div class="bg-t"><span class="bg-dot" style="background:${COL.USD}"></span><b>USDC</b><span class="bg-tv">cible ${share(A.cashW)}${cashCur != null ? ` · actuel ${share(cashCur)}` : ''}</span></div></div>`;
+  }
+  function renderWallet() {
+    const box = $('#bagWallet'); if (!box) return;
+    const ae = document.activeElement; if (ae && box.contains(ae) && ae.tagName === 'INPUT') return;
+    const P = B.P, a = addr(), walletName = h.walletAddr && h.walletAddr() && h.walletAddr() === a ? ' (wallet connecté)' : '';
+    const lines = [];
+    if (P && P.any) {
+      for (const id of S.ids) { const p = P.pos[id]; if (p && p.usd >= 0.5) lines.push({ k: id, l: `${id} · ${qty(p.qty)}`, v: p.usd, c: COL[id], sub: p.where.join(' + ') }); }
+      if (P.cash >= 0.5) lines.push({ k: 'USD', l: 'Dollars stables (USDC…)', v: P.cash, c: COL.USD, sub: S.cash > 0 ? `dont ${usd(+S.cash)} prêts à investir hors wallet` : '' });
+      for (const x of P.out.slice(0, 8)) lines.push({ k: 'OUT', l: `${x.sym}${x.verified === false ? ' (non vérifié)' : ''}`, v: x.usd, c: COL.OUT, sub: 'hors panier' });
+      if (P.out.length > 8) lines.push({ k: 'OUT', l: `${P.out.length - 8} autres jetons`, v: P.out.slice(8).reduce((s, x) => s + x.usd, 0), c: COL.OUT, sub: 'hors panier' });
+    }
+    const T = P ? P.total : 0, sn = S.snaps, ch = d => { if (!sn.length) return null; const k = dayKey(now() - d * BAG_DAY), ref = [...sn].reverse().find(x => x.d <= k); return ref && ref.v > 0 ? T / ref.v - 1 : null; };
+    const evo = [[1, '1 j'], [7, '7 j'], [30, '30 j']].map(([d, l]) => { const v = ch(d); return v != null && sn.length > 1 ? `${l} <span class="${v >= 0 ? 'pos' : 'neg'}">${pct(v, 1)}</span>` : null; }).filter(Boolean).join(' · ');
+    box.innerHTML = `${P && P.any ? `<div class="bg-total"><b>${usd(T)}</b><span class="small muted">au total${evo ? ' · ' + evo : ''}</span></div>
+      ${bar(lines.map(x => ({ v: T > 0 ? x.v / T : 0, c: x.c, l: x.l })))}
+      <div class="bg-lines">${lines.map(x => `<div class="bg-l"><span class="bg-dot" style="background:${x.c}"></span><div><b>${esc(x.l)}</b>${x.sub ? `<small>${esc(x.sub)}</small>` : ''}</div><span class="bg-lv">${usd(x.v)}<small>${share(T > 0 ? x.v / T : 0)}</small></span></div>`).join('')}</div>` : '<p class="note" style="margin:0 0 8px">Aucun avoir lu pour l\'instant.</p>'}
+      <h3 class="w-h">Wallet Solana suivi</h3>
+      <div class="add"><input id="bgAddr" placeholder="Adresse Solana (Phantom…)" autocomplete="off" spellcheck="false" value="${esc(S.addr || '')}"><button class="btn" data-bg="addr">Suivre</button></div>
+      <p class="small muted" style="margin:4px 0 0">${a ? `Suivi : ${esc(short(a))}${walletName}${B.walBusy ? ' · lecture…' : B.walErr ? ` · <span class="neg">${esc(B.walErr)}</span>` : B.walAt ? ` · lu il y a ${Math.max(0, Math.round((now() - B.walAt) / 1000))} s` : ''}` : 'Aucune adresse : colle celle de ton wallet Phantom, ou connecte-le dans l\'onglet Mèmes.'} · lecture seule, rien n'est signé.</p>
+      <div class="row-btns" style="margin:6px 0 0"><button class="btn sm" data-bg="refresh">Actualiser</button></div>
+      <h3 class="w-h">Avoirs ailleurs (Binance, autre wallet…)</h3>
+      ${S.manual.length ? `<div class="bg-lines">${S.manual.map((m, i) => `<div class="bg-l"><span class="bg-dot" style="background:${COL[m.id] || COL.OUT}"></span><div><b>${esc(m.id === 'USD' ? 'Dollars (USDC, USDT…)' : m.id)} · ${qty(+m.qty)}</b><small>${esc(m.where || 'ailleurs')}</small></div><button class="btn sm" data-bg-del="${i}">Retirer</button></div>`).join('')}</div>` : ''}
+      <div class="add"><select id="bgMId">${BAG_ASSETS.map(x => `<option value="${x.id}">${x.id}</option>`).join('')}<option value="USD">Dollars</option></select><input id="bgMQty" type="number" inputmode="decimal" step="any" min="0" placeholder="Quantité"><input id="bgMWhere" placeholder="Où (facultatif)" maxlength="20"><button class="btn" data-bg="madd">Ajouter</button></div>
+      <div class="field" style="margin-top:8px"><label for="bgCash">Argent prêt à investir, hors wallet ($)</label><input id="bgCash" type="number" inputmode="decimal" step="10" min="0" value="${+S.cash || 0}"><span class="hint">Compté comme des USDC disponibles pour les achats du plan</span></div>`;
+  }
+  function renderAna() {
+    const box = $('#bagAna'); if (!box) return;
+    const A = B.A;
+    if (!A) { box.innerHTML = '<p class="note" style="margin:0">En attente des prix.</p>'; return; }
+    const arrow = v => (v == null ? '<span class="muted">—</span>' : `<span class="${v >= 0 ? 'pos' : 'neg'}">${pct(v)}</span>`);
+    const status = r => !r.enough ? '<span class="chip">historique court</span>' : r.held ? (r.ups === 3 ? '<span class="chip long">tendance 3/3</span>' : '<span class="chip warn">gardé 2/3</span>') : `<span class="chip short">hors tendance ${r.ups}/3</span>`;
+    const txt = A.regime === 'haussier' ? 'Tous les actifs du panier sont en tendance haussière : le plan est investi (dans la limite de risque choisie).'
+      : A.regime === 'baissier' ? 'Aucun actif n\'est en tendance : le plan reste en USDC et attend. C\'est ce qui protège des grosses chutes (2018, 2022).'
+      : `${A.nIn} actif${A.nIn > 1 ? 's' : ''} sur ${A.rows.length} en tendance : le plan n'investit que ceux-là, le reste attend en USDC.`;
+    box.innerHTML = `<p class="note" style="margin:0 0 8px">${txt}</p><div class="bg-ana">${A.rows.map(r => `<div class="bg-a">
+        <div class="bg-ah"><b>${esc(r.id)}</b><span>${px(r.price)}</span>${status(r)}</div>
+        <div class="bg-ag"><span>20 j ${arrow(r.r20)}</span><span>60 j ${arrow(r.r60)}</span><span>120 j ${arrow(r.r120)}</span><span>${r.fromHi != null && r.fromHi > -0.005 ? 'au plus haut sur 1 an' : `vs plus haut 1 an ${arrow(r.fromHi)}`}</span><span>agitation ${r.vol != null ? nf(r.vol * 100, 0) + ' %/an' : '—'}</span><span>cible ${share(r.w)}</span></div>
+      </div>`).join('')}</div>`;
+  }
+  function renderBt() {
+    const box = $('#bagBt'); if (!box) return;
+    const T = B.bt;
+    if (!T) { box.innerHTML = '<p class="note" style="margin:0">Calcul après le chargement des prix…</p>'; return; }
+    if (T.none) { box.innerHTML = '<p class="note" style="margin:0">Pas assez d\'historique pour ce panier.</p>'; return; }
+    const row = (l, s) => s ? `<tr><th>${l}</th><td class="${s.total >= 0 ? 'pos' : 'neg'}">${pct(s.total)}</td><td>${pct(s.cagr, 1)}</td><td class="neg">${pct(s.mdd)}</td></tr>` : '';
+    const yrs = Object.keys(T.s.yr).sort();
+    box.innerHTML = `<p class="note" style="margin:0 0 8px">Les règles du plan rejouées jour par jour depuis le ${new Date(T.from).toLocaleDateString('fr-FR')} sur ${esc(B.hist.ids.join(', '))}, frais de 0,2 % par ordre compris, ordres passés le lendemain du signal.</p>
+      <div class="bg-tw"><table class="bg-tb"><thead><tr><th></th><th>Total</th><th>Par an</th><th>Pire baisse</th></tr></thead><tbody>
+      ${row('Le plan', T.s)}${row('Garder BTC', T.b)}${row('Parts égales', T.e)}</tbody></table></div>
+      <p class="small muted" style="margin:0">Le plan : environ ${nf(T.trades / Math.max(T.s.yrs, 0.1), 0)} ordres par an, investi ${share(T.expo)} du temps en moyenne (le reste en USDC). « Parts égales » : le panier gardé sans jamais vendre, rééquilibré chaque mois.</p>
+      <canvas id="bgChart" class="bg-chart" height="180"></canvas>
+      <div class="bg-tw"><table class="bg-tb"><thead><tr><th>Année</th><th>Le plan</th>${T.b ? '<th>Garder BTC</th>' : ''}<th>Parts égales</th></tr></thead><tbody>
+      ${yrs.map(y => `<tr><th>${y}</th><td class="${T.s.yr[y] >= 0 ? 'pos' : 'neg'}">${pct(T.s.yr[y])}</td>${T.b ? `<td class="${(T.b.yr[y] || 0) >= 0 ? 'pos' : 'neg'}">${T.b.yr[y] != null ? pct(T.b.yr[y]) : '—'}</td>` : ''}<td class="${(T.e.yr[y] || 0) >= 0 ? 'pos' : 'neg'}">${T.e.yr[y] != null ? pct(T.e.yr[y]) : '—'}</td></tr>`).join('')}</tbody></table></div>
+      <p class="note">À lire honnêtement : le plan gagne surtout en évitant les grosses chutes (2018, 2022). En pleine euphorie (2023-2024), il gagne nettement moins que garder du BTC, parce qu'il garde des USDC et coupe dès que la tendance faiblit. Le passé ne garantit rien pour la suite.</p>`;
+    drawChart();
+  }
+  function drawChart() {
+    const cv = $('#bgChart'), T = B.bt; if (!cv || !T || !T.eq) return;
+    const W = cv.clientWidth || 320, Hh = 180, dpr = window.devicePixelRatio || 1;
+    cv.width = W * dpr; cv.height = Hh * dpr; const g = cv.getContext('2d'); g.scale(dpr, dpr);
+    const css = getComputedStyle(document.documentElement), col = n => css.getPropertyValue(n).trim() || '#888';
+    const series = [{ e: T.eq, c: col('--long'), l: 'Plan' }, T.btc ? { e: T.btc, c: '#f2a33a', l: 'BTC' } : null, { e: T.ew, c: col('--muted'), l: 'Parts égales' }].filter(Boolean);
+    let lo = Infinity, hi = -Infinity;
+    for (const s of series) for (const x of s.e) { const v = Math.log(x.v); lo = Math.min(lo, v); hi = Math.max(hi, v); }
+    const t0 = T.eq[0].t, t1 = T.eq[T.eq.length - 1].t, X = t => 6 + (t - t0) / (t1 - t0 || 1) * (W - 12), Y = v => Hh - 18 - (Math.log(v) - lo) / (hi - lo || 1) * (Hh - 30);
+    g.clearRect(0, 0, W, Hh); g.lineWidth = 1.6;
+    for (const s of series) { g.strokeStyle = s.c; g.beginPath(); s.e.forEach((x, i) => { const px0 = X(x.t), py = Y(x.v); if (i) g.lineTo(px0, py); else g.moveTo(px0, py); }); g.stroke(); }
+    g.font = '11px sans-serif'; let lx = 8;
+    for (const s of series) { g.fillStyle = s.c; g.fillRect(lx, Hh - 11, 10, 3); g.fillText(s.l, lx + 14, Hh - 6); lx += g.measureText(s.l).width + 30; }
+  }
+  function renderSet() {
+    const box = $('#bagSet'); if (!box) return;
+    const ae = document.activeElement; if (ae && box.contains(ae) && ae.tagName === 'INPUT') return;
+    box.innerHTML = `<h3 class="w-h" style="margin-top:0">Actifs du panier</h3>
+      <div class="bg-chips">${BAG_ASSETS.map(a => `<label class="bg-ck"><input type="checkbox" data-bg-id="${a.id}"${S.ids.includes(a.id) ? ' checked' : ''}>${a.id}</label>`).join('')}</div>
+      <p class="small muted" style="margin:4px 0 10px">BTC, ETH et SOL s'achètent dans Phantom via Jupiter. Les autres, plutôt sur une plateforme d'échange. Plus il y a d'actifs, plus il y a d'ordres et de frais.</p>
+      <h3 class="w-h">Niveau de risque</h3>
+      <div class="seg" role="group">${Object.keys(BAG_VT).map(k => `<button data-bg-risk="${k}" aria-pressed="${S.risk === k}">${k === 'prudent' ? 'Prudent' : k === 'normal' ? 'Normal' : 'Dynamique'}</button>`).join('')}</div>
+      <p class="small muted" style="margin:4px 0 10px">Agitation maximale du panier : ${nf((BAG_VT[S.risk] || 0.6) * 100)} % par an. Plus prudent = plus d'USDC, des baisses plus petites, des hausses plus petites.</p>
+      <div class="field"><label for="bgOut">Part maximale hors panier (mèmes, autres jetons) en %</label><input id="bgOut" type="number" inputmode="numeric" min="0" max="100" step="5" value="${S.outMax}"><span class="hint">Au-delà, le plan te propose d'alléger. 100 = jamais.</span></div>`;
+  }
+
+  /* ---------- actions ---------- */
+  function bindUI() {
+    const root = $('#tab-bag'); if (!root) return;
+    root.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.bg === 'addr') { const v = ($('#bgAddr').value || '').trim(); if (v && !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(v)) { h.toast('Adresse Solana invalide'); return; } S.addr = v; save(); B.wal = null; loadWallet(); }
+      else if (b.dataset.bg === 'refresh') { loadWallet(); loadPrices(); }
+      else if (b.dataset.bg === 'madd') {
+        const id = $('#bgMId').value, q = parseFloat(String($('#bgMQty').value).replace(',', '.')), where = ($('#bgMWhere').value || '').trim();
+        if (!(q > 0)) { h.toast('Indique une quantité'); return; }
+        S.manual.push({ id, qty: q, where: where.slice(0, 20) }); save(); compute();
+      } else if (b.dataset.bgDel != null) { S.manual.splice(+b.dataset.bgDel, 1); save(); compute(); }
+      else if (b.dataset.bgRisk) { S.risk = b.dataset.bgRisk; save(); compute(); }
+    });
+    root.addEventListener('change', e => {
+      const el = e.target;
+      if (el.dataset && el.dataset.bgId) {
+        const id = el.dataset.bgId; S.ids = el.checked ? [...new Set(S.ids.concat(id))] : S.ids.filter(x => x !== id);
+        if (!S.ids.length) { S.ids = ['BTC']; h.toast('Il faut au moins un actif'); }
+        S.ids = BAG_ASSETS.map(a => a.id).filter(x => S.ids.includes(x)); save(); loadPrices();
+      } else if (el.id === 'bgCash') { const v = parseFloat(String(el.value).replace(',', '.')); S.cash = fin(v) && v >= 0 ? v : 0; save(); el.blur(); compute(); }
+      else if (el.id === 'bgOut') { const v = parseFloat(el.value); S.outMax = fin(v) ? Math.min(100, Math.max(0, v)) : 20; save(); el.blur(); compute(); }
+    });
+  }
+  let started = false;
+  function start() {
+    if (started) return; started = true;
+    buildHist(cacheGet()); compute();
+    loadPrices(); loadWallet();
+    setInterval(() => { if (h.visible && h.visible()) { loadPrices(); } }, 10 * 60000);
+    setInterval(() => { if (addr()) loadWallet(); }, 5 * 60000);
+  }
+  function show() { start(); compute(); if (now() - B.walAt > 60000) loadWallet(); if (now() - B.at > 10 * 60000) loadPrices(); }
+  return { start, show, render, bindUI, S, B, _test: { analysis, makePlan, positions, compute, classify, buildHist } };
+}
 
 /* ================= FUTURES AUTO (Hyperliquid via Phantom) =================
    Suivi de tendance sur bougies 4 h, règles fixes (aucun réglage ajusté sur le passé) :
@@ -6604,7 +7658,7 @@ if (typeof module !== 'undefined') module.exports = PerpsBot;
   };
   const DEFAULTS = {
     ex: 'binance', sym: 'BTCUSDT', tf: '5m', capital: 500, risk: 1, leverage: 10, fee: 0.05, feeMaker: 0.02, mmr: 0.5,
-    threshold: 50, sound: true, vibrate: true, wake: false, oppAlerts: false, notif: false,
+    threshold: 50, sound: true, vibrate: true, wake: false, oppAlerts: false, notif: false, notifTrade: true,
     watch: ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'DOGEUSDT'], scanMode: 'list'
   };
   let set = Object.assign({}, DEFAULTS, store.get('set', {}));
@@ -6991,6 +8045,72 @@ if (typeof module !== 'undefined') module.exports = PerpsBot;
     }
     box.innerHTML = t ? `<p class="note" style="margin:0 0 6px;color:var(${l === 'ok' ? '--long' : '--warn'})">${l === 'ok' ? '✓ ' : ''}${esc(t)}</p>` : '';
   }
+
+  /* ---------- trade pris : bandeau dans l'appli + notification du téléphone ----------
+     Chaque achat réel (bot en mode auto, copie, coin choisi à la main, achat depuis ton wallet) : le coin et son nombre
+     de détenteurs, mis à jour en direct tant que le bandeau reste affiché, pour le surveiller. Toucher le bandeau
+     ouvre la fiche du coin. La notification du téléphone se coupe dans Réglages ; le bandeau, jamais. */
+  const POP_MS = 20000;
+  function holdInfo(mint) {
+    const f = mint && radar ? radar.flow(mint) : null;
+    if (!f || !fin(f.holders) || !(f.holders > 0)) return { txt: 'détenteurs : inconnu', tr: '' };
+    const n = Math.round(f.holders);
+    let tr = '';
+    if (f.dH != null) tr = `${f.dH > 0 ? '+' : f.dH < 0 ? '−' : '±'}${Math.abs(f.dH).toLocaleString('fr-FR')} en ${Math.max(1, Math.round(f.win / 60000))} min`;
+    else if (fin(f.dHp)) tr = `${f.dHp > 0 ? '+' : f.dHp < 0 ? '−' : '±'}${String(Math.round(Math.abs(f.dHp) * 10) / 10).replace('.', ',')} % en 5 min`;
+    return { txt: `${n.toLocaleString('fr-FR')} détenteur${n >= 2 ? 's' : ''}`, tr };
+  }
+  let popT = null;
+  function paintPop() {
+    const box = $('#tradePop');
+    if (!box) return;
+    const tn = Date.now();
+    for (const it of [...box.children]) {
+      if (+it.dataset.until < tn) { it.remove(); continue; }
+      const hi = holdInfo(it.dataset.mint), el = it.querySelector('.tp-h');
+      if (el) el.innerHTML = `— ${esc(hi.txt)}${hi.tr ? ` <span class="${hi.tr[0] === '+' ? 'pos' : hi.tr[0] === '−' ? 'neg' : 'muted'}">(${esc(hi.tr)})</span>` : ''}`;
+    }
+    if (!box.children.length) { box.hidden = true; clearInterval(popT); popT = null; }
+  }
+  function tradePop(x) {
+    const box = $('#tradePop');
+    const sym = x.sym || (x.mint || '').slice(0, 6) || '?', sim = !!x.sim;
+    if (box) {
+      // un seul bandeau par coin : un trade simulé déjà affiché sur ce coin reçoit la stratégie en plus
+      const same = [...box.children].find(el => el.dataset.mint === (x.mint || '') && el.dataset.sim === (sim ? '1' : ''));
+      if (same && sim) {
+        const L = (same.dataset.strats || '').split('|').filter(Boolean);
+        if (x.strat && !L.includes(x.strat)) L.push(x.strat);
+        same.dataset.strats = L.join('|'); same.dataset.until = String(Date.now() + POP_MS);
+        const sub = same.querySelector('.tp-sub'); if (sub) sub.textContent = `${x.sub || ''}${L.length ? ' · ' + L.join(', ') : ''}`;
+        box.prepend(same);
+      } else {
+        const it = document.createElement('div');
+        it.className = 'tp-item' + (sim ? ' sim' : ''); it.dataset.mint = x.mint || ''; it.dataset.sim = sim ? '1' : ''; it.dataset.strats = x.strat || '';
+        it.dataset.until = String(Date.now() + POP_MS);
+        const subTxt = `${x.sub || ''}${x.strat ? ' · ' + x.strat : ''}`;
+        it.innerHTML = `<button class="tp-x" type="button" aria-label="Fermer">×</button><span class="tp-k">${sim ? 'Trade simulé' : 'Trade pris'}</span><b class="tp-sym">${esc(sym)}</b> <span class="tp-h"></span>${subTxt ? `<small class="tp-sub">${esc(subTxt)}</small>` : ''}`;
+        box.prepend(it);
+        while (box.children.length > 3) box.lastChild.remove();
+      }
+      box.hidden = false;
+      paintPop();
+      if (!popT) popT = setInterval(paintPop, 2000);
+    }
+    // simulation : bandeau seulement (pas de son ni de notification du téléphone, il y en a beaucoup)
+    if (sim) return;
+    const msg = `Trade pris : ${sym} — ${holdInfo(x.mint).txt}`;
+    if (set.notifTrade !== false) sysNotify(msg, 'long');
+    beep(1);
+    if (set.vibrate && navigator.vibrate) try { navigator.vibrate([120, 60, 120]); } catch {}
+  }
+  $('#tradePop').addEventListener('click', e => {
+    const it = e.target.closest('.tp-item');
+    if (!it) return;
+    const close = !!e.target.closest('.tp-x'), mint = it.dataset.mint;
+    it.remove(); paintPop();
+    if (!close && mint && radar) radar.openDetail(mint);
+  });
 
   /* ---------- rendu : en-tête ---------- */
   function renderHeader() {
@@ -7542,7 +8662,7 @@ if (typeof module !== 'undefined') module.exports = PerpsBot;
     $$('#exSeg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.ex === set.ex));
     $('#sCap').value = set.capital; $('#sRisk').value = set.risk; $('#sLev').value = set.leverage;
     $('#sFee').value = set.fee; $('#sFeeM').value = set.feeMaker; $('#sMmr').value = set.mmr;
-    $('#aSound').checked = set.sound; $('#aVib').checked = set.vibrate; $('#aWake').checked = set.wake; $('#aOpp').checked = !!set.oppAlerts;
+    $('#aSound').checked = set.sound; $('#aVib').checked = set.vibrate; $('#aWake').checked = set.wake; $('#aOpp').checked = !!set.oppAlerts; $('#aNotifTrade').checked = set.notifTrade !== false;
     renderNotif();
   }
   const numIn = (id, keyName, min, max) => $(id).addEventListener('change', e => {
@@ -7557,6 +8677,7 @@ if (typeof module !== 'undefined') module.exports = PerpsBot;
   $('#aSound').onchange = e => { set.sound = e.target.checked; saveSet(); unlockAudio(); };
   $('#aVib').onchange = e => { set.vibrate = e.target.checked; saveSet(); };
   $('#aOpp').onchange = e => { set.oppAlerts = e.target.checked; saveSet(); };
+  $('#aNotifTrade').onchange = e => { set.notifTrade = e.target.checked; saveSet(); };
   $('#aNotif').onchange = async e => {
     const on = e.target.checked;
     if (on) {
@@ -7580,12 +8701,97 @@ if (typeof module !== 'undefined') module.exports = PerpsBot;
     } catch { wl = null; }
   }
 
+  /* ---------- liste noire manuelle (coins et créateurs bannis par toi) ---------- */
+  const ban = Object.assign({ mints: {}, devs: {} }, store.get('ban', {}));
+  const saveBan = () => store.set('ban', ban);
+  const creatorOf = t => (t && (t.creator || (t.live && t.live.creator))) || null;
+  const isBanned = t => !!(t && ((t.mint && ban.mints[t.mint]) || (creatorOf(t) && ban.devs[creatorOf(t)])));
+  const shortA = a => (a ? a.slice(0, 4) + '…' + a.slice(-4) : '');
+  function banHtml(t) {
+    if (!t || !t.mint || (t.sources && t.sources.has('démo'))) return '';
+    const cr = creatorOf(t), bm = !!ban.mints[t.mint], bd = !!(cr && ban.devs[cr]);
+    const txt = bm || bd ? `<b class="neg">${bm ? 'Ce coin' : 'Son créateur'} est sur ta liste noire</b> : le bot n'y entre plus (mode auto, laboratoire, copie).`
+      : `Le bot n'entrera plus sur ce coin (mode auto, laboratoire, copie).${cr ? ' Bannir le créateur écarte aussi tous ses autres coins.' : ' Créateur inconnu pour ce coin : seul le coin peut être banni.'}`;
+    return `<div class="t-box" data-banbox="${esc(t.mint)}"><b>Liste noire</b><p class="note" style="margin:4px 0 8px">${txt}</p><div class="row-btns" style="margin:0">
+      ${bm ? `<button class="btn sm" data-unban-mint="${esc(t.mint)}">Retirer ce coin de la liste</button>` : `<button class="btn sm danger" data-ban-mint="${esc(t.mint)}">Ne plus jamais proposer</button>`}
+      ${cr ? (bd ? `<button class="btn sm" data-unban-dev="${esc(cr)}">Retirer son créateur</button>` : `<button class="btn sm danger" data-ban-dev="${esc(cr)}" data-ban-mintref="${esc(t.mint)}">Bannir son créateur</button>`) : ''}</div></div>`;
+  }
+  function renderBan() {
+    const box = $('#banBody'); if (!box) return;
+    const M = Object.entries(ban.mints).sort((a, b) => b[1].at - a[1].at), D = Object.entries(ban.devs).sort((a, b) => b[1].at - a[1].at);
+    const row = (kind, k, v) => `<div class="j-row"><span class="chip short">${kind === 'm' ? 'coin' : 'créateur'}</span><div class="j-mid"><div>${esc(kind === 'm' ? (v.sym || shortA(k)) : shortA(k))}</div><div class="mono">${kind === 'm' ? esc(shortA(k)) : 'créateur de ' + esc(v.sym || '?')} · banni le ${new Date(v.at).toLocaleDateString('fr-FR')}</div></div><button class="btn sm" data-unban-${kind === 'm' ? 'mint' : 'dev'}="${esc(k)}">Retirer</button></div>`;
+    box.innerHTML = (M.length || D.length) ? `<div class="journal">${[...M.map(([k, v]) => row('m', k, v)), ...D.map(([k, v]) => row('d', k, v))].join('')}</div><p class="note">Ces coins et ces créateurs sont écartés de toutes les entrées du bot : mode auto, laboratoire, copie de wallets.</p>`
+      : '<p class="note" style="margin:0">Liste vide. Pour bannir un coin ou son créateur, ouvre sa fiche (onglets Mèmes ou Nouveaux) et touche « Ne plus jamais proposer ».</p>';
+  }
+  function banClick(e) {
+    const b = e.target.closest('button'); if (!b) return;
+    const d = b.dataset, t0 = Date.now();
+    let mint = null;
+    if (d.banMint) { const t = radar.get(d.banMint); ban.mints[d.banMint] = { sym: (t && t.symbol) || '', at: t0 }; mint = d.banMint; toast('Coin ajouté à ta liste noire', 'short'); }
+    else if (d.banDev) { const t = radar.get(d.banMintref); ban.devs[d.banDev] = { sym: (t && t.symbol) || '', at: t0 }; mint = d.banMintref; toast('Créateur ajouté à ta liste noire : tous ses coins sont écartés', 'short'); }
+    else if (d.unbanMint) { delete ban.mints[d.unbanMint]; mint = d.unbanMint; toast('Coin retiré de la liste noire'); }
+    else if (d.unbanDev) { delete ban.devs[d.unbanDev]; mint = (b.closest('[data-banbox]') || { dataset: {} }).dataset.banbox; toast('Créateur retiré de la liste noire'); }
+    else return;
+    saveBan(); renderBan();
+    const box = b.closest('[data-banbox]');
+    if (box && mint) { const t = radar.get(mint); if (t) box.outerHTML = banHtml(t); }
+  }
+  { const md = $('#memeDetail'); if (md) md.addEventListener('click', banClick); const bb = $('#banBody'); if (bb) bb.addEventListener('click', banClick); }
+
+  /* ---------- apparence ---------- */
+  const look = Object.assign({ theme: 'auto', text: 'md' }, store.get('look', {}));
+  function applyLook() {
+    const r = document.documentElement;
+    if (look.theme === 'light' || look.theme === 'dark') r.dataset.theme = look.theme; else delete r.dataset.theme;
+    if (look.text === 'lg') r.dataset.text = 'lg'; else delete r.dataset.text;
+    $$('#lookTheme button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lookTheme === look.theme));
+    $$('#lookText button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lookText === look.text));
+  }
+  $$('#lookTheme button').forEach(b => b.onclick = () => { look.theme = b.dataset.lookTheme; store.set('look', look); applyLook(); if (curTab === 'signal') requestAnimationFrame(drawChart); });
+  $$('#lookText button').forEach(b => b.onclick = () => { look.text = b.dataset.lookText; store.set('look', look); applyLook(); });
+  applyLook();
+
+  /* ---------- bilan des frais ----------
+     Coût d'un aller-retour mesuré à l'entrée de chaque trade (cotation achat puis revente) : frais du pool ou de la courbe,
+     impact sur le prix et frais réseau. La part réseau est fixe par trade, le reste est proportionnel à la mise. */
+  function feeGroup(list, netFix) {
+    const L = list.filter(x => fin(x.cost) && x.cost > 0 && fin(x.net) && fin(x.rt));
+    if (!L.length) return null;
+    let fees = 0, netw = 0, cost = 0, net = 0;
+    for (const x of L) { const f = Math.max(0, x.rt) * x.cost; fees += f; netw += Math.min(f, netFix); cost += x.cost; net += x.net; }
+    return { n: L.length, fees, netw, pool: fees - netw, cost, net, gross: net + fees, avgPct: fees / cost, netwPct: netw / cost, poolPct: (fees - netw) / cost, stake: cost / L.length };
+  }
+  function renderFees() {
+    const box = $('#feeBody'); if (!box || !bot || !lab) return;
+    const n4 = x => (Math.abs(x) >= 0.1 ? x.toFixed(3) : x.toFixed(4)).replace('.', ',') + ' SOL';
+    const pc = x => (x * 100).toFixed(1).replace('.', ',') + ' %';
+    const netR = 2 * (bot.NET_FEE || 0.0001), netS = 2.5 * (lab.NETF || 0.0002);
+    const real = feeGroup(((bot.S && bot.S.hist) || []).slice(0, 30), netR);
+    const sim = feeGroup(lab.L.closed.filter(x => (x.prof || 'toi') === 'toi' && !x.gap && !/^annulé|^données manquantes|^interrompu/.test(x.why)).slice(0, 60), netS);
+    const grp = (title, g) => !g ? '' : `<h3 class="w-h">${title} · ${g.n} trade${g.n > 1 ? 's' : ''}</h3>
+      <div class="w-top">
+        <div class="kv"><div class="k">Frais payés</div><div class="v">${n4(g.fees)}</div></div>
+        <div class="kv"><div class="k">Par trade</div><div class="v">${pc(g.avgPct)} <small>de la mise</small></div></div>
+        <div class="kv"><div class="k">Résultat net</div><div class="v ${g.net >= 0 ? 'pos' : 'neg'}">${n4(g.net)}</div></div>
+      </div>
+      <p class="note">Réseau Solana ${pc(g.netwPct)} (fixe : ${n4(g.netw / g.n)} par trade) · plateforme, pool et impact ${pc(g.poolPct)}. Sans frais, le résultat aurait été <b class="${g.gross >= 0 ? 'pos' : 'neg'}">${n4(g.gross)}</b>${g.net < 0 && g.gross > 0 ? ' : <b>les frais transforment un gain en perte</b>' : g.net < 0 ? `, dont ${pc(Math.min(1, g.fees / -g.net))} de la perte venant des frais` : ''}.</p>`;
+    const size = bot.cfg().size, fix = real ? real.netw / real.n : netS, poolP = (real || sim) ? (real || sim).poolPct : null;
+    const minFor = r => fix / r;
+    box.innerHTML = (real || sim) ? `${grp('Trades réels', real)}${grp('Trades simulés du laboratoire', sim)}
+      <div class="advice" data-l="${fix / size > 0.02 ? 'warn' : 'ok'}" style="margin:12px 0 0"><h3>Ta mise : ${n4(size)}</h3>
+        <p>Les frais réseau fixes (${n4(fix)} par aller-retour) font ${pc(fix / size)} de cette mise. Ils passent sous 2 % à partir de ${n4(minFor(0.02))}, et sous 1 % à partir de ${n4(minFor(0.01))}.${poolP != null ? ` Les frais de plateforme et l'impact (${pc(poolP)} ici) sont proportionnels : ils ne baissent pas avec une plus grosse mise, et l'impact monte même sur les petits pools.` : ''}</p>
+        <p style="margin-top:6px">Augmente la mise seulement quand une stratégie gagne dans le laboratoire : une plus grosse mise sur une stratégie perdante perd plus vite.</p></div>
+      <p class="note">Estimation : coût d'un achat puis d'une revente immédiate, mesuré à l'entrée de chaque trade (${real ? '30' : '60'} derniers au plus). Les ventes d'urgence peuvent coûter un peu plus.</p>`
+      : '<p class="note" style="margin:0">Pas encore de trade avec des frais mesurés. Le bilan se remplit avec les trades du bot et ceux du laboratoire.</p>';
+  }
+
   /* ---------- navigation ---------- */
   function showTab(t) {
     curTab = t;
-    document.body.classList.toggle('meme', t === 'meme' || t === 'new' || t === 'perps' || t === 'copy');
-    { const mt = $('#memeTitle'); if (mt) mt.textContent = t === 'new' ? 'Nouveaux coins' : t === 'perps' ? 'Futures auto' : t === 'copy' ? 'Copie de wallets' : 'Radar mèmes'; }
-    { const a = $('#memeNet'), b = $('#memeSub'); if (a) a.textContent = t === 'perps' ? 'Hyperliquid' : 'Solana'; if (b) b.textContent = t === 'perps' ? 'via Phantom' : t === 'copy' ? 'suivi de wallets' : 'temps réel'; }
+    document.body.classList.toggle('meme', t === 'meme' || t === 'new' || t === 'perps' || t === 'copy' || t === 'bag');
+    { const mt = $('#memeTitle'); if (mt) mt.textContent = t === 'new' ? 'Nouveaux coins' : t === 'perps' ? 'Futures auto' : t === 'copy' ? 'Copie de wallets' : t === 'bag' ? 'Bag crypto' : 'Radar mèmes'; }
+    { const a = $('#memeNet'), b = $('#memeSub'); if (a) a.textContent = t === 'perps' ? 'Hyperliquid' : t === 'bag' ? 'Plan' : 'Solana'; if (b) b.textContent = t === 'perps' ? 'via Phantom' : t === 'copy' ? 'suivi de wallets' : t === 'bag' ? 'du jour' : 'temps réel'; }
+    if (t === 'bag') setTimeout(() => bag && bag.show(), 0);
     if (t === 'copy') setTimeout(() => copy && copy.render(), 0);
     if (t === 'perps') setTimeout(() => perps && perps.render(), 0);
     if (t === 'new') setTimeout(() => newCoins && newCoins.render(), 0);
@@ -7594,15 +8800,15 @@ if (typeof module !== 'undefined') module.exports = PerpsBot;
     $$('.tabbar button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
     if (t === 'signal') requestAnimationFrame(drawChart);
     if (t === 'scan') { renderScan(!!st.scanAt); if (!st.scanAt || Date.now() - st.scanAt > 30000) scan(); }
-    if (t === 'stats') { renderCalib(); renderJournal(); }
+    if (t === 'stats') { renderCalib(); renderJournal(); renderFees(); }
     if (t === 'pos') { if (!pos) fillForm(null); renderPos(); }
-    if (t === 'set') { renderSettings(); renderDiag(); renderApp(); appDiag(); }
+    if (t === 'set') { renderSettings(); renderDiag(); renderApp(); appDiag(); renderBan(); applyLook(); }
     window.scrollTo(0, 0);
   }
   $$('.tabbar button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
 
   // radar mèmes + trading via wallet + bot autonome
-  let trader = null, bot = null, newCoins = null, live = null, lab = null, perps = null, copy = null;
+  let trader = null, bot = null, newCoins = null, live = null, lab = null, perps = null, copy = null, bag = null;
   const inFrame = (() => { try { return window.top !== window.self; } catch { return true; } })();
   const buzz = p => { if (set.vibrate && navigator.vibrate) try { navigator.vibrate(p); } catch {} };
   const jup = JupClient(() => (trader ? trader.jupKey() : ''));
@@ -7611,7 +8817,7 @@ if (typeof module !== 'undefined') module.exports = PerpsBot;
     $, $$, esc, store, log, toast, capital: () => set.capital,
     jup: (p, prio) => jup.get(p, prio),
     rpc: (m, p) => rpcPool.call(m, p),
-    tradeHtml: t => (trader ? trader.detailHtml(t) : '') + (bot ? bot.detailHtml(t) : ''),
+    tradeHtml: t => (trader ? trader.detailHtml(t) : '') + (bot ? bot.detailHtml(t) : '') + banHtml(t),
     onNew: t => { if (newCoins) newCoins.onNew(t); },
     socialHtml: t => (newCoins ? newCoins.socialHtml(t) : ''),
     alert: msg => { if (!set.oppAlerts) return; toast('Mème · ' + msg, 'long'); sysNotify('Mème · ' + msg, 'long'); beep(1); if (set.vibrate && navigator.vibrate) try { navigator.vibrate([80, 40, 80, 40, 160]); } catch {} }
@@ -7620,19 +8826,22 @@ if (typeof module !== 'undefined') module.exports = PerpsBot;
   trader = WalletTrader({
     $, $$, esc, store, log, toast, capital: () => set.capital, rpcPool,
     solUsd: () => { if (!st.feed || st.feed === Demo || !st.tickers) return null; const x = st.tickers.get('SOLUSDT'); return x ? x.last : null; },
-    alertSell: msg => { toast(msg, 'short'); sysNotify(msg, 'short'); beep(-1); if (set.vibrate && navigator.vibrate) try { navigator.vibrate([300, 80, 300]); } catch {} }
+    alertSell: msg => { toast(msg, 'short'); sysNotify(msg, 'short'); beep(-1); if (set.vibrate && navigator.vibrate) try { navigator.vibrate([300, 80, 300]); } catch {} },
+    tradeTaken: tradePop
   }, radar, jup);
   trader.start();
   // temps réel : websocket Solana sur les courbes pump.fun (ton RPC perso d'abord, puis des RPC publics)
   live = CurveLive({
     loadW3: () => trader.loadW3(),
+    onWalRefused: (err, host) => { toast(`Suivi des wallets en direct refusé par ${host} (${err}). Le filtre anti-bots continue sans. Détails dans l'onglet Nouveaux.`, 'short'); },
     rpc: (m, p) => rpcPool.call(m, p),
     wsUrls: () => { const c = (trader.rpcUrl() || '').trim(); const L = []; if (/^https:\/\//.test(c)) L.push(c.replace(/^https:/, 'wss:')); return L.concat(['wss://solana-rpc.publicnode.com', 'wss://api.mainnet-beta.solana.com']); }
   }, radar);
   bot = TradeBot({
-    $, $$, esc, store, log, toast, inFrame,
+    $, $$, esc, store, log, toast, inFrame, banned: isBanned,
     visible: () => curTab === 'meme' && document.visibilityState === 'visible',
     notify: (msg, cls) => { toast(msg, cls); sysNotify(msg, cls); beep(cls === 'short' ? -1 : 1); buzz(cls === 'short' ? [300, 80, 300] : [120, 60, 120]); },
+    tradeTaken: tradePop,
     ask: msg => { if (!set.oppAlerts) return; toast(msg, 'long'); sysNotify(msg, 'long'); beep(1); buzz([80, 40, 80, 40, 160]); },
     autoOn: () => !!(newCoins && newCoins.autoOn()),
     live: () => live
@@ -7652,7 +8861,9 @@ if (typeof module !== 'undefined') module.exports = PerpsBot;
     solUsd: () => trader.solUsd(),
     requireX: () => newCoins.requireX(),
     xOk: t => newCoins.xOk(t),
-    copy: () => copy
+    copy: () => copy,
+    banned: isBanned,
+    tradeTaken: tradePop
   }, radar, live, bot);
   newCoins.start();
   if (!inFrame) lab.start();
@@ -7668,11 +8879,24 @@ if (typeof module !== 'undefined') module.exports = PerpsBot;
   // copie de wallets : le wallet copié est seulement lu ; les achats réels passent par le wallet du bot mèmes
   copy = CopyTrade({
     $, esc, store, log, toast, inFrame, lab: () => lab,
+    jup: (p, prio) => jup.get(p, prio), jupBusy: () => jup.pending(),
+    ownRpc: () => /^https:\/\//.test(((trader && trader.rpcUrl()) || '').trim()),
+    alert: msg => { toast(msg, 'long'); sysNotify(msg, 'long'); },
     visible: () => curTab === 'copy' && document.visibilityState === 'visible',
     showBot: () => { showTab('meme'); setTimeout(() => { const el = $('#botCard'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); }
   }, radar, bot, (m, p) => rpcPool.call(m, p));
   copy.bindUI();
   if (!inFrame) copy.start();
+  // bag : panier de cryptos majeures, plan d'achats et de ventes du jour (le wallet est seulement lu)
+  bag = BagPlan({
+    $, esc, store, toast,
+    jup: (p, prio) => jup.get(p, prio),
+    walletAddr: () => (trader && trader.addr ? trader.addr() : '') || '',
+    visible: () => curTab === 'bag' && document.visibilityState === 'visible',
+    notify: (msg, cls) => { toast(msg, cls); sysNotify(msg, cls); }
+  });
+  bag.bindUI();
+  setTimeout(() => { try { bag.start(); } catch (e) { log('Bag : ' + e.message); } }, 15000);
   let wTick = 0, pTick = 0, cTick = 0;
   setInterval(() => {
     if (curTab === 'meme' && $('#memeSheet').hidden && $('#tradeSheet').hidden) radar.render();
